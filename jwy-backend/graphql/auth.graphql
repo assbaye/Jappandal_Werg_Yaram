@@ -1,0 +1,67 @@
+"Payload retourné après authentification"
+type AuthPayload {
+    access_token: String!
+    token_type: String!
+    expires_in: Int!
+    user: User!
+}
+
+type User {
+    id: ID!
+    email: String!
+    telephone: String
+    role: String!
+    langue_preferee: String!
+    est_actif: Boolean!
+    dernier_login: DateTime
+    created_at: DateTime!
+    patient: Patient @hasOne
+    medecin: Medecin @hasOne
+    pharmacien: Pharmacien @hasOne
+    notifications: [Notification!] @hasMany
+    notifications_non_lues: Int!
+        @field(resolver: "App\\GraphQL\\Queries\\NotificationsNonLues")
+}
+
+input RegisterInput {
+    email: String! @rules(apply: ["required", "email", "unique:users,email"])
+    password: String! @rules(apply: ["required", "min:8"])
+    telephone: String @rules(apply: ["nullable", "unique:users,telephone"])
+    role: String! @rules(apply: ["required", "in:patient,medecin,pharmacien"])
+    langue_preferee: String
+    # Données profil selon le rôle
+    nom: String! @rules(apply: ["required"])
+    prenom: String! @rules(apply: ["required"])
+    # Patient uniquement
+    date_naissance: String
+    genre: String
+    groupe_sanguin: String
+    # Médecin uniquement
+    numero_ordre: String
+    specialite: String
+    hopital_rattachement: String
+    tarif_consultation: Float
+}
+
+type Query {
+    "Utilisateur actuellement connecté"
+    me: User @auth
+}
+
+type Mutation {
+    "Inscription d'un nouvel utilisateur"
+    register(input: RegisterInput! @spread): AuthPayload!
+        @field(resolver: "App\\GraphQL\\Mutations\\Register")
+
+    "Connexion"
+    login(email: String!, password: String!): AuthPayload!
+        @field(resolver: "App\\GraphQL\\Mutations\\Login")
+
+    "Déconnexion"
+    logout: Boolean! @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\Logout")
+
+    "Rafraîchir le token JWT"
+    refreshToken: AuthPayload! @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\RefreshToken")
+}

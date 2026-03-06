@@ -1,0 +1,51 @@
+name: jwy_mobile
+description: "Jappandal Werg Yaram - Plateforme de santé communautaire sénégalaise"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # GraphQL
+  graphql_flutter: ^5.2.0
+
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # Navigation
+  go_router: ^13.2.0
+
+  # Auth token storage
+  flutter_secure_storage: ^9.2.2
+
+  # Vidéo Agora
+  agora_rtc_engine: ^6.3.2
+
+  # Permissions (caméra, micro, localisation)
+  permission_handler: ^11.3.1
+
+  # Géolocalisation
+  geolocator: ^12.0.0
+
+  # Images réseau avec cache
+  cached_network_image: ^3.3.1
+
+  # Internationalisation (dates, monnaie)
+  intl: ^0.19.0
+
+  # WebView pour paiements (Wave, Orange Money redirect)
+  flutter_inappwebview: ^6.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true

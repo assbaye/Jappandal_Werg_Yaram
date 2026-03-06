@@ -1,0 +1,16 @@
+"La date/heure au format ISO 8601"
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"Un objet JSON arbitraire"
+scalar JSON @scalar(class: "App\\GraphQL\\Scalars\\JSON")
+
+#import auth.graphql
+#import enums.graphql
+#import patient.graphql
+#import medecin.graphql
+#import pharmacie.graphql
+#import consultation.graphql
+#import prescription.graphql
+#import paiement.graphql
+#import notification.graphql
+#import administration.graphql

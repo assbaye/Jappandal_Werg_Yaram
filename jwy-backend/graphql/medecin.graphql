@@ -1,0 +1,54 @@
+type Medecin {
+    id: ID!
+    user: User! @belongsTo
+    numero_ordre: String!
+    nom: String!
+    prenom: String!
+    nom_complet: String!
+    specialite: String!
+    hopital_rattachement: String
+    tarif_consultation: Float!
+    heures_disponibilite: JSON
+    est_certifie: Boolean!
+    disponible_maintenant: Boolean!
+    photo: String
+    biographie: String
+    annees_experience: Int!
+    note_moyenne: Float!
+    nombre_consultations: Int!
+    consultations: [Consultation!]! @hasMany
+    rendez_vous: [RendezVous!]! @hasMany
+}
+
+extend type Query {
+    "Liste des médecins avec filtres"
+    medecins(
+        specialite: String
+        disponible: Boolean
+        first: Int = 20
+        page: Int
+    ): MedecinPaginator! @paginate(model: "App\\Models\\Medecin")
+
+    "Détail d'un médecin"
+    medecin(id: ID! @eq): Medecin @find
+}
+
+type MedecinPaginator {
+    data: [Medecin!]!
+    paginatorInfo: PaginatorInfo!
+}
+
+type PaginatorInfo {
+    count: Int!
+    currentPage: Int!
+    lastPage: Int!
+    total: Int!
+    hasMorePages: Boolean!
+}
+
+extend type Mutation {
+    "Mettre à jour la disponibilité du médecin"
+    toggleDisponibilite: Medecin!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\ToggleDisponibilite")
+}

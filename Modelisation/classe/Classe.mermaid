@@ -1,0 +1,310 @@
+classDiagram
+    %% Classes principales utilisateurs
+    class Utilisateur {
+        -id: Int
+        -email: String
+        -motDePasse: String
+        -telephone: String
+        -dateCreation: DateTime
+        -dernierLogin: DateTime
+        -estActif: Boolean
+        -languePreferee: String
+        +seConnecter()
+        +seDeconnecter()
+        +modifierProfil()
+    }
+
+    class Patient {
+        -numeroPatient: String
+        -nom: String
+        -prenom: String
+        -dateNaissance: Date
+        -genre: String
+        -adresse: String
+        -numeroUrgence: String
+        -groupeSanguin: String
+        -allergies: String[]
+        -coordonneesGPS: String
+        +consulterDossierMedical()
+        +prendreRendezVous()
+        +payerFacture()
+    }
+
+    class Medecin {
+        -numeroOrdre: String
+        -nom: String
+        -prenom: String
+        -specialite: String
+        -hopitalRattachement: String
+        -tarifConsultation: Float
+        -heuresDisponibilite: String
+        -estCertifie: Boolean
+        +effectuerConsultation()
+        +prescrireMedicament()
+        +modifierDossierMedical()
+    }
+
+    class Pharmacie {
+        -nomPharmacie: String
+        -adresse: String
+        -telephone: String
+        -coordonneesGPS: String
+        -heuresOuverture: String
+        -estPartenaire: Boolean
+        -tauxCommission: Float
+        +gererStock()
+        +traiterCommande()
+        +mettreAJourDisponibilite()
+    }
+
+    class Pharmacien {
+        -numeroOrdre: String
+        -nom: String
+        -prenom: String
+        +validerOrdonnance()
+        +conseillerPatient()
+        +gererInventaire()
+    }
+
+    %% Classes métier principales
+    class DossierMedical {
+        -id: Int
+        -patientId: Int
+        -dateCreation: DateTime
+        -antecedentsMedicaux: String
+        -allergiesConnues: String[]
+        -medicamentsActuels: String[]
+        -groupeSanguin: String
+        -poids: Float
+        -taille: Float
+        +ajouterConsultation()
+        +ajouterPrescription()
+        +consulterHistorique()
+    }
+
+    class Consultation {
+        -id: Int
+        -dateConsultation: DateTime
+        -typeConsultation: String
+        -symptomes: String
+        -diagnostic: String
+        -recommandations: String
+        -coutConsultation: Float
+        -statut: String
+        -notesConsultation: String
+        +demarrerConsultation()
+        +terminerConsultation()
+        +genererCompteRendu()
+    }
+
+    class TeleConsultation {
+        -urlVideoCall: String
+        -dureeConsultation: Int
+        -qualiteConnexion: String
+        -enregistrementDisponible: Boolean
+        +lancerAppelVideo()
+        +partagerEcran()
+        +enregistrerSession()
+    }
+
+    class ConsultationPhysique {
+        -adresseConsultation: String
+        -salleConsultation: String
+        +confirmerPresence()
+        +reporterRendezVous()
+    }
+
+    class Prescription {
+        -id: Int
+        -dateCreation: DateTime
+        -validiteJours: Int
+        -instructions: String
+        -estExecutee: Boolean
+        +ajouterMedicament()
+        +validerPrescription()
+        +marquerExecutee()
+    }
+
+    class MedicamentPrescrit {
+        -id: Int
+        -quantite: Int
+        -posologie: String
+        -dureeTraitement: Int
+        -instructionsSpeciales: String
+        +calculerCout()
+        +verifierStock()
+    }
+
+    class Medicament {
+        -id: Int
+        -nomCommercial: String
+        -principeActif: String
+        -dosage: String
+        -forme: String
+        -fabricant: String
+        -prixUnitaire: Float
+        -codeBarre: String
+        -dateExpiration: Date
+        -necessiteOrdonnance: Boolean
+        +rechercherAlternatives()
+        +verifierInteractions()
+    }
+
+    class StockMedicament {
+        -id: Int
+        -quantiteDisponible: Int
+        -quantiteMinimale: Int
+        -dateExpiration: Date
+        -prixVente: Float
+        -emplacementStock: String
+        +mettreAJourStock()
+        +alerteStockFaible()
+        +verifierExpiration()
+    }
+
+    %% Classes de paiement
+    class Paiement {
+        -id: Int
+        -montant: Float
+        -devise: String
+        -datePaiement: DateTime
+        -statut: String
+        -methodePaiement: String
+        -numeroTransaction: String
+        -fraisTransaction: Float
+        +traiterPaiement()
+        +confirmerPaiement()
+        +rembourser()
+    }
+
+    class Facture {
+        -id: Int
+        -numeroFacture: String
+        -dateEmission: DateTime
+        -dateEcheance: DateTime
+        -montantHT: Float
+        -montantTTC: Float
+        -tva: Float
+        -statut: String
+        +genererFacture()
+        +envoyerFacture()
+        +marquerPayee()
+    }
+
+    %% Classes de géolocalisation et notifications
+    class Localisation {
+        -id: Int
+        -latitude: Float
+        -longitude: Float
+        -adresse: String
+        -ville: String
+        -region: String
+        -codePostal: String
+        +calculerDistance()
+        +trouverPlusProche()
+    }
+
+    class Notification {
+        -id: Int
+        -titre: String
+        -message: String
+        -type: String
+        -dateEnvoi: DateTime
+        -estLue: Boolean
+        -priorite: String
+        +envoyer()
+        +marquerLue()
+        +programmer()
+    }
+
+    class AlerteSante {
+        -id: Int
+        -typeAlerte: String
+        -zone: String
+        -niveauGravite: String
+        -dateDebut: DateTime
+        -dateFin: DateTime
+        -recommandations: String
+        +diffuser()
+        +mettreAJour()
+        +archiver()
+    }
+
+    %% Classes système
+    class RendezVous {
+        -id: Int
+        -dateRendezVous: DateTime
+        -dureeEstimee: Int
+        -statut: String
+        -typeRendezVous: String
+        -lieuRendezVous: String
+        -rappelEnvoye: Boolean
+        +confirmer()
+        +reporter()
+        +annuler()
+    }
+
+    class Commande {
+        -id: Int
+        -numeroCommande: String
+        -dateCommande: DateTime
+        -statut: String
+        -typeLivraison: String
+        -adresseLivraison: String
+        -montantTotal: Float
+        -fraisLivraison: Float
+        +traiterCommande()
+        +suivreCommande()
+        +livrer()
+    }
+
+    %% Relations d'héritage
+    Utilisateur <|-- Patient
+    Utilisateur <|-- Medecin
+    Utilisateur <|-- Pharmacien
+    Consultation <|-- TeleConsultation
+    Consultation <|-- ConsultationPhysique
+
+    %% Relations Patient
+    Patient "1" -- "1" DossierMedical : possède
+    Patient "1" -- "0..*" Consultation : effectue
+    Patient "1" -- "0..*" RendezVous : prend
+    Patient "1" -- "0..*" Paiement : effectue
+    Patient "1" -- "0..*" Commande : passe
+    Patient "1" -- "0..*" Notification : reçoit
+
+    %% Relations Medecin
+    Medecin "1" -- "0..*" Consultation : réalise
+    Medecin "1" -- "0..*" Prescription : crée
+    Medecin "1" -- "0..*" RendezVous : planifie
+    Medecin "1" -- "0..*" Notification : reçoit
+
+    %% Relations Consultation
+    Consultation "1" -- "0..*" Prescription : génère
+    Consultation "1" -- "1" Paiement : nécessite
+    Consultation "1" -- "1" Facture : produit
+
+    %% Relations Prescription et Médicaments
+    Prescription "1" -- "1..*" MedicamentPrescrit : contient
+    MedicamentPrescrit "1..*" -- "1" Medicament : référence
+
+    %% Relations Pharmacie
+    Pharmacie "1" -- "1..*" Pharmacien : emploie
+    Pharmacie "1" -- "0..*" StockMedicament : possède
+    Pharmacie "1" -- "1" Localisation : située
+    Pharmacie "1" -- "0..*" Commande : traite
+
+    %% Relations Stock et Commandes
+    StockMedicament "1..*" -- "1" Medicament : stocke
+    Commande "1" -- "1..*" MedicamentPrescrit : inclut
+
+    %% Relations Paiement et Facture
+    Paiement "1" -- "1" Facture : règle
+
+    %% Relations Notifications
+    Pharmacien "1" -- "0..*" Notification : reçoit
+    AlerteSante "1" -- "0..*" Notification : génère
+
+    %% Relations Dossier Médical
+    DossierMedical "1" -- "0..*" Consultation : archive
+    DossierMedical "1" -- "0..*" Prescription : stocke

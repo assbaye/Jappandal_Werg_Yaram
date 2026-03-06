@@ -1,0 +1,88 @@
+type Patient {
+    id: ID!
+    user: User! @belongsTo
+    numero_patient: String!
+    nom: String!
+    prenom: String!
+    nom_complet: String!
+    date_naissance: String
+    age: Int
+    genre: String
+    adresse: String
+    numero_urgence: String
+    groupe_sanguin: GroupeSanguin
+    allergies: [String!]!
+    latitude: Float
+    longitude: Float
+    photo: String
+    dossier_medical: DossierMedical @hasOne
+    consultations: [Consultation!]! @hasMany
+    rendez_vous: [RendezVous!]! @hasMany
+    prescriptions: [Prescription!]! @hasMany
+    commandes: [Commande!]! @hasMany
+    created_at: DateTime!
+}
+
+type DossierMedical {
+    id: ID!
+    patient: Patient! @belongsTo
+    antecedents_medicaux: String
+    allergies_connues: [String!]!
+    medicaments_actuels: [String!]!
+    groupe_sanguin: GroupeSanguin
+    poids: Float
+    taille: Float
+    imc: Float
+    notes_generales: String
+    consultations: [Consultation!]! @hasMany
+    prescriptions: [Prescription!]!
+        @field(resolver: "App\\GraphQL\\Queries\\DossierPrescriptions")
+    updated_at: DateTime!
+}
+
+input UpdatePatientInput {
+    nom: String
+    prenom: String
+    date_naissance: String
+    genre: String
+    adresse: String
+    numero_urgence: String
+    groupe_sanguin: GroupeSanguin
+    allergies: [String!]
+    latitude: Float
+    longitude: Float
+}
+
+input UpdateDossierInput {
+    antecedents_medicaux: String
+    allergies_connues: [String!]
+    medicaments_actuels: [String!]
+    groupe_sanguin: GroupeSanguin
+    poids: Float
+    taille: Float
+    notes_generales: String
+}
+
+extend type Query {
+    "Mon dossier médical (patient connecté)"
+    dossierMedical: DossierMedical
+        @guard
+        @field(resolver: "App\\GraphQL\\Queries\\MonDossierMedical")
+
+    "Dossier médical d'un patient (médecin seulement)"
+    dossierMedicalPatient(patient_id: ID!): DossierMedical
+        @guard
+        @field(resolver: "App\\GraphQL\\Queries\\DossierMedicalPatient")
+}
+
+extend type Mutation {
+    "Mettre à jour son profil patient"
+    updateProfil(input: UpdatePatientInput! @spread): Patient!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\UpdateProfil")
+
+    "Mettre à jour le dossier médical"
+    updateDossierMedical(input: UpdateDossierInput! @spread): DossierMedical!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\UpdateDossierMedical")
+}

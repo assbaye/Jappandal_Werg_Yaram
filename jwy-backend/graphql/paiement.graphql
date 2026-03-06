@@ -1,0 +1,78 @@
+type Paiement {
+    id: ID!
+    user: User! @belongsTo
+    montant: Float!
+    devise: String!
+    statut: StatutPaiement!
+    methode_paiement: MethodePaiement!
+    numero_transaction: String
+    frais_transaction: Float!
+    montant_total: Float!
+    metadata: JSON
+    confirme_le: DateTime
+    facture: Facture @hasOne
+    created_at: DateTime!
+}
+
+type Facture {
+    id: ID!
+    numero_facture: String!
+    date_emission: DateTime!
+    montant_ht: Float!
+    tva: Float!
+    montant_ttc: Float!
+    statut: String!
+    pdf_url: String
+}
+
+"Réponse initiation paiement Orange Money ou Wave"
+type PaiementMobileResponse {
+    paiement_id: ID!
+    payment_url: String
+    ussd_code: String
+    reference: String!
+    message: String!
+}
+
+"Réponse initiation Stripe"
+type PaiementStripeResponse {
+    paiement_id: ID!
+    client_secret: String!
+    publishable_key: String!
+}
+
+union PaiementResponse = PaiementMobileResponse | PaiementStripeResponse
+
+input InitierPaiementInput {
+    methode: MethodePaiement!
+    payable_type: String!
+    payable_id: ID!
+    telephone: String
+}
+
+extend type Query {
+    "Historique de mes paiements"
+    mesPaiements(first: Int = 10, page: Int): PaiementPaginator! @guard
+        @field(resolver: "App\\GraphQL\\Queries\\MesPaiements")
+
+    "Détail d'un paiement"
+    paiement(id: ID!): Paiement @guard
+        @field(resolver: "App\\GraphQL\\Queries\\DetailPaiement")
+}
+
+type PaiementPaginator {
+    data: [Paiement!]!
+    paginatorInfo: PaginatorInfo!
+}
+
+extend type Mutation {
+    "Initier un paiement"
+    initierPaiement(input: InitierPaiementInput! @spread): PaiementResponse!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\InitierPaiement")
+
+    "Confirmer un paiement (webhook ou manuel)"
+    confirmerPaiement(transaction_id: String!): Paiement!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\ConfirmerPaiement")
+}

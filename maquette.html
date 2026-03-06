@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jappandal Werg Yaram — Maquette</title>
+    <style>
+        :root {
+            --primary: #4F6BF0;
+            --primary-dark: #3A52C4;
+            --primary-light: #E8ECFF;
+            --secondary: #00C896;
+            --secondary-light: #E0FBF4;
+            --danger: #F05C5C;
+            --danger-light: #FFF0F0;
+            --warning: #F0A435;
+            --warning-light: #FFF7E8;
+            --dark: #1A1D2E;
+            --gray-900: #2D2F3E;
+            --gray-700: #555869;
+            --gray-500: #8E92A4;
+            --gray-300: #D1D5E4;
+            --gray-100: #F4F5FA;
+            --white: #FFFFFF;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 22px;
+            --shadow-sm: 0 2px 8px rgba(79,107,240,.1);
+            --shadow-md: 0 8px 24px rgba(79,107,240,.15);
+            --shadow-lg: 0 16px 48px rgba(79,107,240,.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1A1D2E 0%, #2D3561 50%, #4F6BF0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            gap: 30px;
+        }
+
+        /* ─── Navigation latérale ──────────────────────────────────────────── */
+        .side-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-group-title {
+            color: rgba(255,255,255,.4);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 8px;
+            margin-top: 12px;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            color: rgba(255,255,255,.7);
+            cursor: pointer;
+            font-size: 12px;
+            text-align: left;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: rgba(79,107,240,.5);
+            border-color: rgba(79,107,240,.8);
+            color: white;
+        }
+
+        /* ─── Phone Container ──────────────────────────────────────────────── */
+        .phone-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .phone-label {
+            color: rgba(255,255,255,.5);
+            font-size: 11px;
+            text-align: center;
+            letter-spacing: .5px;
+        }
+
+        .phone {
+            width: 390px;
+            height: 844px;
+            background: #1A1D2E;
+            border-radius: 48px;
+            padding: 12px;
+            box-shadow: 0 40px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1);
+            position: relative;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 34px;
+            background: #1A1D2E;
+            border-radius: 20px;
+            z-index: 100;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: var(--gray-100);
+            border-radius: 38px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ─── Status Bar ───────────────────────────────────────────────────── */
+        .status-bar {
+            height: 50px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0 24px 8px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-bar.dark { color: white; }
+        .status-bar.light { color: var(--dark); }
+
+        /* ─── Pages ────────────────────────────────────────────────────────── */
+        .page {
+            display: none;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 90px;
+            scrollbar-width: none;
+        }
+
+        .page::-webkit-scrollbar { display: none; }
+        .page.active { display: block; }
+
+        /* ─── Splash / Accueil ─────────────────────────────────────────────── */
+        #splash {
+            background: linear-gradient(165deg, #1A1D2E 0%, #2D3561 60%, #4F6BF0 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 30px;
+            padding-bottom: 40px;
+        }
+
+        #splash.active { display: flex; }
+
+        .splash-logo {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #4F6BF0, #00C896);
+            border-radius: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: 0 12px 32px rgba(79,107,240,.5);
+        }
+
+        .splash-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .splash-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,.55);
+            text-align: center;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 28px;
+        }
+
+        .role-card {
+            background: rgba(255,255,255,.08);
+            border: 1.5px solid rgba(255,255,255,.12);
+            border-radius: var(--radius-md);
+            padding: 18px 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .25s;
+        }
+
+        .role-card:hover, .role-card.active {
+            background: rgba(79,107,240,.35);
+            border-color: #4F6BF0;
+        }
+
+        .role-icon { font-size: 30px; margin-bottom: 8px; }
+        .role-label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.85); }
+        .role-desc { font-size: 10px; color: rgba(255,255,255,.45); margin-top: 3px; }
+
+        /* ─── Auth Pages ───────────────────────────────────────────────────── */
+        #login, #register {
+            background: white;
+            padding: 60px 26px 30px;
+        }
+
+        #login.active, #register.active { display: block; }
+
+        .auth-header { text-align: center; margin-bottom: 32px; }
+        .auth-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4F6BF0, #00C896);
+            border-radius: 18px;
+            margin: 0 auto 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .page-title { font-size: 22px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+        .page-sub { font-size: 13px; color: var(--gray-500); }
+
+        .form-field { margin-bottom: 18px; }
+        .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-700); margin-bottom: 7px; }
+        .form-input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1.5px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--dark);
+            transition: border-color .2s;
+            background: white;
+        }
+
+        .form-input:focus { outline: none; border-color: var(--primary); }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4F6BF0, #3A52C4);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 16px rgba(79,107,240,.35);
+        }
+
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(79,107,240,.45); }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 13px;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1.5px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s;
+            margin-bottom: 10px;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 56px;
+            left: 18px;
+            width: 36px;
+            height: 36px;
+            background: var(--gray-100);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--dark);
+            z-index: 10;
+        }
+
+        /* ─── Dashboard Patient ────────────────────────────────────────────── */
+        #dashboard { background: var(--gray-100); }
+        #dashboard.active { display: block; }
+
+        .dash-header {
+            background: linear-gradient(135deg, #1A1D2E 0%, #2D3561 100%);
+            padding: 56px 22px 28px;
+            border-radius: 0 0 28px 28px;
+        }
+
+        .dash-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .dash-greeting { font-size: 11px; color: rgba(255,255,255,.5); margin-bottom: 4px; }
+        .dash-name { font-size: 20px; font-weight: 700; color: white; }
+        .dash-role { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 2px; }
+        .dash-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #4F6BF0, #00C896);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .notif-badge {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 16px;
+            height: 16px;
+            background: var(--danger);
+            border-radius: 50%;
+            font-size: 9px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0 22px;
+            margin-top: -20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 14px 10px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-num { font-size: 22px; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 10px; color: var(--gray-500); margin-top: 3px; line-height: 1.3; }
+
+        /* Section */
+        .section { padding: 0 22px; margin-bottom: 22px; }
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .see-all { font-size: 11px; color: var(--primary); cursor: pointer; font-weight: 600; }
+
+        /* Alert Card */
+        .alert-card {
+            background: linear-gradient(135deg, #4F6BF0 0%, #00C896 100%);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            color: white;
+            margin: 0 22px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+        }
+
+        .alert-icon { font-size: 28px; flex-shrink: 0; }
+        .alert-content { flex: 1; }
+        .alert-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+        .alert-text { font-size: 11px; opacity: .8; }
+        .alert-arrow { font-size: 18px; opacity: .7; }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .feat-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 18px 14px;
+            cursor: pointer;
+            transition: all .25s;
+            box-shadow: var(--shadow-sm);
+            border: 1.5px solid transparent;
+        }
+
+        .feat-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .feat-icon {
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .feat-title { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+        .feat-sub { font-size: 10px; color: var(--gray-500); }
+
+        /* Quick Actions */
+        .quick-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .quick-item {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 13px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all .2s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quick-item:hover { transform: translateX(4px); box-shadow: var(--shadow-md); }
+
+        .quick-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .quick-text { flex: 1; }
+        .quick-name { font-size: 13px; font-weight: 600; color: var(--dark); }
+        .quick-hint { font-size: 10px; color: var(--gray-500); }
+        .quick-arrow { color: var(--gray-300); font-size: 14px; }
+
+        /* ─── Pages Internes ───────────────────────────────────────────────── */
+        .page-header {
+            background: linear-gradient(135deg, #1A1D2E, #2D3561);
+            padding: 56px 22px 24px;
+            border-radius: 0 0 24px 24px;
+            color: white;
+        }
+
+        .page-header-title { font-size: 20px; font-weight: 700; }
+        .page-header-sub { font-size: 12px; opacity: .55; margin-top: 4px; }
+        .ph-back { font-size: 20px; cursor: pointer; margin-bottom: 12px; display: inline-block; }
+
+        .content-area { padding: 20px 22px; }
+
+        /* Card universelle */
+        .card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow-sm);
+            border: 1.5px solid transparent;
+            transition: all .2s;
+        }
+
+        .card:hover { border-color: var(--gray-300); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .card-title { font-size: 14px; font-weight: 700; color: var(--dark); }
+        .card-sub { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+        .card-body { font-size: 12px; color: var(--gray-700); line-height: 1.6; }
+
+        /* Chips / Badges */
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .chip-green  { background: var(--secondary-light); color: #00A07A; }
+        .chip-blue   { background: var(--primary-light); color: var(--primary); }
+        .chip-orange { background: var(--warning-light); color: #C47A00; }
+        .chip-red    { background: var(--danger-light); color: var(--danger); }
+        .chip-gray   { background: var(--gray-100); color: var(--gray-500); }
+
+        /* Médecin Card */
+        .doc-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .doc-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+        .doc-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .doc-info { flex: 1; }
+        .doc-name { font-size: 14px; font-weight: 700; color: var(--dark); }
+        .doc-spec { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+        .doc-meta { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+        .doc-rating { font-size: 11px; color: var(--warning); font-weight: 600; }
+        .doc-price { font-size: 11px; color: var(--gray-500); }
+        .doc-status { margin-left: auto; }
+
+        /* Pharmacie Card */
+        .pharma-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .pharma-card:hover { box-shadow: var(--shadow-md); }
+        .pharma-name { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+        .pharma-meta { display: flex; gap: 10px; margin-bottom: 8px; }
+        .pharma-dist { font-size: 11px; color: var(--gray-500); }
+        .pharma-hours { font-size: 11px; color: var(--secondary); font-weight: 600; }
+
+        /* Dossier Medical */
+        .dossier-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .dossier-item {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .dossier-key { font-size: 10px; color: var(--gray-500); margin-bottom: 4px; }
+        .dossier-val { font-size: 14px; font-weight: 700; color: var(--dark); }
+
+        /* Paiements */
+        .payment-method {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all .2s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .payment-method:hover, .payment-method.selected {
+            border-color: var(--primary);
+        }
+
+        .pm-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .pm-name { font-size: 14px; font-weight: 700; color: var(--dark); }
+        .pm-desc { font-size: 11px; color: var(--gray-500); }
+
+        /* Dashboard Médecin */
+        #dashboard-medecin { background: var(--gray-100); }
+        #dashboard-medecin.active { display: block; }
+
+        .medecin-header {
+            background: linear-gradient(135deg, #1A1D2E 0%, #1e2f5a 100%);
+            padding: 56px 22px 28px;
+            border-radius: 0 0 28px 28px;
+        }
+
+        .consult-queue {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .queue-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .queue-title { font-size: 14px; font-weight: 700; color: var(--dark); }
+        .queue-count { font-size: 11px; background: var(--danger-light); color: var(--danger); padding: 2px 8px; border-radius: 20px; font-weight: 700; }
+
+        .patient-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .patient-row:last-child { border-bottom: none; }
+        .patient-avatar { width: 36px; height: 36px; border-radius: 10px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .patient-name { font-size: 13px; font-weight: 600; color: var(--dark); }
+        .patient-symptom { font-size: 10px; color: var(--gray-500); }
+        .patient-time { margin-left: auto; font-size: 10px; color: var(--gray-500); }
+        .btn-consult {
+            padding: 5px 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Dashboard Pharmacien */
+        #dashboard-pharmacien { background: var(--gray-100); }
+        #dashboard-pharmacien.active { display: block; }
+
+        .stock-alert {
+            background: var(--danger-light);
+            border-left: 3px solid var(--danger);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+        }
+
+        .stock-alert-title { font-size: 12px; font-weight: 700; color: var(--danger); }
+        .stock-alert-text { font-size: 11px; color: var(--gray-700); margin-top: 2px; }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--gray-100);
+            border-radius: 3px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width .3s;
+        }
+
+        /* Urgence */
+        #urgence { background: var(--gray-100); }
+        #urgence.active { display: block; }
+
+        .urgence-header {
+            background: linear-gradient(135deg, #C0392B, #E74C3C);
+            padding: 56px 22px 28px;
+            text-align: center;
+            color: white;
+        }
+
+        .urgence-icon { font-size: 48px; margin-bottom: 10px; }
+        .urgence-title { font-size: 22px; font-weight: 800; }
+        .urgence-sub { font-size: 13px; opacity: .8; margin-top: 4px; }
+
+        .btn-urgence {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all .2s;
+        }
+
+        .btn-urgence-red { background: var(--danger); color: white; box-shadow: 0 4px 16px rgba(240,92,92,.4); }
+        .btn-urgence-orange { background: var(--warning); color: white; box-shadow: 0 4px 16px rgba(240,164,53,.4); }
+        .btn-urgence-blue { background: var(--primary); color: white; box-shadow: 0 4px 16px rgba(79,107,240,.4); }
+
+        /* Notifications */
+        #notifications { background: var(--gray-100); }
+        #notifications.active { display: block; }
+
+        .notif-item {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 13px 14px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            border-left: 3px solid transparent;
+        }
+
+        .notif-item.unread { border-left-color: var(--primary); background: var(--primary-light); }
+        .notif-item.urgent { border-left-color: var(--danger); background: var(--danger-light); }
+
+        .notif-icon { font-size: 20px; width: 36px; text-align: center; flex-shrink: 0; }
+        .notif-content { flex: 1; }
+        .notif-title { font-size: 13px; font-weight: 700; color: var(--dark); }
+        .notif-msg { font-size: 11px; color: var(--gray-700); margin-top: 2px; line-height: 1.4; }
+        .notif-time { font-size: 10px; color: var(--gray-500); margin-top: 4px; }
+
+        /* Profil */
+        #profil { background: var(--gray-100); }
+        #profil.active { display: block; }
+
+        .profil-header {
+            background: linear-gradient(135deg, #1A1D2E, #2D3561);
+            padding: 56px 22px 32px;
+            text-align: center;
+            color: white;
+        }
+
+        .profil-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #4F6BF0, #00C896);
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            box-shadow: 0 8px 24px rgba(79,107,240,.4);
+        }
+
+        .profil-name { font-size: 20px; font-weight: 700; }
+        .profil-role { font-size: 12px; opacity: .5; margin-top: 4px; }
+        .profil-chips { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+
+        .menu-item {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all .2s;
+        }
+
+        .menu-item:hover { transform: translateX(4px); }
+        .menu-icon { font-size: 18px; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .menu-text { flex: 1; font-size: 14px; font-weight: 600; color: var(--dark); }
+        .menu-arrow { color: var(--gray-300); font-size: 14px; }
+
+        /* ─── Bottom Navigation ─────────────────────────────────────────────── */
+        .bottom-nav {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            background: white;
+            border-radius: 24px;
+            padding: 10px 8px;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 8px 32px rgba(0,0,0,.12);
+            z-index: 100;
+        }
+
+        .bn-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 4px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all .2s;
+            position: relative;
+        }
+
+        .bn-item.active { background: var(--primary-light); }
+        .bn-icon { font-size: 20px; }
+        .bn-label { font-size: 9px; font-weight: 600; color: var(--gray-500); }
+        .bn-item.active .bn-label { color: var(--primary); }
+
+        .bn-notif {
+            position: absolute;
+            top: 2px;
+            right: 10px;
+            width: 14px;
+            height: 14px;
+            background: var(--danger);
+            border-radius: 50%;
+            font-size: 8px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* ─── Search ─────────────────────────────────────────────────────────── */
+        .search-box {
+            background: white;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            padding: 11px 14px;
+            gap: 10px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 16px;
+            border: 1.5px solid var(--gray-300);
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            font-size: 13px;
+            color: var(--dark);
+            flex: 1;
+            background: transparent;
+        }
+
+        /* Filter chips */
+        .filter-row { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+
+        .filter-chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1.5px solid var(--gray-300);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-500);
+            cursor: pointer;
+            white-space: nowrap;
+            background: white;
+            transition: all .2s;
+        }
+
+        .filter-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Transitions */
+        .page { animation: fadeIn .25s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<!-- ─── Navigation Latérale ──────────────────────────────────────────────── -->
+<div class="side-nav">
+    <div style="color:rgba(255,255,255,.8);font-size:13px;font-weight:700;padding:8px;margin-bottom:4px;">📱 Écrans</div>
+
+    <div class="nav-group-title">Accueil</div>
+    <button class="nav-btn active" onclick="nav('splash')">🏠 Splash / Accueil</button>
+    <button class="nav-btn" onclick="nav('login')">🔐 Connexion</button>
+    <button class="nav-btn" onclick="nav('register')">✍️ Inscription</button>
+
+    <div class="nav-group-title">Patient</div>
+    <button class="nav-btn" onclick="nav('dashboard')">📊 Dashboard Patient</button>
+    <button class="nav-btn" onclick="nav('teleconsult')">💬 Téléconsultation</button>
+    <button class="nav-btn" onclick="nav('medecins')">👨‍⚕️ Liste Médecins</button>
+    <button class="nav-btn" onclick="nav('dossier')">📋 Dossier Médical</button>
+    <button class="nav-btn" onclick="nav('pharmacies')">🏥 Pharmacies</button>
+    <button class="nav-btn" onclick="nav('paiements')">💳 Paiements</button>
+
+    <div class="nav-group-title">Médecin / Pharmacien</div>
+    <button class="nav-btn" onclick="nav('dashboard-medecin')">🩺 Dashboard Médecin</button>
+    <button class="nav-btn" onclick="nav('dashboard-pharmacien')">💊 Dashboard Pharmacien</button>
+
+    <div class="nav-group-title">Autres</div>
+    <button class="nav-btn" onclick="nav('urgence')">🚨 Urgences</button>
+    <button class="nav-btn" onclick="nav('notifications')">🔔 Notifications</button>
+    <button class="nav-btn" onclick="nav('profil')">👤 Profil</button>
+</div>
+
+<!-- ─── Phone ────────────────────────────────────────────────────────────── -->
+<div class="phone-wrap">
+    <div class="phone-label">JWY · Maquette interactive</div>
+    <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="screen">
+
+            <!-- Status Bar -->
+            <div class="status-bar dark" id="statusBar">
+                <span>9:41</span>
+                <span>▲▲ 📶 🔋</span>
+            </div>
+
+            <!-- ══ PAGE: Splash ══════════════════════════════════════════════ -->
+            <div class="page active" id="splash">
+                <div class="splash-logo">JWY</div>
+                <div class="splash-title">Jappandal Werg Yaram</div>
+                <div class="splash-subtitle">Votre santé entre vos mains.<br>Plateforme communautaire du Sénégal.</div>
+
+                <div class="role-grid">
+                    <div class="role-card active" onclick="selectRole(this, 'patient')">
+                        <div class="role-icon">👤</div>
+                        <div class="role-label">Patient</div>
+                        <div class="role-desc">Consultez, suivez</div>
+                    </div>
+                    <div class="role-card" onclick="selectRole(this, 'medecin')">
+                        <div class="role-icon">👨‍⚕️</div>
+                        <div class="role-label">Médecin</div>
+                        <div class="role-desc">Consultez à distance</div>
+                    </div>
+                    <div class="role-card" onclick="selectRole(this, 'pharmacien')">
+                        <div class="role-icon">💊</div>
+                        <div class="role-label">Pharmacien</div>
+                        <div class="role-desc">Gérez votre stock</div>
+                    </div>
+                    <div class="role-card" onclick="selectRole(this, 'admin')">
+                        <div class="role-icon">🖥️</div>
+                        <div class="role-label">Admin</div>
+                        <div class="role-desc">Gérez la plateforme</div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="nav('login')" style="width:100%;margin-bottom:10px;">Se connecter</button>
+                <button class="btn-secondary" onclick="nav('register')" style="width:100%;">Créer un compte</button>
+
+                <div style="text-align:center;margin-top:16px;color:rgba(255,255,255,.3);font-size:11px;">
+                    Sécurisé · Confidentiel · RGPD conforme
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Login ═══════════════════════════════════════════════ -->
+            <div class="page" id="login">
+                <button class="back-btn" onclick="nav('splash')">←</button>
+                <div class="auth-header">
+                    <div class="auth-logo">JWY</div>
+                    <div class="page-title">Connexion</div>
+                    <div class="page-sub">Accédez à votre espace santé</div>
+                </div>
+                <div style="padding:0 26px;">
+                    <div class="form-field">
+                        <label class="form-label">Email ou Téléphone</label>
+                        <input class="form-input" type="text" placeholder="aminata@example.sn">
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Mot de passe</label>
+                        <input class="form-input" type="password" placeholder="••••••••">
+                    </div>
+                    <div style="text-align:right;margin-bottom:20px;">
+                        <span style="font-size:12px;color:var(--primary);cursor:pointer;font-weight:600;">Mot de passe oublié ?</span>
+                    </div>
+                    <button class="btn-primary" onclick="nav('dashboard')">Se connecter</button>
+                    <button class="btn-secondary" onclick="nav('register')">Pas de compte ? S'inscrire</button>
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Register ════════════════════════════════════════════ -->
+            <div class="page" id="register">
+                <button class="back-btn" onclick="nav('splash')">←</button>
+                <div class="auth-header">
+                    <div class="auth-logo">JWY</div>
+                    <div class="page-title">Inscription</div>
+                    <div class="page-sub">Créez votre compte en 2 minutes</div>
+                </div>
+                <div style="padding:0 26px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div class="form-field">
+                            <label class="form-label">Prénom</label>
+                            <input class="form-input" type="text" placeholder="Aminata">
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label">Nom</label>
+                            <input class="form-input" type="text" placeholder="Diallo">
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Email</label>
+                        <input class="form-input" type="email" placeholder="aminata@example.sn">
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Téléphone</label>
+                        <input class="form-input" type="tel" placeholder="+221 77 123 45 67">
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">Mot de passe</label>
+                        <input class="form-input" type="password" placeholder="Min. 8 caractères">
+                    </div>
+                    <button class="btn-primary" onclick="nav('dashboard')">Créer mon compte</button>
+                    <button class="btn-secondary" onclick="nav('login')">Déjà un compte ? Se connecter</button>
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Dashboard Patient ═══════════════════════════════════ -->
+            <div class="page" id="dashboard">
+                <div class="dash-header">
+                    <div class="dash-top">
+                        <div>
+                            <div class="dash-greeting">Bonjour 👋</div>
+                            <div class="dash-name">Aminata Diallo</div>
+                            <div class="dash-role">Patiente · Dakar</div>
+                        </div>
+                        <div style="display:flex;gap:12px;align-items:center;">
+                            <div class="notif-badge" onclick="nav('notifications')">
+                                <div style="font-size:22px;cursor:pointer;">🔔</div>
+                                <div class="badge">3</div>
+                            </div>
+                            <div class="dash-avatar">👤</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-num">12</div>
+                        <div class="stat-label">Consultations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num">3</div>
+                        <div class="stat-label">RDV à venir</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num">5</div>
+                        <div class="stat-label">Ordonnances</div>
+                    </div>
+                </div>
+
+                <div class="alert-card" onclick="nav('teleconsult')">
+                    <div class="alert-icon">📅</div>
+                    <div class="alert-content">
+                        <div class="alert-title">RDV · Dr. Ibrahima Diop</div>
+                        <div class="alert-text">Demain à 14h30 · Téléconsultation vidéo</div>
+                    </div>
+                    <div class="alert-arrow">›</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">
+                        Accès rapides
+                        <span class="see-all">Tout voir</span>
+                    </div>
+                    <div class="feature-grid">
+                        <div class="feat-card" onclick="nav('teleconsult')">
+                            <div class="feat-icon">📹</div>
+                            <div class="feat-title">Téléconsultation</div>
+                            <div class="feat-sub">Vidéo · Chat · Différée</div>
+                        </div>
+                        <div class="feat-card" onclick="nav('dossier')">
+                            <div class="feat-icon">📋</div>
+                            <div class="feat-title">Dossier Médical</div>
+                            <div class="feat-sub">Historique complet</div>
+                        </div>
+                        <div class="feat-card" onclick="nav('pharmacies')">
+                            <div class="feat-icon">🏥</div>
+                            <div class="feat-title">Pharmacies</div>
+                            <div class="feat-sub">Proches · Stock en temps réel</div>
+                        </div>
+                        <div class="feat-card" onclick="nav('paiements')">
+                            <div class="feat-icon">💳</div>
+                            <div class="feat-title">Paiements</div>
+                            <div class="feat-sub">Orange Money · Wave</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Actions rapides</div>
+                    <div class="quick-list">
+                        <div class="quick-item" onclick="nav('urgence')">
+                            <div class="quick-dot" style="background:var(--danger-light);">🚨</div>
+                            <div class="quick-text">
+                                <div class="quick-name">Urgence médicale</div>
+                                <div class="quick-hint">Géolocalisation automatique</div>
+                            </div>
+                            <span class="quick-arrow">›</span>
+                        </div>
+                        <div class="quick-item" onclick="nav('medecins')">
+                            <div class="quick-dot" style="background:var(--primary-light);">👨‍⚕️</div>
+                            <div class="quick-text">
+                                <div class="quick-name">Trouver un médecin</div>
+                                <div class="quick-hint">Disponibles maintenant</div>
+                            </div>
+                            <span class="quick-arrow">›</span>
+                        </div>
+                        <div class="quick-item">
+                            <div class="quick-dot" style="background:var(--secondary-light);">💊</div>
+                            <div class="quick-text">
+                                <div class="quick-name">Mes médicaments</div>
+                                <div class="quick-hint">Rappels · Ordonnances</div>
+                            </div>
+                            <span class="quick-arrow">›</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Téléconsultation ════════════════════════════════════ -->
+            <div class="page" id="teleconsult">
+                <div class="page-header">
+                    <span class="ph-back" onclick="nav('dashboard')">← </span>
+                    <div class="page-header-title">Téléconsultation</div>
+                    <div class="page-header-sub">Consultez depuis chez vous</div>
+                </div>
+                <div class="content-area">
+                    <div class="filter-row">
+                        <div class="filter-chip active">Tous</div>
+                        <div class="filter-chip">Vidéo</div>
+                        <div class="filter-chip">Chat</div>
+                        <div class="filter-chip">Différée</div>
+                    </div>
+
+                    <div class="section-title" style="padding:0;margin-bottom:12px;">Consultation en cours</div>
+                    <div class="card" style="background:linear-gradient(135deg,#1A1D2E,#2D3561);border:none;">
+                        <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+                            <div style="width:52px;height:52px;border-radius:14px;background:rgba(79,107,240,.3);display:flex;align-items:center;justify-content:center;font-size:22px;">👨‍⚕️</div>
+                            <div>
+                                <div style="font-size:14px;font-weight:700;color:white;">Dr. Ibrahima Diop</div>
+                                <div style="font-size:11px;color:rgba(255,255,255,.5);">Médecin généraliste · En ligne</div>
+                            </div>
+                            <div style="margin-left:auto;background:var(--secondary);color:white;padding:4px 10px;border-radius:12px;font-size:10px;font-weight:700;">🔴 Live</div>
+                        </div>
+                        <div style="display:flex;gap:10px;">
+                            <button style="flex:1;padding:10px;background:var(--secondary);color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">📹 Rejoindre</button>
+                            <button style="flex:1;padding:10px;background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);border-radius:8px;font-size:12px;cursor:pointer;">💬 Chat</button>
+                        </div>
+                    </div>
+
+                    <div class="section-title" style="padding:0;margin-bottom:12px;margin-top:4px;">Nouvelle demande</div>
+                    <div class="card">
+                        <div class="form-field">
+                            <label class="form-label">Décrivez vos symptômes</label>
+                            <textarea style="width:100%;padding:12px;border:1.5px solid var(--gray-300);border-radius:8px;font-size:13px;min-height:90px;resize:none;font-family:inherit;" placeholder="Ex: Fièvre depuis 2 jours, maux de tête..."></textarea>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+                            <div style="text-align:center;padding:10px 6px;background:var(--primary-light);border-radius:8px;cursor:pointer;border:2px solid var(--primary);">
+                                <div style="font-size:18px;margin-bottom:4px;">📹</div>
+                                <div style="font-size:10px;font-weight:700;color:var(--primary);">Vidéo</div>
+                            </div>
+                            <div style="text-align:center;padding:10px 6px;background:var(--gray-100);border-radius:8px;cursor:pointer;">
+                                <div style="font-size:18px;margin-bottom:4px;">💬</div>
+                                <div style="font-size:10px;font-weight:600;color:var(--gray-500);">Chat</div>
+                            </div>
+                            <div style="text-align:center;padding:10px 6px;background:var(--gray-100);border-radius:8px;cursor:pointer;">
+                                <div style="font-size:18px;margin-bottom:4px;">📝</div>
+                                <div style="font-size:10px;font-weight:600;color:var(--gray-500);">Différée</div>
+                            </div>
+                        </div>
+                        <button class="btn-primary">Demander une consultation</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Liste Médecins ═══════════════════════════════════════ -->
+            <div class="page" id="medecins">
+                <div class="page-header">
+                    <span class="ph-back" onclick="nav('dashboard')">← </span>
+                    <div class="page-header-title">Médecins</div>
+                    <div class="page-header-sub">Trouvez le bon spécialiste</div>
+                </div>
+                <div class="content-area">
+                    <div class="search-box">
+                        <span>🔍</span>
+                        <input type="text" placeholder="Nom, spécialité...">
+                    </div>
+                    <div class="filter-row">
+                        <div class="filter-chip active">Tous</div>
+                        <div class="filter-chip">Disponibles</div>
+                        <div class="filter-chip">Généraliste</div>
+                        <div class="filter-chip">Cardiologue</div>
+                        <div class="filter-chip">Pédiatre</div>
+                    </div>
+
+                    <div class="doc-card" onclick="nav('teleconsult')">
+                        <div class="doc-avatar" style="background:var(--primary-light);">👨‍⚕️</div>
+                        <div class="doc-info">
+                            <div class="doc-name">Dr. Ibrahima Diop</div>
+                            <div class="doc-spec">Médecin généraliste · CHU Fann</div>
+                            <div class="doc-meta">
+                                <span class="doc-rating">⭐ 4.8</span>
+                                <span class="doc-price">15 000 FCFA</span>
+                                <div class="doc-status"><span class="chip chip-green">● Disponible</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="doc-card">
+                        <div class="doc-avatar" style="background:var(--secondary-light);">👩‍⚕️</div>
+                        <div class="doc-info">
+                            <div class="doc-name">Dr. Fatou Ndiaye</div>
+                            <div class="doc-spec">Pédiatre · Clinique Pasteur</div>
+                            <div class="doc-meta">
+                                <span class="doc-rating">⭐ 4.9</span>
+                                <span class="doc-price">20 000 FCFA</span>
+                                <div class="doc-status"><span class="chip chip-green">● Disponible</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="doc-card">
+                        <div class="doc-avatar" style="background:var(--warning-light);">👨‍⚕️</div>
+                        <div class="doc-info">
+                            <div class="doc-name">Dr. Mamadou Sow</div>
+                            <div class="doc-spec">Cardiologue · Institut Pasteur</div>
+                            <div class="doc-meta">
+                                <span class="doc-rating">⭐ 4.7</span>
+                                <span class="doc-price">30 000 FCFA</span>
+                                <div class="doc-status"><span class="chip chip-orange">◌ Occupé</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="doc-card">
+                        <div class="doc-avatar" style="background:var(--danger-light);">👩‍⚕️</div>
+                        <div class="doc-info">
+                            <div class="doc-name">Dr. Aïssatou Balde</div>
+                            <div class="doc-spec">Dermatologue · CHU Principal</div>
+                            <div class="doc-meta">
+                                <span class="doc-rating">⭐ 4.6</span>
+                                <span class="doc-price">25 000 FCFA</span>
+                                <div class="doc-status"><span class="chip chip-gray">○ Hors ligne</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Dossier Médical ══════════════════════════════════════ -->
+            <div class="page" id="dossier">
+                <div class="page-header">
+                    <span class="ph-back" onclick="nav('dashboard')">← </span>
+                    <div class="page-header-title">Dossier Médical</div>
+                    <div class="page-header-sub">Aminata Diallo · PAT-A1B2C3D4</div>
+                </div>
+                <div class="content-area">
+                    <div class="dossier-grid">
+                        <div class="dossier-item">
+                            <div class="dossier-key">Groupe sanguin</div>
+                            <div class="dossier-val">O+</div>
+                        </div>
+                        <div class="dossier-item">
+                            <div class="dossier-key">IMC</div>
+                            <div class="dossier-val">22.4</div>
+                        </div>
+                        <div class="dossier-item">
+                            <div class="dossier-key">Poids</div>
+                            <div class="dossier-val">62 kg</div>
+                        </div>
+                        <div class="dossier-item">
+                            <div class="dossier-key">Taille</div>
+                            <div class="dossier-val">166 cm</div>
+                        </div>
+                    </div>
+
+                    <div style="background:var(--warning-light);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;border-left:3px solid var(--warning);">
+                        <div style="font-size:12px;font-weight:700;color:#C47A00;">⚠️ Allergies connues</div>
+                        <div style="font-size:11px;color:var(--gray-700);margin-top:4px;">Pénicilline · Amoxicilline</div>
+                    </div>
+
+                    <div class="section-title" style="padding:0;margin-bottom:12px;">Consultations récentes</div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Consultation générale</div>
+                                <div class="card-sub">Dr. Ibrahima Diop · 15 juin 2025</div>
+                            </div>
+                            <span class="chip chip-green">Terminée</span>
+                        </div>
+                        <div class="card-body">Tension artérielle normale. Prescription : Paracétamol 500mg × 3/j pendant 5 jours.</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Analyses sanguines</div>
+                                <div class="card-sub">Labo Central · 10 mai 2025</div>
+                            </div>
+                            <span class="chip chip-blue">Résultats</span>
+                        </div>
+                        <div class="card-body">Glycémie : 0.9 g/L · Cholestérol : 1.8 g/L. Prochaine analyse dans 6 mois.</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Vaccination</div>
+                                <div class="card-sub">Centre de Santé Médina · 25 avril 2025</div>
+                            </div>
+                            <span class="chip chip-green">✓ Fait</span>
+                        </div>
+                        <div class="card-body">Vaccin fièvre jaune. Rappel dans 10 ans.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Pharmacies ══════════════════════════════════════════ -->
+            <div class="page" id="pharmacies">
+                <div class="page-header">
+                    <span class="ph-back" onclick="nav('dashboard')">← </span>
+                    <div class="page-header-title">Pharmacies</div>
+                    <div class="page-header-sub">📍 Dakar-Plateau · 4 proches</div>
+                </div>
+                <div class="content-area">
+                    <div class="search-box">
+                        <span>🔍</span>
+                        <input type="text" placeholder="Médicament, pharmacie...">
+                    </div>
+
+                    <div class="pharma-card">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                            <div class="pharma-name">Pharmacie de la Paix</div>
+                            <span class="chip chip-green">● Ouvert</span>
+                        </div>
+                        <div class="pharma-meta">
+                            <span class="pharma-dist">📍 0.5 km</span>
+                            <span class="pharma-hours">⏰ Jusqu'à 20h</span>
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <span class="chip chip-green">✅ Paracétamol</span>
+                            <span class="chip chip-green">✅ Amoxicilline</span>
+                            <span class="chip chip-blue">🚗 Livraison</span>
+                        </div>
+                    </div>
+
+                    <div class="pharma-card">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                            <div class="pharma-name">Pharmacie du Centre</div>
+                            <span class="chip chip-green">● Ouvert 24h/24</span>
+                        </div>
+                        <div class="pharma-meta">
+                            <span class="pharma-dist">📍 1.2 km</span>
+                            <span class="pharma-hours">⏰ 24h/7j</span>
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <span class="chip chip-green">✅ Ibuprofène</span>
+                            <span class="chip chip-red">❌ Paracétamol</span>
+                            <span class="chip chip-blue">🚗 Livraison</span>
+                        </div>
+                    </div>
+
+                    <div class="pharma-card">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                            <div class="pharma-name">Pharmacie Moderne</div>
+                            <span class="chip chip-orange">◌ Ferme à 19h</span>
+                        </div>
+                        <div class="pharma-meta">
+                            <span class="pharma-dist">📍 2.1 km</span>
+                            <span class="pharma-hours">⏰ 8h–19h</span>
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <span class="chip chip-green">✅ Paracétamol</span>
+                            <span class="chip chip-gray">— Pas de livraison</span>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" style="margin-top:6px;">🚗 Commander une livraison</button>
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Paiements ═══════════════════════════════════════════ -->
+            <div class="page" id="paiements">
+                <div class="page-header">
+                    <span class="ph-back" onclick="nav('dashboard')">← </span>
+                    <div class="page-header-title">Paiements</div>
+                    <div class="page-header-sub">Gérez vos transactions</div>
+                </div>
+                <div class="content-area">
+                    <div class="section-title" style="padding:0;margin-bottom:12px;">Méthodes disponibles</div>
+
+                    <div class="payment-method selected">
+                        <div class="pm-icon" style="background:#FF6600;color:white;font-size:16px;font-weight:800;">OM</div>
+                        <div>
+                            <div class="pm-name">Orange Money</div>
+                            <div class="pm-desc">Paiement mobile · Instantané</div>
+                        </div>
+                        <div style="margin-left:auto;color:var(--primary);font-size:18px;">✓</div>
+                    </div>
+
+                    <div class="payment-method">
+                        <div class="pm-icon" style="background:#1A8FE3;color:white;font-size:16px;font-weight:800;">W</div>
+                        <div>
+                            <div class="pm-name">Wave</div>
+                            <div class="pm-desc">Transfert rapide · 0% frais</div>
+                        </div>
+                    </div>
+
+                    <div class="payment-method">
+                        <div class="pm-icon" style="background:#635BFF;color:white;">💳</div>
+                        <div>
+                            <div class="pm-name">Carte bancaire</div>
+                            <div class="pm-desc">Visa · Mastercard · Stripe</div>
+                        </div>
+                    </div>
+
+                    <div class="section-title" style="padding:0;margin-top:8px;margin-bottom:12px;">Historique récent</div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Consultation Dr. Diop</div>
+                                <div class="card-sub">15 juin 2025 · Orange Money</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:15px;font-weight:800;color:var(--dark);">15 000</div>
+                                <div style="font-size:10px;color:var(--gray-500);">FCFA</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span class="chip chip-green">✓ Payé</span>
+                            <span style="font-size:11px;color:var(--primary);cursor:pointer;">Voir facture</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Médicaments — Pharmacie de la Paix</div>
+                                <div class="card-sub">12 juin 2025 · Wave</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:15px;font-weight:800;color:var(--dark);">8 500</div>
+                                <div style="font-size:10px;color:var(--gray-500);">FCFA</div>
+                            </div>
+                        </div>
+                        <span class="chip chip-green">✓ Payé</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Dashboard Médecin ════════════════════════════════════ -->
+            <div class="page" id="dashboard-medecin">
+                <div class="medecin-header">
+                    <div class="dash-top">
+                        <div>
+                            <div class="dash-greeting">Tableau de bord</div>
+                            <div class="dash-name">Dr. Ibrahima Diop</div>
+                            <div class="dash-role">Médecin généraliste</div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+                            <div style="background:var(--secondary);color:white;padding:5px 12px;border-radius:16px;font-size:11px;font-weight:700;cursor:pointer;">● En ligne</div>
+                            <div class="notif-badge" onclick="nav('notifications')">
+                                <div style="font-size:22px;">🔔</div>
+                                <div class="badge">5</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-num" style="color:var(--secondary);">8</div>
+                        <div class="stat-label">Aujourd'hui</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" style="color:var(--warning);">3</div>
+                        <div class="stat-label">En attente</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" style="color:var(--primary);">47</div>
+                        <div class="stat-label">Ce mois</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="consult-queue">
+                        <div class="queue-header">
+                            <div class="queue-title">File d'attente</div>
+                            <div class="queue-count">3 patients</div>
+                        </div>
+                        <div class="patient-row">
+                            <div class="patient-avatar">👤</div>
+                            <div>
+                                <div class="patient-name">Aminata Diallo</div>
+                                <div class="patient-symptom">Fièvre · Maux de tête</div>
+                            </div>
+                            <div class="patient-time">9:15</div>
+                            <button class="btn-consult">Démarrer</button>
+                        </div>
+                        <div class="patient-row">
+                            <div class="patient-avatar">👤</div>
+                            <div>
+                                <div class="patient-name">Moussa Traoré</div>
+                                <div class="patient-symptom">Douleurs dorsales</div>
+                            </div>
+                            <div class="patient-time">9:45</div>
+                            <button class="btn-consult" style="background:var(--gray-300);color:var(--gray-700);">Attente</button>
+                        </div>
+                        <div class="patient-row">
+                            <div class="patient-avatar">👤</div>
+                            <div>
+                                <div class="patient-name">Mariama Bah</div>
+                                <div class="patient-symptom">Suivi traitement</div>
+                            </div>
+                            <div class="patient-time">10:30</div>
+                            <button class="btn-consult" style="background:var(--gray-300);color:var(--gray-700);">Attente</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Actions rapides</div>
+                    <div class="quick-list">
+                        <div class="quick-item">
+                            <div class="quick-dot" style="background:var(--primary-light);">📝</div>
+                            <div class="quick-text">
+                                <div class="quick-name">Créer une prescription</div>
+                                <div class="quick-hint">Pour un patient actif</div>
+                            </div>
+                            <span class="quick-arrow">›</span>
+                        </div>
+                        <div class="quick-item">
+                            <div class="quick-dot" style="background:var(--secondary-light);">📅</div>
+                            <div class="quick-text">
+                                <div class="quick-name">Mon planning</div>
+                                <div class="quick-hint">Rendez-vous du jour</div>
+                            </div>
+                            <span class="quick-arrow">›</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Dashboard Pharmacien ════════════════════════════════ -->
+            <div class="page" id="dashboard-pharmacien">
+                <div class="medecin-header" style="background:linear-gradient(135deg,#1A2E1A,#2D5C2D);">
+                    <div class="dash-top">
+                        <div>
+                            <div class="dash-greeting">Gestion stock</div>
+                            <div class="dash-name">Pharmacie de la Paix</div>
+                            <div class="dash-role">Ouvert · jusqu'à 20h</div>
+                        </div>
+                        <div class="notif-badge" onclick="nav('notifications')">
+                            <div style="font-size:22px;">🔔</div>
+                            <div class="badge">2</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-num" style="color:var(--secondary);">142</div>
+                        <div class="stat-label">Références en stock</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" style="color:var(--danger);">7</div>
+                        <div class="stat-label">Stock faible</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" style="color:var(--warning);">12</div>
+                        <div class="stat-label">Commandes</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Alertes stock</div>
+                    <div class="stock-alert">
+                        <div class="stock-alert-title">⚠️ Paracétamol 500mg — Stock faible</div>
+                        <div class="stock-alert-text">Il reste 8 boîtes (minimum : 20)</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width:20%;background:var(--danger);"></div></div>
+                    </div>
+                    <div class="stock-alert" style="border-color:var(--warning);background:var(--warning-light);">
+                        <div class="stock-alert-title" style="color:#C47A00;">⏰ Amoxicilline 250mg — Expiration proche</div>
+                        <div class="stock-alert-text" style="color:var(--gray-700);">Expire dans 15 jours · 34 boîtes</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width:60%;background:var(--warning);"></div></div>
+                    </div>
+
+                    <div class="section-title" style="margin-top:8px;">Commandes en attente</div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">CMD-4F8A2C · Aminata Diallo</div>
+                                <div class="card-sub">2 médicaments · Livraison</div>
+                            </div>
+                            <span class="chip chip-orange">En attente</span>
+                        </div>
+                        <div style="display:flex;gap:8px;margin-top:8px;">
+                            <button style="flex:1;padding:8px;background:var(--secondary);color:white;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">✓ Confirmer</button>
+                            <button style="flex:1;padding:8px;background:var(--gray-100);color:var(--gray-700);border:none;border-radius:6px;font-size:12px;cursor:pointer;">Détails</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Urgences ════════════════════════════════════════════ -->
+            <div class="page" id="urgence">
+                <div class="urgence-header">
+                    <div class="urgence-icon">🚨</div>
+                    <div class="urgence-title">Urgence Médicale</div>
+                    <div class="urgence-sub">En cas de danger immédiat</div>
+                </div>
+                <div class="content-area">
+                    <div style="background:var(--danger-light);border-radius:var(--radius-md);padding:14px;margin-bottom:20px;text-align:center;">
+                        <div style="font-size:12px;color:var(--danger);font-weight:700;">📍 Position détectée</div>
+                        <div style="font-size:11px;color:var(--gray-700);margin-top:4px;">Plateau, Dakar · Lat: 14.6928, Lng: -17.4467</div>
+                    </div>
+
+                    <button class="btn-urgence btn-urgence-red">🚑 Appeler le SAMU (15)</button>
+                    <button class="btn-urgence btn-urgence-orange">📍 Envoyer ma position</button>
+                    <button class="btn-urgence btn-urgence-blue">👨‍⚕️ Médecin d'urgence en ligne</button>
+
+                    <div class="section-title" style="padding:0;margin-top:10px;margin-bottom:12px;">Alertes santé actives</div>
+
+                    <div style="background:var(--danger-light);border-left:3px solid var(--danger);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px;margin-bottom:10px;">
+                        <div style="font-size:12px;font-weight:700;color:var(--danger);">🔴 URGENCE · Épidémie dengue</div>
+                        <div style="font-size:11px;color:var(--gray-700);margin-top:3px;">Zone : Dakar · Depuis le 1er mars 2025</div>
+                        <div style="font-size:11px;color:var(--gray-700);">Portez des répulsifs. Consultez si fièvre.</div>
+                    </div>
+
+                    <div style="background:var(--warning-light);border-left:3px solid var(--warning);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px;">
+                        <div style="font-size:12px;font-weight:700;color:#C47A00;">⚠️ ATTENTION · Canicule</div>
+                        <div style="font-size:11px;color:var(--gray-700);margin-top:3px;">Températures 42°C · Hydratation obligatoire</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Notifications ════════════════════════════════════════ -->
+            <div class="page" id="notifications">
+                <div class="page-header">
+                    <span class="ph-back" onclick="nav('dashboard')">← </span>
+                    <div class="page-header-title">Notifications</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+                        <div class="page-header-sub">3 non lues</div>
+                        <span style="font-size:11px;color:rgba(255,255,255,.5);cursor:pointer;">Tout marquer lu</span>
+                    </div>
+                </div>
+                <div class="content-area">
+                    <div class="notif-item urgent">
+                        <div class="notif-icon">🚨</div>
+                        <div class="notif-content">
+                            <div class="notif-title">Alerte santé · Dengue Dakar</div>
+                            <div class="notif-msg">Une épidémie de dengue est signalée. Portez des répulsifs et consultez en cas de fièvre.</div>
+                            <div class="notif-time">Il y a 30 min · URGENTE</div>
+                        </div>
+                    </div>
+
+                    <div class="notif-item unread">
+                        <div class="notif-icon">📅</div>
+                        <div class="notif-content">
+                            <div class="notif-title">Rappel rendez-vous</div>
+                            <div class="notif-msg">Votre RDV avec Dr. Ibrahima Diop est demain à 14h30.</div>
+                            <div class="notif-time">Il y a 2h</div>
+                        </div>
+                    </div>
+
+                    <div class="notif-item unread">
+                        <div class="notif-icon">💊</div>
+                        <div class="notif-content">
+                            <div class="notif-title">Rappel médicament</div>
+                            <div class="notif-msg">Il est l'heure de prendre Paracétamol 500mg (dose du soir).</div>
+                            <div class="notif-time">Il y a 4h · HAUTE</div>
+                        </div>
+                    </div>
+
+                    <div class="notif-item">
+                        <div class="notif-icon">✅</div>
+                        <div class="notif-content">
+                            <div class="notif-title">Paiement confirmé</div>
+                            <div class="notif-msg">Consultation Dr. Diop · 15 000 FCFA via Orange Money.</div>
+                            <div class="notif-time">Hier · 18:42</div>
+                        </div>
+                    </div>
+
+                    <div class="notif-item">
+                        <div class="notif-icon">📋</div>
+                        <div class="notif-content">
+                            <div class="notif-title">Nouvelle prescription</div>
+                            <div class="notif-msg">Dr. Diop vous a prescrit des médicaments. Voir l'ordonnance.</div>
+                            <div class="notif-time">Il y a 2 jours</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ PAGE: Profil ══════════════════════════════════════════════ -->
+            <div class="page" id="profil">
+                <div class="profil-header">
+                    <div class="profil-avatar">👤</div>
+                    <div class="profil-name">Aminata Diallo</div>
+                    <div class="profil-role">Patiente</div>
+                    <div class="profil-chips">
+                        <span class="chip" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);">O+</span>
+                        <span class="chip" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);">28 ans</span>
+                        <span class="chip" style="background:rgba(0,200,150,.3);color:#00C896;">✓ Vérifié</span>
+                    </div>
+                </div>
+                <div class="content-area">
+                    <div class="section-title" style="padding:0;margin-bottom:12px;">Mon compte</div>
+                    <div class="menu-item">
+                        <div class="menu-icon" style="background:var(--primary-light);">✏️</div>
+                        <div class="menu-text">Modifier le profil</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-icon" style="background:var(--secondary-light);">📋</div>
+                        <div class="menu-text">Dossier médical</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-icon" style="background:var(--warning-light);">🔔</div>
+                        <div class="menu-text">Paramètres notifications</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+
+                    <div class="section-title" style="padding:0;margin-bottom:12px;margin-top:6px;">Sécurité</div>
+                    <div class="menu-item">
+                        <div class="menu-icon" style="background:var(--gray-100);">🔑</div>
+                        <div class="menu-text">Changer le mot de passe</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-icon" style="background:var(--gray-100);">📱</div>
+                        <div class="menu-text">Authentification 2FA</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+
+                    <div class="section-title" style="padding:0;margin-bottom:12px;margin-top:6px;">Aide & Légal</div>
+                    <div class="menu-item">
+                        <div class="menu-icon" style="background:var(--primary-light);">❓</div>
+                        <div class="menu-text">Centre d'aide</div>
+                        <div class="menu-arrow">›</div>
+                    </div>
+                    <div class="menu-item" onclick="nav('splash')">
+                        <div class="menu-icon" style="background:var(--danger-light);">🚪</div>
+                        <div class="menu-text" style="color:var(--danger);">Se déconnecter</div>
+                        <div class="menu-arrow" style="color:var(--danger);">›</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── Bottom Navigation ────────────────────────────────────── -->
+            <div class="bottom-nav" id="bottomNav">
+                <div class="bn-item active" id="bn-home" onclick="nav('dashboard');setActiveNav('bn-home')">
+                    <div class="bn-icon">🏠</div>
+                    <div class="bn-label">Accueil</div>
+                </div>
+                <div class="bn-item" id="bn-consult" onclick="nav('medecins');setActiveNav('bn-consult')">
+                    <div class="bn-icon">💬</div>
+                    <div class="bn-label">Consulter</div>
+                </div>
+                <div class="bn-item" id="bn-dossier" onclick="nav('dossier');setActiveNav('bn-dossier')">
+                    <div class="bn-icon">📋</div>
+                    <div class="bn-label">Dossier</div>
+                </div>
+                <div class="bn-item" id="bn-notif" onclick="nav('notifications');setActiveNav('bn-notif')">
+                    <div class="bn-icon">🔔</div>
+                    <div class="bn-label">Alertes</div>
+                    <div class="bn-notif">3</div>
+                </div>
+                <div class="bn-item" id="bn-profil" onclick="nav('profil');setActiveNav('bn-profil')">
+                    <div class="bn-icon">👤</div>
+                    <div class="bn-label">Profil</div>
+                </div>
+            </div>
+
+        </div><!-- /screen -->
+    </div><!-- /phone -->
+</div><!-- /phone-wrap -->
+
+<script>
+    const PAGES_DARK_HEADER = ['splash','dashboard','dashboard-medecin','dashboard-pharmacien','teleconsult','medecins','dossier','pharmacies','paiements','urgence','notifications','profil'];
+    const PAGES_NO_BOTTOMNAV = ['splash','login','register'];
+
+    function nav(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const target = document.getElementById(pageId);
+        if (target) target.classList.add('active');
+
+        // Status bar color
+        const sb = document.getElementById('statusBar');
+        if (PAGES_DARK_HEADER.includes(pageId)) {
+            sb.className = 'status-bar dark';
+        } else {
+            sb.className = 'status-bar light';
+        }
+
+        // Bottom Nav visibility
+        const bn = document.getElementById('bottomNav');
+        bn.style.display = PAGES_NO_BOTTOMNAV.includes(pageId) ? 'none' : 'flex';
+
+        // Sync side nav buttons
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        const matchBtn = [...document.querySelectorAll('.nav-btn')].find(b => b.getAttribute('onclick')?.includes(`'${pageId}'`));
+        if (matchBtn) matchBtn.classList.add('active');
+    }
+
+    function selectRole(el, role) {
+        document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+
+        // Adapter la redirection selon le rôle
+        const loginBtn = document.querySelector('#splash .btn-primary');
+        if (loginBtn) {
+            loginBtn.onclick = () => {
+                if (role === 'medecin') nav('dashboard-medecin');
+                else if (role === 'pharmacien') nav('dashboard-pharmacien');
+                else nav('login');
+            };
+        }
+    }
+
+    function setActiveNav(id) {
+        document.querySelectorAll('.bn-item').forEach(i => i.classList.remove('active'));
+        const el = document.getElementById(id);
+        if (el) el.classList.add('active');
+    }
+
+    // Animation d'entrée
+    window.addEventListener('load', () => {
+        const phone = document.querySelector('.phone');
+        phone.style.opacity = '0';
+        phone.style.transform = 'scale(.92) translateY(20px)';
+        setTimeout(() => {
+            phone.style.transition = 'all .5s cubic-bezier(.34,1.56,.64,1)';
+            phone.style.opacity = '1';
+            phone.style.transform = 'scale(1) translateY(0)';
+        }, 80);
+
+        // Masquer bottom nav au démarrage (page splash)
+        document.getElementById('bottomNav').style.display = 'none';
+    });
+</script>
+</body>
+</html>

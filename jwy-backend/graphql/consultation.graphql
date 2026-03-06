@@ -1,0 +1,169 @@
+type Consultation {
+    id: ID!
+    patient: Patient! @belongsTo
+    medecin: Medecin! @belongsTo
+    dossier_medical: DossierMedical @belongsTo
+    type_consultation: TypeConsultation!
+    symptomes: String
+    diagnostic: String
+    recommandations: String
+    cout_consultation: Float!
+    statut: StatutConsultation!
+    notes_consultation: String
+    date_consultation: DateTime
+    duree_minutes: Int
+    note_patient: Float
+    avis_patient: String
+    teleconsultation: TeleConsultation @hasOne
+    consultation_physique: ConsultationPhysique @hasOne
+    prescriptions: [Prescription!]! @hasMany
+    paiement: Paiement @morphOne
+    created_at: DateTime!
+}
+
+type TeleConsultation {
+    id: ID!
+    consultation: Consultation! @belongsTo
+    agora_channel: String!
+    duree_consultation: Int
+    qualite_connexion: String
+    enregistrement_disponible: Boolean!
+    debut_appel: DateTime
+    fin_appel: DateTime
+}
+
+"Token retourné pour rejoindre l'appel vidéo"
+type TeleConsultationToken {
+    agora_channel: String!
+    agora_token: String!
+    agora_app_id: String!
+    consultation: Consultation!
+}
+
+type ConsultationPhysique {
+    id: ID!
+    consultation: Consultation! @belongsTo
+    adresse_consultation: String!
+    salle_consultation: String
+    presence_confirmee: Boolean!
+}
+
+type RendezVous {
+    id: ID!
+    patient: Patient! @belongsTo
+    medecin: Medecin! @belongsTo
+    date_rendez_vous: DateTime!
+    duree_estimee: Int!
+    statut: StatutRendezVous!
+    type_rendez_vous: TypeConsultation!
+    lieu_rendez_vous: String
+    motif: String
+    rappel_envoye: Boolean!
+    created_at: DateTime!
+}
+
+input DemanderConsultationInput {
+    medecin_id: ID!
+    type_consultation: TypeConsultation!
+    symptomes: String!
+    date_souhaitee: DateTime
+    adresse_physique: String
+}
+
+input PrendreRendezVousInput {
+    medecin_id: ID!
+    date_rendez_vous: DateTime!
+    type_rendez_vous: TypeConsultation!
+    motif: String
+    lieu_rendez_vous: String
+}
+
+input NoterConsultationInput {
+    consultation_id: ID!
+    note: Float!
+    avis: String
+}
+
+extend type Query {
+    "Mes consultations (patient ou médecin)"
+    mesConsultations(
+        statut: StatutConsultation
+        first: Int = 10
+        page: Int
+    ): ConsultationPaginator! @guard
+        @field(resolver: "App\\GraphQL\\Queries\\MesConsultations")
+
+    "Détail d'une consultation"
+    consultation(id: ID!): Consultation @guard
+        @field(resolver: "App\\GraphQL\\Queries\\DetailConsultation")
+
+    "Mes rendez-vous"
+    mesRendezVous(
+        statut: StatutRendezVous
+        first: Int = 10
+        page: Int
+    ): RendezVousPaginator! @guard
+        @field(resolver: "App\\GraphQL\\Queries\\MesRendezVous")
+}
+
+type ConsultationPaginator {
+    data: [Consultation!]!
+    paginatorInfo: PaginatorInfo!
+}
+
+type RendezVousPaginator {
+    data: [RendezVous!]!
+    paginatorInfo: PaginatorInfo!
+}
+
+extend type Mutation {
+    "Demander une consultation (patient)"
+    demanderConsultation(input: DemanderConsultationInput! @spread): Consultation!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\DemanderConsultation")
+
+    "Démarrer l'appel vidéo Agora (médecin ou patient)"
+    demarrerTeleConsultation(consultation_id: ID!): TeleConsultationToken!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\DemarrerTeleConsultation")
+
+    "Terminer une consultation (médecin)"
+    terminerConsultation(
+        consultation_id: ID!
+        diagnostic: String!
+        recommandations: String
+        notes: String
+    ): Consultation!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\TerminerConsultation")
+
+    "Prendre un rendez-vous"
+    prendreRendezVous(input: PrendreRendezVousInput! @spread): RendezVous!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\PrendreRendezVous")
+
+    "Annuler un rendez-vous"
+    annulerRendezVous(id: ID!): RendezVous!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\AnnulerRendezVous")
+
+    "Reporter un rendez-vous"
+    reporterRendezVous(id: ID!, nouvelle_date: DateTime!): RendezVous!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\ReporterRendezVous")
+
+    "Noter une consultation (patient)"
+    noterConsultation(input: NoterConsultationInput! @spread): Consultation!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\NoterConsultation")
+}
+
+type Subscription {
+    "Suivi du statut d'une consultation en temps réel"
+    statutConsultation(consultation_id: ID!): Consultation!
+        @subscription(class: "App\\GraphQL\\Subscriptions\\StatutConsultation")
+
+    "Nouvelle notification pour l'utilisateur connecté"
+    nouvelleNotification: Notification!
+        @subscription(class: "App\\GraphQL\\Subscriptions\\NouvelleNotification")
+}

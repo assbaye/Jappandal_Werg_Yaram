@@ -1,0 +1,38 @@
+type DashboardStats {
+    total_patients: Int!
+    total_medecins: Int!
+    total_consultations: Int!
+    consultations_aujourd_hui: Int!
+    revenus_ce_mois: Float!
+    alertes_actives: Int!
+}
+
+extend type Query {
+    "Statistiques du tableau de bord (admin)"
+    dashboardStats: DashboardStats! @guard
+        @field(resolver: "App\\GraphQL\\Queries\\DashboardStats")
+
+    "Liste des utilisateurs (admin)"
+    utilisateurs(
+        role: String
+        est_actif: Boolean
+        first: Int = 20
+        page: Int
+    ): UserPaginator! @guard
+        @field(resolver: "App\\GraphQL\\Queries\\ListeUtilisateurs")
+}
+
+type UserPaginator {
+    data: [User!]!
+    paginatorInfo: PaginatorInfo!
+}
+
+extend type Mutation {
+    "Activer/désactiver un utilisateur (admin)"
+    toggleUtilisateurActif(user_id: ID!): User! @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\ToggleUtilisateurActif")
+
+    "Certifier un médecin (admin)"
+    certifierMedecin(medecin_id: ID!): Medecin! @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\CertifierMedecin")
+}

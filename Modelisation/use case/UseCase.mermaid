@@ -1,0 +1,260 @@
+graph TB
+    %% Acteurs
+    Patient[👤 Patient]
+    Medecin[👨‍⚕️ Médecin]
+    Pharmacien[👨‍💼 Pharmacien]
+    Pharmacie[🏥 Pharmacie]
+    Administrateur[👨‍💻 Administrateur]
+    SystemePaiement[💳 Système de Paiement]
+    ServicesUrgence[🚨 Services d'Urgence]
+
+    %% Cas d'utilisation - Gestion des comptes
+    subgraph "Gestion des Comptes"
+        UC01[S'inscrire]
+        UC02[Se connecter]
+        UC03[Modifier profil]
+        UC04[Gérer les paramètres]
+    end
+
+    %% Cas d'utilisation - Dossier Médical
+    subgraph "Gestion Dossier Médical"
+        UC05[Consulter dossier médical]
+        UC06[Mettre à jour dossier médical]
+        UC07[Partager dossier médical]
+        UC08[Ajouter prescription au dossier]
+        UC09[Ajouter résultats de tests]
+        UC10[Consulter historique médical]
+    end
+
+    %% Cas d'utilisation - Téléconsultation
+    subgraph "Téléconsultation"
+        UC11[Demander téléconsultation]
+        UC12[Effectuer consultation vidéo]
+        UC13[Effectuer consultation chat]
+        UC14[Envoyer consultation pré-enregistrée]
+        UC15[Fournir diagnostic à distance]
+        UC16[Système de triage automatique]
+    end
+
+    %% Cas d'utilisation - Rendez-vous et Suivi
+    subgraph "Rendez-vous et Suivi"
+        UC17[Prendre rendez-vous]
+        UC18[Planifier rendez-vous]
+        UC19[Confirmer rendez-vous]
+        UC20[Reporter rendez-vous]
+        UC21[Annuler rendez-vous]
+        UC22[Suivre traitement]
+        UC23[Recevoir rappels de traitement]
+    end
+
+    %% Cas d'utilisation - Gestion des Médicaments
+    subgraph "Gestion des Médicaments"
+        UC24[Prescrire médicament]
+        UC25[Vérifier disponibilité médicament]
+        UC26[Réserver médicament]
+        UC27[Gérer stock pharmacie]
+        UC28[Mettre à jour stock temps réel]
+        UC29[Localiser pharmacie]
+        UC30[Demander livraison à domicile]
+    end
+
+    %% Cas d'utilisation - Paiements
+    subgraph "Paiements"
+        UC31[Payer consultation]
+        UC32[Payer médicament]
+        UC33[Payer ordonnance]
+        UC34[Consulter historique paiements]
+        UC35[Traiter paiement]
+        UC36[Confirmer transaction]
+    end
+
+    %% Cas d'utilisation - Notifications et Alertes
+    subgraph "Notifications et Alertes"
+        UC37[Envoyer notification]
+        UC38[Recevoir alerte santé publique]
+        UC39[Diffuser campagne prévention]
+        UC40[Alerter épidémie locale]
+        UC41[Envoyer rappel médicament]
+    end
+
+    %% Cas d'utilisation - Urgences
+    subgraph "Gestion des Urgences"
+        UC42[Déclencher alerte urgence]
+        UC43[Géolocaliser pour urgence]
+        UC44[Contacter services urgence]
+        UC45[Appliquer protocole critique]
+    end
+
+    %% Cas d'utilisation - Formation et Éducation
+    subgraph "Formation et Éducation"
+        UC46[Consulter contenus éducatifs]
+        UC47[Suivre formation professionnelle]
+        UC48[Accéder aux tutoriels]
+        UC49[Gérer contenus formation]
+    end
+
+    %% Cas d'utilisation - Administration
+    subgraph "Administration"
+        UC50[Gérer utilisateurs]
+        UC51[Configurer système]
+        UC52[Générer rapports]
+        UC53[Monitorer performances]
+        UC54[Gérer partenariats]
+    end
+
+    %% Relations Patient
+    Patient --> UC01
+    Patient --> UC02
+    Patient --> UC03
+    Patient --> UC05
+    Patient --> UC07
+    Patient --> UC10
+    Patient --> UC11
+    Patient --> UC14
+    Patient --> UC17
+    Patient --> UC19
+    Patient --> UC20
+    Patient --> UC21
+    Patient --> UC22
+    Patient --> UC23
+    Patient --> UC25
+    Patient --> UC26
+    Patient --> UC29
+    Patient --> UC30
+    Patient --> UC31
+    Patient --> UC32
+    Patient --> UC33
+    Patient --> UC34
+    Patient --> UC38
+    Patient --> UC41
+    Patient --> UC42
+    Patient --> UC43
+    Patient --> UC46
+    Patient --> UC48
+
+    %% Relations Médecin
+    Medecin --> UC01
+    Medecin --> UC02
+    Medecin --> UC03
+    Medecin --> UC05
+    Medecin --> UC06
+    Medecin --> UC08
+    Medecin --> UC09
+    Medecin --> UC12
+    Medecin --> UC13
+    Medecin --> UC15
+    Medecin --> UC16
+    Medecin --> UC18
+    Medecin --> UC24
+    Medecin --> UC37
+    Medecin --> UC47
+    Medecin --> UC48
+
+    %% Relations Pharmacien
+    Pharmacien --> UC01
+    Pharmacien --> UC02
+    Pharmacien --> UC03
+    Pharmacien --> UC27
+    Pharmacien --> UC28
+    Pharmacien --> UC37
+    Pharmacien --> UC47
+    Pharmacien --> UC48
+
+    %% Relations Pharmacie
+    Pharmacie --> UC27
+    Pharmacie --> UC28
+    Pharmacie --> UC30
+    Pharmacie --> UC54
+
+    %% Relations Administrateur
+    Administrateur --> UC04
+    Administrateur --> UC37
+    Administrateur --> UC39
+    Administrateur --> UC40
+    Administrateur --> UC49
+    Administrateur --> UC50
+    Administrateur --> UC51
+    Administrateur --> UC52
+    Administrateur --> UC53
+    Administrateur --> UC54
+
+    %% Relations Système de Paiement
+    SystemePaiement --> UC35
+    SystemePaiement --> UC36
+
+    %% Relations Services d'Urgence
+    ServicesUrgence --> UC44
+    ServicesUrgence --> UC45
+
+    %% Relations d'inclusion et d'extension
+    %% Tous les cas d'utilisation (sauf inscription) incluent l'authentification
+    UC03 -.->|<<include>>| UC02
+    UC04 -.->|<<include>>| UC02
+    UC05 -.->|<<include>>| UC02
+    UC06 -.->|<<include>>| UC02
+    UC07 -.->|<<include>>| UC02
+    UC08 -.->|<<include>>| UC02
+    UC09 -.->|<<include>>| UC02
+    UC10 -.->|<<include>>| UC02
+    UC11 -.->|<<include>>| UC02
+    UC12 -.->|<<include>>| UC02
+    UC13 -.->|<<include>>| UC02
+    UC14 -.->|<<include>>| UC02
+    UC15 -.->|<<include>>| UC02
+    UC16 -.->|<<include>>| UC02
+    UC17 -.->|<<include>>| UC02
+    UC18 -.->|<<include>>| UC02
+    UC19 -.->|<<include>>| UC02
+    UC20 -.->|<<include>>| UC02
+    UC21 -.->|<<include>>| UC02
+    UC22 -.->|<<include>>| UC02
+    UC23 -.->|<<include>>| UC02
+    UC24 -.->|<<include>>| UC02
+    UC25 -.->|<<include>>| UC02
+    UC26 -.->|<<include>>| UC02
+    UC27 -.->|<<include>>| UC02
+    UC28 -.->|<<include>>| UC02
+    UC29 -.->|<<include>>| UC02
+    UC30 -.->|<<include>>| UC02
+    UC31 -.->|<<include>>| UC02
+    UC32 -.->|<<include>>| UC02
+    UC33 -.->|<<include>>| UC02
+    UC34 -.->|<<include>>| UC02
+    UC35 -.->|<<include>>| UC02
+    UC36 -.->|<<include>>| UC02
+    UC37 -.->|<<include>>| UC02
+    UC38 -.->|<<include>>| UC02
+    UC39 -.->|<<include>>| UC02
+    UC40 -.->|<<include>>| UC02
+    UC41 -.->|<<include>>| UC02
+    UC42 -.->|<<include>>| UC02
+    UC43 -.->|<<include>>| UC02
+    UC44 -.->|<<include>>| UC02
+    UC45 -.->|<<include>>| UC02
+    UC46 -.->|<<include>>| UC02
+    UC47 -.->|<<include>>| UC02
+    UC48 -.->|<<include>>| UC02
+    UC49 -.->|<<include>>| UC02
+    UC50 -.->|<<include>>| UC02
+    UC51 -.->|<<include>>| UC02
+    UC52 -.->|<<include>>| UC02
+    UC53 -.->|<<include>>| UC02
+    UC54 -.->|<<include>>| UC02
+
+    %% Autres relations spécifiques
+    UC31 -.->|<<include>>| UC35
+    UC32 -.->|<<include>>| UC35
+    UC33 -.->|<<include>>| UC35
+    UC26 -.->|<<extend>>| UC30
+    UC42 -.->|<<include>>| UC43
+    UC16 -.->|<<extend>>| UC11
+    UC23 -.->|<<include>>| UC37
+    UC41 -.->|<<include>>| UC37
+
+    %% Style des acteurs
+    classDef acteur fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    class Patient,Medecin,Pharmacien,Pharmacie,Administrateur,SystemePaiement,ServicesUrgence acteur
+
+    %% Style des cas d'utilisation
+    classDef usecase fill:#f3e5f5,stroke:#4a148c,stroke-width:1px
+    class UC01,UC02,UC03,UC04,UC05,UC06,UC07,UC08,UC09,UC10,UC11,UC12,UC13,UC14,UC15,UC16,UC17,UC18,UC19,UC20,UC21,UC22,UC23,UC24,UC25,UC26,UC27,UC28,UC29,UC30,UC31,UC32,UC33,UC34,UC35,UC36,UC37,UC38,UC39,UC40,UC41,UC42,UC43,UC44,UC45,UC46,UC47,UC48,UC49,UC50,UC51,UC52,UC53,UC54 usecase

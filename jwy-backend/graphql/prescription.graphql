@@ -1,0 +1,57 @@
+type Prescription {
+    id: ID!
+    medecin: Medecin! @belongsTo
+    patient: Patient! @belongsTo
+    consultation: Consultation @belongsTo
+    validite_jours: Int!
+    instructions: String
+    est_executee: Boolean!
+    date_execution: DateTime
+    medicaments_prescrits: [MedicamentPrescrit!]! @hasMany
+    is_expiree: Boolean!
+    created_at: DateTime!
+}
+
+type MedicamentPrescrit {
+    id: ID!
+    medicament: Medicament! @belongsTo
+    quantite: Int!
+    posologie: String!
+    duree_traitement: Int!
+    instructions_speciales: String
+    cout_total: Float!
+}
+
+input CreerPrescriptionInput {
+    consultation_id: ID
+    patient_id: ID!
+    validite_jours: Int = 30
+    instructions: String
+    medicaments: [MedicamentPrescritInput!]!
+}
+
+input MedicamentPrescritInput {
+    medicament_id: ID!
+    quantite: Int!
+    posologie: String!
+    duree_traitement: Int!
+    instructions_speciales: String
+}
+
+extend type Query {
+    "Mes prescriptions (patient)"
+    mesPrescriptions(first: Int = 10, page: Int): PrescriptionPaginator! @guard
+        @field(resolver: "App\\GraphQL\\Queries\\MesPrescriptions")
+}
+
+type PrescriptionPaginator {
+    data: [Prescription!]!
+    paginatorInfo: PaginatorInfo!
+}
+
+extend type Mutation {
+    "Créer une prescription (médecin uniquement)"
+    creerPrescription(input: CreerPrescriptionInput! @spread): Prescription!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\CreerPrescription")
+}

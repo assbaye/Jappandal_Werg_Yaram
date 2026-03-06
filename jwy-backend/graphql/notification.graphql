@@ -1,0 +1,76 @@
+type Notification {
+    id: ID!
+    user: User! @belongsTo
+    titre: String!
+    message: String!
+    type: TypeNotification!
+    priorite: String!
+    est_lue: Boolean!
+    lue_le: DateTime
+    data: JSON
+    action_url: String
+    created_at: DateTime!
+}
+
+type AlerteSante {
+    id: ID!
+    type_alerte: String!
+    zone: String!
+    niveau_gravite: NiveauGravite!
+    description: String!
+    recommandations: String
+    date_debut: DateTime!
+    date_fin: DateTime
+    est_active: Boolean!
+    personnes_touchees: Int!
+}
+
+extend type Query {
+    "Mes notifications"
+    mesNotifications(
+        est_lue: Boolean
+        first: Int = 20
+        page: Int
+    ): NotificationPaginator! @guard
+        @field(resolver: "App\\GraphQL\\Queries\\MesNotifications")
+
+    "Alertes santé actives dans une zone"
+    alertesSante(zone: String): [AlerteSante!]!
+        @field(resolver: "App\\GraphQL\\Queries\\AlertesSante")
+}
+
+type NotificationPaginator {
+    data: [Notification!]!
+    paginatorInfo: PaginatorInfo!
+}
+
+extend type Mutation {
+    "Marquer une notification comme lue"
+    marquerNotificationLue(id: ID!): Notification!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\MarquerNotificationLue")
+
+    "Marquer toutes les notifications comme lues"
+    marquerToutesLues: Boolean! @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\MarquerToutesLues")
+
+    "Déclencher une alerte d'urgence (patient)"
+    declencherAlerteUrgence(
+        latitude: Float!
+        longitude: Float!
+        description: String
+    ): Boolean! @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\DeclencherAlerteUrgence")
+
+    "Créer une alerte santé publique (admin)"
+    creerAlerteSante(
+        type_alerte: String!
+        zone: String!
+        niveau_gravite: NiveauGravite!
+        description: String!
+        recommandations: String
+        date_debut: DateTime!
+        date_fin: DateTime
+    ): AlerteSante! @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\CreerAlerteSante")
+}

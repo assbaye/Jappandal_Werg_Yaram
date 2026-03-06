@@ -1,0 +1,134 @@
+type Pharmacie {
+    id: ID!
+    nom_pharmacie: String!
+    adresse: String!
+    telephone: String
+    latitude: Float!
+    longitude: Float!
+    heures_ouverture: JSON
+    est_partenaire: Boolean!
+    est_active: Boolean!
+    livraison_disponible: Boolean!
+    photo: String
+    distance: Float
+    pharmaciens: [Pharmacien!]! @belongsToMany
+    stocks: [StockMedicament!]! @hasMany
+}
+
+type Pharmacien {
+    id: ID!
+    user: User! @belongsTo
+    numero_ordre: String!
+    nom: String!
+    prenom: String!
+    nom_complet: String!
+    photo: String
+    pharmacies: [Pharmacie!]! @belongsToMany
+}
+
+type StockMedicament {
+    id: ID!
+    pharmacie: Pharmacie! @belongsTo
+    medicament: Medicament! @belongsTo
+    quantite_disponible: Int!
+    quantite_minimale: Int!
+    date_expiration: String
+    prix_vente: Float!
+    is_stock_faible: Boolean!
+}
+
+type Medicament {
+    id: ID!
+    nom_commercial: String!
+    principe_actif: String!
+    dosage: String
+    forme: FormeMedicament!
+    fabricant: String
+    prix_unitaire: Float!
+    necessite_ordonnance: Boolean!
+    description: String
+    contre_indications: [String!]!
+    effets_secondaires: [String!]!
+    stocks: [StockMedicament!]! @hasMany
+}
+
+extend type Query {
+    "Pharmacies proches par géolocalisation (rayon en km)"
+    pharmaciesProches(
+        latitude: Float!
+        longitude: Float!
+        rayon: Float = 10
+    ): [Pharmacie!]!
+        @field(resolver: "App\\GraphQL\\Queries\\PharmaciesProches")
+
+    "Rechercher un médicament"
+    rechercherMedicament(terme: String!): [Medicament!]!
+        @field(resolver: "App\\GraphQL\\Queries\\RechercherMedicament")
+
+    "Vérifier la disponibilité d'un médicament"
+    disponibiliteMedicament(
+        medicament_id: ID!
+        latitude: Float
+        longitude: Float
+    ): [StockMedicament!]!
+        @field(resolver: "App\\GraphQL\\Queries\\DisponibiliteMedicament")
+
+    "Stock d'une pharmacie (pour le pharmacien connecté)"
+    monStock(first: Int = 20, page: Int): StockPaginator! @guard
+        @field(resolver: "App\\GraphQL\\Queries\\MonStock")
+}
+
+type StockPaginator {
+    data: [StockMedicament!]!
+    paginatorInfo: PaginatorInfo!
+}
+
+input CommandeInput {
+    pharmacie_id: ID!
+    prescription_id: ID
+    type_livraison: TypeLivraison!
+    adresse_livraison: String
+    medicaments: [CommandeMedicamentInput!]!
+}
+
+input CommandeMedicamentInput {
+    medicament_id: ID!
+    quantite: Int!
+}
+
+type Commande {
+    id: ID!
+    patient: Patient! @belongsTo
+    pharmacie: Pharmacie! @belongsTo
+    prescription: Prescription @belongsTo
+    numero_commande: String!
+    statut: String!
+    type_livraison: String!
+    adresse_livraison: String
+    montant_total: Float!
+    frais_livraison: Float!
+    medicaments: [Medicament!]! @belongsToMany
+    paiement: Paiement @morphOne
+    created_at: DateTime!
+}
+
+extend type Mutation {
+    "Passer une commande de médicaments"
+    commanderMedicaments(input: CommandeInput! @spread): Commande!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\CommanderMedicaments")
+
+    "Mettre à jour le stock (pharmacien)"
+    updateStock(
+        medicament_id: ID!
+        quantite_disponible: Int!
+        prix_vente: Float
+    ): StockMedicament!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\UpdateStock")
+
+    "Mettre à jour le statut d'une commande (pharmacien)"
+    updateStatutCommande(id: ID!, statut: StatutCommande!): Commande!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\UpdateStatutCommande")
+}
