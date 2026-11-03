@@ -45,6 +45,11 @@ class Prescription extends Model
         return $this->hasMany(MedicamentPrescrit::class);
     }
 
+    public function getIsExpireeAttribute(): bool
+    {
+        return $this->isExpiree();
+    }
+
     public function isExpiree(): bool
     {
         return $this->created_at->addDays($this->validite_jours)->isPast();
