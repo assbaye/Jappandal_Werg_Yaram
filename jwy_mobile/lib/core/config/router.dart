@@ -23,6 +23,8 @@ import '../../features/pharmacien/screens/stock_screen.dart';
 import '../../features/commande/screens/commander_ordonnance_screen.dart';
 import '../../features/commande/screens/mes_commandes_screen.dart';
 import '../../features/profil/screens/profil_screen.dart';
+import '../../features/urgence/screens/urgence_screen.dart';
+import '../../features/urgence/screens/urgences_medecin_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -107,6 +109,8 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // ── Hors shell (plein écran) ──────────────────────────────────────────
       GoRoute(path: '/profil', builder: (_, __) => const ProfilScreen()),
+      GoRoute(path: '/urgence', builder: (_, __) => const UrgenceScreen()),
+      GoRoute(path: '/medecin/urgences', builder: (_, __) => const UrgencesMedecinScreen()),
       GoRoute(path: '/commandes', builder: (_, __) => const MesCommandesScreen()),
       GoRoute(
         path: '/commandes/ordonnance',

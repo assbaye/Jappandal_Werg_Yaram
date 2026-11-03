@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/outils.dart';
 import '../../../core/graphql/queries/notification_queries.dart';
 import '../../auth/providers/auth_provider.dart';
 
@@ -150,8 +151,7 @@ class _NotificationTile extends ConsumerWidget {
       };
 
   String _quand(String? d) {
-    if (d == null) return '';
-    final date = DateTime.tryParse(d);
+    final date = dateServeurUtc(d);
     if (date == null) return '';
     final diff = DateTime.now().difference(date);
     if (diff.inMinutes < 1) return 'À l\'instant';
@@ -166,6 +166,10 @@ class _NotificationTile extends ConsumerWidget {
     final data = notification['data'];
     if (data is! Map) return null;
     if (data['consultation_id'] != null) return '/consultations/${data['consultation_id']}';
+    if (data['alerte_urgence_id'] != null) {
+      final role = ref.read(authProvider).user?['role'];
+      return role == 'medecin' ? '/medecin/urgences' : '/urgence';
+    }
     if (data['commande_id'] != null) {
       final role = ref.read(authProvider).user?['role'];
       return role == 'pharmacien' ? '/pharmacien/commandes' : '/commandes';
@@ -189,7 +193,8 @@ class _NotificationTile extends ConsumerWidget {
     final dest = _destination(ref);
     if (dest != null && context.mounted) {
       // Les onglets (rendez-vous) se remplacent, les détails s'empilent
-      (dest.startsWith('/consultations/') || dest == '/commandes') ? context.push(dest) : context.go(dest);
+      const empilees = ['/commandes', '/urgence', '/medecin/urgences'];
+      (dest.startsWith('/consultations/') || empilees.contains(dest)) ? context.push(dest) : context.go(dest);
     }
   }
 

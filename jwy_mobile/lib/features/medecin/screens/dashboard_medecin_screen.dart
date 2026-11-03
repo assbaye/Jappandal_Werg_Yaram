@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/graphql/queries/medecin_queries.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../notifications/screens/notifications_screen.dart';
+import '../../urgence/screens/urgences_medecin_screen.dart';
 
 // ─── Shell médecin (BottomNav) ────────────────────────────────────────────────
 
@@ -106,6 +107,7 @@ class DashboardMedecinTab extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const BandeauUrgences(),
                 _MedecinWelcomeCard(medecin: medecin, user: user),
                 const SizedBox(height: 20),
                 _DisponibiliteCard(medecin: medecin),

@@ -43,6 +43,7 @@ dependencies:
 
   # WebView pour paiements (Wave, Orange Money redirect)
   flutter_inappwebview: ^6.0.0
+  url_launcher: ^6.3.3
 
 dev_dependencies:
   flutter_test:

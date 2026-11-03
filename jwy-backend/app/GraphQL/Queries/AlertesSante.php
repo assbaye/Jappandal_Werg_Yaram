@@ -3,20 +3,17 @@
 namespace App\GraphQL\Queries;
 
 use App\Models\AlerteSante;
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class AlertesSante
 {
-    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator
+    public function __invoke(mixed $root, array $args, GraphQLContext $context): Collection
     {
-        $query = AlerteSante::query();
-
-        if (!empty($args['actives_seulement'])) {
-            $query->where('est_active', true);
-        }
-
-        return $query->orderBy('created_at', 'desc')->paginate($args['first'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+        return AlerteSante::where('est_active', true)
+            ->when(! empty($args['zone']), fn ($q) => $q->where('zone', 'ilike', "%{$args['zone']}%"))
+            ->latest()
+            ->limit(20)
+            ->get();
     }
 }

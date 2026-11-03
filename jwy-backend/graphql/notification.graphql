@@ -12,6 +12,29 @@ type Notification {
     created_at: DateTime!
 }
 
+enum StatutUrgence {
+    ACTIVE          @enum(value: "active")
+    PRISE_EN_CHARGE @enum(value: "prise_en_charge")
+    CLOTUREE        @enum(value: "cloturee")
+    ANNULEE         @enum(value: "annulee")
+}
+
+"Alerte d'urgence individuelle (bouton SOS du patient)"
+type AlerteUrgence {
+    id: ID!
+    patient: Patient! @belongsTo
+    "Médecin qui a pris l'alerte en charge"
+    medecin: Medecin @belongsTo
+    type_urgence: String!
+    description: String
+    latitude: Float!
+    longitude: Float!
+    statut: StatutUrgence!
+    prise_en_charge_le: DateTime
+    cloturee_le: DateTime
+    created_at: DateTime!
+}
+
 type AlerteSante {
     id: ID!
     type_alerte: String!
@@ -37,6 +60,14 @@ extend type Query {
     "Alertes santé actives dans une zone"
     alertesSante(zone: String): [AlerteSante!]!
         @field(resolver: "App\\GraphQL\\Queries\\AlertesSante")
+
+    "Mon alerte d'urgence en cours (patient)"
+    monAlerteUrgence: AlerteUrgence @guard
+        @field(resolver: "App\\GraphQL\\Queries\\MonAlerteUrgence")
+
+    "Alertes d'urgence (médecin) : en cours, puis celles prises en charge par moi"
+    alertesUrgence: [AlerteUrgence!]! @guard
+        @field(resolver: "App\\GraphQL\\Queries\\AlertesUrgence")
 }
 
 type NotificationPaginator {
@@ -56,11 +87,20 @@ extend type Mutation {
 
     "Déclencher une alerte d'urgence (patient)"
     declencherAlerteUrgence(
-        latitude: Float!
-        longitude: Float!
+        latitude: Float! @rules(apply: ["between:-90,90"])
+        longitude: Float! @rules(apply: ["between:-180,180"])
+        type_urgence: String!
         description: String
-    ): Boolean! @guard
+    ): AlerteUrgence! @guard
         @field(resolver: "App\\GraphQL\\Mutations\\DeclencherAlerteUrgence")
+
+    "Prendre en charge une alerte d'urgence (médecin)"
+    prendreEnChargeUrgence(id: ID!): AlerteUrgence! @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\PrendreEnChargeUrgence")
+
+    "Clôturer (médecin en charge) ou annuler (patient) une alerte d'urgence"
+    terminerAlerteUrgence(id: ID!): AlerteUrgence! @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\TerminerAlerteUrgence")
 
     "Créer une alerte santé publique (admin)"
     creerAlerteSante(

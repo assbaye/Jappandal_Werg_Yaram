@@ -2,36 +2,61 @@
 
 namespace App\GraphQL\Mutations;
 
-use App\Models\AlerteSante;
+use App\Models\AlerteUrgence;
+use App\Models\Medecin;
 use App\Services\NotificationService;
-use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class DeclencherAlerteUrgence
 {
-    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): AlerteSante
-    {
-        $user = $context->user();
+    public function __construct(private NotificationService $notif) {}
 
-        $alerte = AlerteSante::create([
-            'created_by'      => $user->id,
-            'type_alerte'     => 'urgence_personnelle',
-            'zone'            => "GPS: {$args['latitude']}, {$args['longitude']}",
-            'niveau_gravite'  => 'urgence',
-            'description'     => "Alerte urgence déclenchée par {$user->email}",
-            'recommandations' => 'Contacter les secours : 15 (SAMU) ou 18 (Pompiers)',
-            'date_debut'      => now(),
-            'est_active'      => true,
+    public function __invoke(mixed $root, array $args, GraphQLContext $context): AlerteUrgence
+    {
+        $patient = $context->user()->patient;
+
+        if (! $patient) {
+            throw new Error('Seul un patient peut déclencher une alerte d\'urgence.');
+        }
+
+        // Une seule alerte en cours par patient : un nouvel appui met à jour la position
+        $alerte = AlerteUrgence::where('patient_id', $patient->id)->enCours()->latest()->first();
+
+        if ($alerte) {
+            $alerte->update([
+                'latitude'  => $args['latitude'],
+                'longitude' => $args['longitude'],
+            ]);
+
+            return $alerte;
+        }
+
+        $alerte = AlerteUrgence::create([
+            'patient_id'   => $patient->id,
+            'type_urgence' => $args['type_urgence'],
+            'description'  => $args['description'] ?? null,
+            'latitude'     => $args['latitude'],
+            'longitude'    => $args['longitude'],
+            'statut'       => 'active',
         ]);
 
-        // Notifier les équipes médicales proches (simplifié)
-        app(NotificationService::class)->sendToUser(
-            userId: $user->id,
-            titre: '🚨 Alerte urgence déclenchée',
-            message: 'Votre alerte a été envoyée. Les secours ont été notifiés.',
-            type: 'urgence',
-            priorite: 'urgente',
-        );
+        // Médecins disponibles en priorité ; à défaut, tous les médecins
+        $medecins = Medecin::where('disponible_maintenant', true)->get();
+        if ($medecins->isEmpty()) {
+            $medecins = Medecin::all();
+        }
+
+        foreach ($medecins as $medecin) {
+            $this->notif->sendToUser(
+                userId: $medecin->user_id,
+                titre: '🚨 Urgence : ' . $alerte->type_urgence,
+                message: "{$patient->nom_complet} a déclenché une alerte d'urgence.",
+                type: 'urgence',
+                data: ['alerte_urgence_id' => $alerte->id],
+                priorite: 'urgente',
+            );
+        }
 
         return $alerte;
     }

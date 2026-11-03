@@ -491,7 +491,7 @@ class _PatientCard extends StatelessWidget {
                         context: context,
                         isScrollControlled: true,
                         showDragHandle: true,
-                        builder: (_) => _DossierSheet(patientId: patient!['id'] as String),
+                        builder: (_) => DossierPatientSheet(patientId: patient!['id'] as String),
                       ),
             ),
           ),
@@ -503,9 +503,9 @@ class _PatientCard extends StatelessWidget {
 
 // ─── Dossier médical (bottom sheet médecin) ───────────────────────────────────
 
-class _DossierSheet extends ConsumerWidget {
+class DossierPatientSheet extends ConsumerWidget {
   final String patientId;
-  const _DossierSheet({required this.patientId});
+  const DossierPatientSheet({super.key, required this.patientId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
