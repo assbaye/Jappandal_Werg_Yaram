@@ -7,9 +7,6 @@ class AppConfig {
   // Appareil physique : flutter run --dart-define=API_URL=http://<IP_DU_MAC>:8001/graphql
   static const String graphqlUrlOverride = String.fromEnvironment('API_URL');
 
-  // Agora.io — remplacer par votre App ID réel depuis console.agora.io
-  static const String agoraAppId = 'VOTRE_AGORA_APP_ID';
-
   // Couleurs JWY
   static const String primaryColorHex = '#1565C0'; // Bleu santé
   static const String secondaryColorHex = '#42A5F5'; // Bleu clair

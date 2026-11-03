@@ -36,8 +36,11 @@ type TeleConsultation {
 "Token retourné pour rejoindre l'appel vidéo"
 type TeleConsultationToken {
     agora_channel: String!
+    "Vide si le projet Agora est en mode test (sans certificat)"
     agora_token: String!
     agora_app_id: String!
+    "uid Agora à utiliser pour rejoindre le canal (lié au token)"
+    agora_uid: Int!
     consultation: Consultation!
 }
 

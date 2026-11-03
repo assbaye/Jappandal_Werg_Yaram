@@ -66,6 +66,7 @@ const String demarrerTeleConsultationMutation = r'''
       agora_channel
       agora_token
       agora_app_id
+      agora_uid
     }
   }
 ''';

@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../../core/config/app_config.dart';
 import '../../../core/graphql/queries/patient_queries.dart';
 import '../../auth/providers/auth_provider.dart';
 
@@ -28,6 +27,7 @@ class _TeleConsultationScreenState extends ConsumerState<TeleConsultationScreen>
   Duration _duration = Duration.zero;
   Timer? _timer;
 
+  String? _agoraAppId;
   String? _agoraChannel;
   String? _agoraToken;
   int? _agoraUid;
@@ -61,9 +61,11 @@ class _TeleConsultationScreenState extends ConsumerState<TeleConsultationScreen>
       }
 
       final data = result.data!['demarrerTeleConsultation'] as Map<String, dynamic>;
+      // App ID, canal, token et uid viennent du serveur (le token est lié à cet uid)
+      _agoraAppId = data['agora_app_id'] as String?;
       _agoraChannel = data['agora_channel'] as String?;
       _agoraToken = data['agora_token'] as String?;
-      _agoraUid = 0;
+      _agoraUid = data['agora_uid'] as int?;
 
       // 3. Initialiser le moteur Agora
       await _initAgora();
@@ -78,16 +80,16 @@ class _TeleConsultationScreenState extends ConsumerState<TeleConsultationScreen>
   }
 
   Future<void> _initAgora() async {
-    if (_agoraChannel == null || AppConfig.agoraAppId == 'VOTRE_AGORA_APP_ID') {
+    if (_agoraChannel == null || _agoraAppId == null || _agoraAppId!.isEmpty) {
       setState(() {
-        _error = 'Agora App ID non configuré. Veuillez définir AppConfig.agoraAppId.';
+        _error = 'La vidéo n\'est pas configurée sur le serveur.';
         _isLoading = false;
       });
       return;
     }
 
     _engine = createAgoraRtcEngine();
-    await _engine!.initialize(RtcEngineContext(appId: AppConfig.agoraAppId));
+    await _engine!.initialize(RtcEngineContext(appId: _agoraAppId!));
 
     _engine!.registerEventHandler(RtcEngineEventHandler(
       onJoinChannelSuccess: (connection, elapsed) {
@@ -100,7 +102,13 @@ class _TeleConsultationScreenState extends ConsumerState<TeleConsultationScreen>
         if (mounted) setState(() => _remoteUid = null);
       },
       onError: (err, msg) {
-        if (mounted) setState(() => _error = 'Agora error: $msg');
+        final detail = switch (err) {
+          ErrorCodeType.errInvalidToken || ErrorCodeType.errTokenExpired =>
+            'Jeton vidéo refusé : vérifiez AGORA_APP_CERTIFICATE sur le serveur.',
+          ErrorCodeType.errInvalidAppId => 'App ID Agora invalide : vérifiez AGORA_APP_ID sur le serveur.',
+          _ => 'Erreur vidéo ($err) $msg',
+        };
+        if (mounted) setState(() => _error = detail);
       },
     ));
 

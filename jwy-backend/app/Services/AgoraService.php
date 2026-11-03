@@ -2,19 +2,24 @@
 
 namespace App\Services;
 
+use GraphQL\Error\Error;
+
 /**
- * Service de génération de tokens RTC Agora.io
+ * Service de génération de tokens RTC Agora.io.
  *
- * Basé sur le protocole Agora Token Builder.
- * Docs : https://docs.agora.io/en/video-calling/get-started/authentication-workflow
- *
- * Pour l'installer :  composer require agora/agora-token
- * (ou implémentation manuelle ci-dessous)
+ * - Projet Agora en « mode test » (App ID seul, pas de certificat) : aucun token n'est
+ *   nécessaire, on renvoie une chaîne vide.
+ * - Projet en « mode sécurisé » (App ID + App Certificate) : token au format 006,
+ *   portage de RtcTokenBuilder::buildTokenWithUid du dépôt officiel AgoraIO/Tools
+ *   (DynamicKey/AgoraDynamicKey/php).
  */
 class AgoraService
 {
-    public const ROLE_PUBLISHER  = 1;
-    public const ROLE_SUBSCRIBER = 2;
+    // Privilèges du format 006
+    private const JOIN_CHANNEL         = 1;
+    private const PUBLISH_AUDIO_STREAM = 2;
+    private const PUBLISH_VIDEO_STREAM = 3;
+    private const PUBLISH_DATA_STREAM  = 4;
 
     private ?string $appId;
     private ?string $appCertificate;
@@ -27,82 +32,62 @@ class AgoraService
         $this->tokenExpiry    = (int) config('services.agora.token_expiry', 3600);
     }
 
-    /**
-     * Génère un RTC Token Agora pour rejoindre un canal.
-     *
-     * @param  string  $channel  Nom du canal (ex: jwy-XXXXXXXX)
-     * @param  string  $userId   UID de l'utilisateur (converti en int pour Agora)
-     * @param  int     $role     ROLE_PUBLISHER (médecin) ou ROLE_SUBSCRIBER (patient)
-     * @return string  Le token RTC
-     */
-    public function generateToken(string $channel, string $userId, int $role = self::ROLE_PUBLISHER): string
+    public function appId(): string
     {
-        $expireTimestamp = time() + $this->tokenExpiry;
-
-        // Si la librairie officielle est installée :
-        // return RtcTokenBuilder::build($this->appId, $this->appCertificate, $channel, (int)$userId, $role, $expireTimestamp);
-
-        // Implémentation manuelle du protocole Agora Token 006
-        return $this->buildToken006($channel, (int) $userId, $role, $expireTimestamp);
-    }
-
-    /**
-     * Implémentation du protocole Agora Token 006.
-     * Référence : https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey/php
-     */
-    private function buildToken006(string $channel, int $uid, int $role, int $expireAt): string
-    {
-        $message = [
-            'salt'        => random_int(1, 4294967295),
-            'ts'          => time() + 24 * 3600,
-            'privileges'  => $this->buildPrivileges($role, $expireAt),
-        ];
-
-        $content = pack('N', $message['salt'])
-            . pack('N', $message['ts'])
-            . $this->packPrivileges($message['privileges']);
-
-        $sign = hash_hmac(
-            'sha256',
-            $this->appId . $channel . $uid . $content,
-            $this->appCertificate,
-            true
-        );
-
-        $token = '006' . $this->appId . base64_encode($sign . $content);
-
-        return $token;
-    }
-
-    private function buildPrivileges(int $role, int $expireAt): array
-    {
-        $privileges = [
-            1 => $expireAt, // JOIN_CHANNEL
-            2 => $expireAt, // PUBLISH_AUDIO_STREAM
-            3 => $expireAt, // PUBLISH_VIDEO_STREAM
-        ];
-
-        if ($role === self::ROLE_SUBSCRIBER) {
-            unset($privileges[2], $privileges[3]);
+        if (empty($this->appId)) {
+            throw new Error('La vidéo n\'est pas encore configurée sur le serveur (AGORA_APP_ID manquant).');
         }
 
-        return $privileges;
-    }
-
-    private function packPrivileges(array $privileges): string
-    {
-        $result = pack('v', count($privileges));
-        foreach ($privileges as $key => $val) {
-            $result .= pack('vN', $key, $val);
-        }
-        return $result;
+        return $this->appId;
     }
 
     /**
-     * Crée un nom de canal unique pour une consultation.
+     * Token RTC permettant à $uid de rejoindre $channel et d'y émettre audio et vidéo
+     * (patient comme médecin : les deux doivent se voir et s'entendre).
      */
-    public static function generateChannel(int $consultationId): string
+    public function generateToken(string $channel, int $uid): string
     {
-        return 'jwy-cons-' . $consultationId . '-' . bin2hex(random_bytes(4));
+        $appId = $this->appId();
+
+        if (empty($this->appCertificate)) {
+            return ''; // mode test Agora
+        }
+
+        $expireAt = time() + $this->tokenExpiry;
+
+        $message = pack('V', random_int(1, 99999999))   // salt
+            . pack('V', time() + 24 * 3600)               // ts
+            . $this->packMapUint32([
+                self::JOIN_CHANNEL         => $expireAt,
+                self::PUBLISH_AUDIO_STREAM => $expireAt,
+                self::PUBLISH_VIDEO_STREAM => $expireAt,
+                self::PUBLISH_DATA_STREAM  => $expireAt,
+            ]);
+
+        $uidStr    = $uid === 0 ? '' : (string) $uid;
+        $signature = hash_hmac('sha256', $appId . $channel . $uidStr . $message, $this->appCertificate, true);
+
+        $content = $this->packString($signature)
+            . pack('V', crc32($channel) & 0xffffffff)
+            . pack('V', crc32($uidStr) & 0xffffffff)
+            . $this->packString($message);
+
+        return '006' . $appId . base64_encode($content);
+    }
+
+    private function packString(string $value): string
+    {
+        return pack('v', strlen($value)) . $value;
+    }
+
+    private function packMapUint32(array $map): string
+    {
+        ksort($map);
+        $out = pack('v', count($map));
+        foreach ($map as $key => $value) {
+            $out .= pack('v', $key) . pack('V', $value);
+        }
+
+        return $out;
     }
 }

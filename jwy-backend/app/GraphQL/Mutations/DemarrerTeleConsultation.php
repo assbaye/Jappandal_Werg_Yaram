@@ -34,13 +34,9 @@ class DemarrerTeleConsultation
         // Rattrapage des consultations créées sans salle (ancien bug de casse des enums)
         $tc = $consultation->teleconsultation
             ?? $consultation->teleconsultation()->create();
-        $role = $user->role === 'medecin' ? AgoraService::ROLE_PUBLISHER : AgoraService::ROLE_SUBSCRIBER;
 
-        $token = $this->agora->generateToken(
-            channel: $tc->agora_channel,
-            userId: (string) $user->id,
-            role: $role
-        );
+        // L'app rejoint le canal avec ce même uid (le token y est lié)
+        $token = $this->agora->generateToken($tc->agora_channel, $user->id);
 
         // Marquer la consultation comme en cours si elle est confirmée
         if ($consultation->statut === 'confirmee') {
@@ -53,7 +49,8 @@ class DemarrerTeleConsultation
         return [
             'agora_channel' => $tc->agora_channel,
             'agora_token'   => $token,
-            'agora_app_id'  => config('services.agora.app_id'),
+            'agora_app_id'  => $this->agora->appId(),
+            'agora_uid'     => $user->id,
             'consultation'  => $consultation,
         ];
     }
