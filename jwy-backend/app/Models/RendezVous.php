@@ -28,6 +28,20 @@ class RendezVous extends Model
         ];
     }
 
+    /**
+     * Rendez-vous actifs d'un médecin qui chevauchent le créneau [début, début + durée[.
+     */
+    public function scopeChevauche($query, int $medecinId, string $debut, int $dureeMinutes, ?int $saufId = null)
+    {
+        $fin = \Carbon\Carbon::parse($debut)->addMinutes($dureeMinutes);
+
+        return $query->where('medecin_id', $medecinId)
+            ->whereNotIn('statut', ['annule', 'termine'])
+            ->when($saufId, fn ($q) => $q->where('id', '!=', $saufId))
+            ->where('date_rendez_vous', '<', $fin)
+            ->whereRaw("date_rendez_vous + (duree_estimee || ' minutes')::interval > ?", [\Carbon\Carbon::parse($debut)]);
+    }
+
     public function patient(): BelongsTo
     {
         return $this->belongsTo(Patient::class);

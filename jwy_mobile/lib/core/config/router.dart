@@ -14,6 +14,9 @@ import '../../features/paiement/screens/paiement_webview_screen.dart';
 import '../../features/medecin/screens/dashboard_medecin_screen.dart';
 import '../../features/consultation/screens/consultation_detail_screen.dart';
 import '../../features/medecin/screens/nouvelle_ordonnance_screen.dart';
+import '../../features/notifications/screens/notifications_screen.dart';
+import '../../features/rendez_vous/screens/rendez_vous_screen.dart';
+import '../../features/rendez_vous/screens/nouveau_rendez_vous_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -40,6 +43,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isLoggedIn && role == 'medecin') {
         final isMedecinRoute = loc.startsWith('/medecin') ||
             loc.startsWith('/consultations/') ||
+            loc == '/notifications' ||
             loc == '/acces-restreint';
         if (!isMedecinRoute) return '/medecin';
       }
@@ -60,6 +64,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(path: '/', builder: (_, __) => const DashboardHomeTab()),
           GoRoute(path: '/consultations', builder: (_, __) => const ConsultationsScreen()),
+          GoRoute(path: '/rendez-vous', builder: (_, __) => const RendezVousScreen()),
           GoRoute(path: '/pharmacies', builder: (_, __) => const PharmaciesScreen()),
         ],
       ),
@@ -70,10 +75,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(path: '/medecin', builder: (_, __) => const DashboardMedecinTab()),
           GoRoute(path: '/medecin/consultations', builder: (_, __) => const ConsultationsMedecinScreen()),
+          GoRoute(path: '/medecin/rendez-vous', builder: (_, __) => const RendezVousScreen()),
         ],
       ),
 
       // ── Hors shell (plein écran) ──────────────────────────────────────────
+      GoRoute(path: '/notifications', builder: (_, __) => const NotificationsScreen()),
+      GoRoute(path: '/rendez-vous/nouveau', builder: (_, __) => const NouveauRendezVousScreen()),
       GoRoute(
         path: '/consultations/nouvelle',
         builder: (_, __) => const NouvelleConsultationScreen(),

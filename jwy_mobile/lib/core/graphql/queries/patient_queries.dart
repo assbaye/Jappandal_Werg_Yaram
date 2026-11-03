@@ -27,25 +27,6 @@ const String mesConsultationsQuery = r'''
   }
 ''';
 
-const String mesRendezVousQuery = r'''
-  query MesRendezVous($first: Int) {
-    mesRendezVous(first: $first) {
-      data {
-        id
-        date_rendez_vous
-        statut
-        type_rendez_vous
-        lieu_rendez_vous
-        medecin {
-          nom
-          prenom
-          specialite
-        }
-      }
-    }
-  }
-''';
-
 const String pharmaciesProchesQuery = r'''
   query PharmaciesProches($latitude: Float!, $longitude: Float!, $rayon: Float) {
     pharmaciesProches(latitude: $latitude, longitude: $longitude, rayon: $rayon) {

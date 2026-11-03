@@ -6,33 +6,28 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/graphql/queries/medecin_queries.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../notifications/screens/notifications_screen.dart';
 
 // ─── Shell médecin (BottomNav) ────────────────────────────────────────────────
 
-class MedecinShell extends StatefulWidget {
+class MedecinShell extends StatelessWidget {
   final Widget child;
   const MedecinShell({super.key, required this.child});
 
-  @override
-  State<MedecinShell> createState() => _MedecinShellState();
-}
-
-class _MedecinShellState extends State<MedecinShell> {
-  int _currentIndex = 0;
-  static const _routes = ['/medecin', '/medecin/consultations'];
+  static const _routes = ['/medecin', '/medecin/consultations', '/medecin/rendez-vous'];
 
   @override
   Widget build(BuildContext context) {
+    // L'onglet actif suit l'URL (y compris après une navigation depuis une notification)
+    final index = _routes.indexOf(GoRouterState.of(context).matchedLocation);
+
     return Scaffold(
-      body: widget.child,
+      body: child,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
+        currentIndex: index < 0 ? 0 : index,
         selectedItemColor: AppTheme.primary,
         unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          setState(() => _currentIndex = index);
-          context.go(_routes[index]);
-        },
+        onTap: (i) => context.go(_routes[i]),
         items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
@@ -42,6 +37,10 @@ class _MedecinShellState extends State<MedecinShell> {
               icon: Icon(Icons.medical_services_outlined),
               activeIcon: Icon(Icons.medical_services),
               label: 'Consultations'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.event_outlined),
+              activeIcon: Icon(Icons.event),
+              label: 'Rendez-vous'),
         ],
       ),
     );
@@ -89,6 +88,7 @@ class DashboardMedecinTab extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('JWY — Médecin'),
         actions: [
+          const NotificationBell(),
           IconButton(
             icon: const Icon(Icons.person_outline),
             onPressed: () => _showProfile(context, ref),

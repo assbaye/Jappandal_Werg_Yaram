@@ -9,7 +9,8 @@ type Consultation {
     recommandations: String
     cout_consultation: Float!
     statut: StatutConsultation!
-    notes_consultation: String
+    "Privé : visible uniquement par le médecin de la consultation"
+    notes_consultation: String @field(resolver: "App\\GraphQL\\Fields\\NotesConsultation")
     date_consultation: DateTime
     duree_minutes: Int
     note_patient: Float
@@ -146,6 +147,11 @@ extend type Mutation {
     prendreRendezVous(input: PrendreRendezVousInput! @spread): RendezVous!
         @guard
         @field(resolver: "App\\GraphQL\\Mutations\\PrendreRendezVous")
+
+    "Confirmer ou refuser un rendez-vous (médecin)"
+    repondreRendezVous(id: ID!, accepter: Boolean!, motif: String): RendezVous!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\RepondreRendezVous")
 
     "Annuler un rendez-vous"
     annulerRendezVous(id: ID!): RendezVous!

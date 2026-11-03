@@ -3,32 +3,27 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../features/auth/providers/auth_provider.dart';
+import '../../notifications/screens/notifications_screen.dart';
 
 // ─── Shell patient ────────────────────────────────────────────────────────────
 
-class PatientShell extends StatefulWidget {
+class PatientShell extends StatelessWidget {
   final Widget child;
   const PatientShell({super.key, required this.child});
 
-  @override
-  State<PatientShell> createState() => _PatientShellState();
-}
-
-class _PatientShellState extends State<PatientShell> {
-  int _currentIndex = 0;
-  static const _routes = ['/', '/consultations', '/pharmacies'];
+  static const _routes = ['/', '/consultations', '/rendez-vous', '/pharmacies'];
 
   @override
   Widget build(BuildContext context) {
+    // L'onglet actif suit l'URL (y compris après une navigation depuis une notification)
+    final index = _routes.indexOf(GoRouterState.of(context).matchedLocation);
+
     return Scaffold(
-      body: widget.child,
+      body: child,
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
+        selectedIndex: index < 0 ? 0 : index,
         indicatorColor: AppTheme.primary.withValues(alpha: 0.15),
-        onDestinationSelected: (index) {
-          setState(() => _currentIndex = index);
-          context.go(_routes[index]);
-        },
+        onDestinationSelected: (i) => context.go(_routes[i]),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
@@ -39,6 +34,11 @@ class _PatientShellState extends State<PatientShell> {
             icon: Icon(Icons.medical_services_outlined),
             selectedIcon: Icon(Icons.medical_services, color: AppTheme.primary),
             label: 'Consultations',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.event_outlined),
+            selectedIcon: Icon(Icons.event, color: AppTheme.primary),
+            label: 'Rendez-vous',
           ),
           NavigationDestination(
             icon: Icon(Icons.local_pharmacy_outlined),
@@ -67,10 +67,7 @@ class DashboardHomeTab extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('JWY'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {},
-          ),
+          const NotificationBell(),
           IconButton(
             icon: const Icon(Icons.person_outline),
             onPressed: () => _showProfile(context, ref),
@@ -235,11 +232,11 @@ class _QuickActionsGrid extends StatelessWidget {
       isPush: false,
     ),
     _QuickAction(
-      icon: Icons.add_circle_outline,
-      label: 'Nouvelle demande',
+      icon: Icons.event_available,
+      label: 'Prendre rendez-vous',
       color: Color(0xFF0277BD),
       bgColor: Color(0xFFE1F5FE),
-      route: '/consultations/nouvelle',
+      route: '/rendez-vous/nouveau',
       isPush: true,
     ),
   ];

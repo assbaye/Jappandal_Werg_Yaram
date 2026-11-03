@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cupertino_icons: ^1.0.8
 
@@ -37,7 +39,7 @@ dependencies:
   cached_network_image: ^3.3.1
 
   # Internationalisation (dates, monnaie)
-  intl: ^0.19.0
+  intl: ^0.20.2
 
   # WebView pour paiements (Wave, Orange Money redirect)
   flutter_inappwebview: ^6.0.0
