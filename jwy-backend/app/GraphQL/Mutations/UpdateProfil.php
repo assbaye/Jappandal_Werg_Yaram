@@ -3,19 +3,21 @@
 namespace App\GraphQL\Mutations;
 
 use App\Models\Patient;
-use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Error\Error;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class UpdateProfil
 {
-    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Patient
+    public function __invoke(mixed $root, array $args, GraphQLContext $context): Patient
     {
-        $user    = $context->user();
-        $patient = $user->patient;
+        $patient = $context->user()->patient;
 
-        abort_if(!$patient, 403, 'Profil patient non trouvé.');
+        if (! $patient) {
+            throw new Error('Profil patient non trouvé.');
+        }
 
-        $patient->update(array_filter($args, fn($v) => $v !== null));
+        // Champs facultatifs vidés volontairement → null ; nom/prénom absents → inchangés
+        $patient->update(array_filter($args, fn ($v, $k) => $v !== null || ! in_array($k, ['nom', 'prenom']), ARRAY_FILTER_USE_BOTH));
 
         return $patient->fresh();
     }

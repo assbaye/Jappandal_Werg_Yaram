@@ -558,6 +558,17 @@ class _MedecinProfileSheet extends StatelessWidget {
               style: TextStyle(color: Colors.grey[500], fontSize: 12)),
           const SizedBox(height: 24),
           ListTile(
+            leading: const Icon(Icons.edit_outlined, color: AppTheme.primary),
+            title: const Text('Modifier mon profil'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () async {
+              final router = GoRouter.of(context); // le contexte de la fiche disparaît au pop
+              Navigator.pop(context);
+              await router.push('/profil');
+              ref.invalidate(_medecinInfoProvider);
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.logout, color: AppTheme.errorColor),
             title: const Text('Se déconnecter',
                 style: TextStyle(color: AppTheme.errorColor)),

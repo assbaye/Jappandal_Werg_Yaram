@@ -87,9 +87,12 @@ class DashboardPharmacienTab extends ConsumerWidget {
         actions: [
           const NotificationBell(),
           IconButton(
-            tooltip: 'Se déconnecter',
-            icon: const Icon(Icons.logout),
-            onPressed: () => ref.read(authProvider.notifier).logout(),
+            tooltip: 'Mon profil',
+            icon: const Icon(Icons.person_outline),
+            onPressed: () async {
+              await context.push('/profil');
+              ref.invalidate(_maPharmacieProvider);
+            },
           ),
         ],
       ),

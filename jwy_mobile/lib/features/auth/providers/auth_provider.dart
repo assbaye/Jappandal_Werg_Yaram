@@ -159,6 +159,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
     return err?.message ?? defaut;
   }
 
+  /// Recharge l'utilisateur connecté (après une modification de profil).
+  Future<void> rafraichirUtilisateur() async {
+    if (state.token == null) return;
+    final result = await buildGraphQLClient(state.token).query(
+      QueryOptions(document: gql(meQuery), fetchPolicy: FetchPolicy.networkOnly),
+    );
+    final me = result.data?['me'] as Map<String, dynamic>?;
+    if (me != null) state = state.copyWith(user: me);
+  }
+
   Future<void> logout() async {
     await _storage.delete(key: _tokenKey);
     state = const AuthState();

@@ -41,10 +41,12 @@ type DossierMedical {
 }
 
 input UpdatePatientInput {
-    nom: String
-    prenom: String
-    date_naissance: String
-    genre: String
+    nom: String @rules(apply: ["nullable", "filled"], messages: [{ rule: "filled", message: "Ce champ ne peut pas être vide." }])
+    prenom: String @rules(apply: ["nullable", "filled"], messages: [{ rule: "filled", message: "Ce champ ne peut pas être vide." }])
+    date_naissance: String @rules(apply: ["nullable", "date", "before:today"], messages: [
+        { rule: "before", message: "La date de naissance doit être dans le passé." }
+    ])
+    genre: String @rules(apply: ["nullable", "in:M,F"], messages: [{ rule: "in", message: "Genre invalide." }])
     adresse: String
     numero_urgence: String
     groupe_sanguin: GroupeSanguin

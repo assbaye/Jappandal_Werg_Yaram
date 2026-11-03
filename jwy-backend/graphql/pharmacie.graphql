@@ -140,7 +140,30 @@ extend type Query {
         @field(resolver: "App\\GraphQL\\Queries\\MesCommandes")
 }
 
+input UpdatePharmacienInput {
+    nom: String @rules(apply: ["nullable", "filled"], messages: [{ rule: "filled", message: "Ce champ ne peut pas être vide." }])
+    prenom: String @rules(apply: ["nullable", "filled"], messages: [{ rule: "filled", message: "Ce champ ne peut pas être vide." }])
+}
+
+input UpdatePharmacieInput {
+    nom_pharmacie: String @rules(apply: ["nullable", "filled"], messages: [{ rule: "filled", message: "Ce champ ne peut pas être vide." }])
+    adresse: String @rules(apply: ["nullable", "filled"], messages: [{ rule: "filled", message: "Ce champ ne peut pas être vide." }])
+    telephone: String
+    livraison_disponible: Boolean
+    heures_ouverture: JSON
+}
+
 extend type Mutation {
+    "Modifier son profil pharmacien"
+    updateProfilPharmacien(input: UpdatePharmacienInput! @spread): Pharmacien!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\UpdateProfilPharmacien")
+
+    "Modifier les informations de sa pharmacie"
+    updateMaPharmacie(input: UpdatePharmacieInput! @spread): Pharmacie!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\UpdateMaPharmacie")
+
     "Passer une commande de médicaments"
     commanderMedicaments(input: CommandeInput! @spread): Commande!
         @guard

@@ -1,3 +1,15 @@
+input UpdateMedecinInput {
+    nom: String @rules(apply: ["nullable", "filled"], messages: [{ rule: "filled", message: "Ce champ ne peut pas être vide." }])
+    prenom: String @rules(apply: ["nullable", "filled"], messages: [{ rule: "filled", message: "Ce champ ne peut pas être vide." }])
+    specialite: String @rules(apply: ["nullable", "filled"], messages: [{ rule: "filled", message: "Ce champ ne peut pas être vide." }])
+    hopital_rattachement: String
+    tarif_consultation: Float @rules(apply: ["nullable", "numeric", "min:0"], messages: [
+        { rule: "min", message: "Le tarif ne peut pas être négatif." }
+    ])
+    biographie: String
+    annees_experience: Int @rules(apply: ["nullable", "integer", "min:0", "max:70"])
+}
+
 type Medecin {
     id: ID!
     user: User! @belongsTo
@@ -39,4 +51,9 @@ extend type Mutation {
     toggleDisponibilite: Medecin!
         @guard
         @field(resolver: "App\\GraphQL\\Mutations\\ToggleDisponibilite")
+
+    "Modifier son profil médecin"
+    updateProfilMedecin(input: UpdateMedecinInput! @spread): Medecin!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\UpdateProfilMedecin")
 }

@@ -22,6 +22,7 @@ import '../../features/pharmacien/screens/commandes_pharmacien_screen.dart';
 import '../../features/pharmacien/screens/stock_screen.dart';
 import '../../features/commande/screens/commander_ordonnance_screen.dart';
 import '../../features/commande/screens/mes_commandes_screen.dart';
+import '../../features/profil/screens/profil_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -50,13 +51,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/';
       }
       if (isLoggedIn && role == 'pharmacien') {
-        final isPharmacienRoute = loc.startsWith('/pharmacien') || loc == '/notifications';
+        final isPharmacienRoute =
+            loc.startsWith('/pharmacien') || loc == '/notifications' || loc == '/profil';
         if (!isPharmacienRoute) return '/pharmacien';
       }
       if (isLoggedIn && role == 'medecin') {
         final isMedecinRoute = loc.startsWith('/medecin') ||
             loc.startsWith('/consultations/') ||
             loc == '/notifications' ||
+            loc == '/profil' ||
             loc == '/acces-restreint';
         if (!isMedecinRoute) return '/medecin';
       }
@@ -103,6 +106,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // ── Hors shell (plein écran) ──────────────────────────────────────────
+      GoRoute(path: '/profil', builder: (_, __) => const ProfilScreen()),
       GoRoute(path: '/commandes', builder: (_, __) => const MesCommandesScreen()),
       GoRoute(
         path: '/commandes/ordonnance',

@@ -434,6 +434,16 @@ class _ProfileSheet extends StatelessWidget {
           ],
           const Divider(height: 24),
           ListTile(
+            leading: const Icon(Icons.edit_outlined, color: AppTheme.primary),
+            title: const Text('Modifier mon profil'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              final router = GoRouter.of(context); // le contexte de la fiche disparaît au pop
+              Navigator.pop(context);
+              router.push('/profil');
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.logout, color: AppTheme.errorColor),
             title: const Text('Se déconnecter', style: TextStyle(color: AppTheme.errorColor)),
             onTap: () async {

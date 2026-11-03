@@ -14,6 +14,17 @@ const String loginMutation = r'''
           nom
           prenom
         }
+        medecin {
+          id
+          nom
+          prenom
+          specialite
+        }
+        pharmacien {
+          id
+          nom
+          prenom
+        }
       }
     }
   }
@@ -47,6 +58,17 @@ const String meQuery = r'''
         prenom
         adresse
         groupe_sanguin
+      }
+      medecin {
+        id
+        nom
+        prenom
+        specialite
+      }
+      pharmacien {
+        id
+        nom
+        prenom
       }
     }
   }
