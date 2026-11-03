@@ -166,6 +166,10 @@ class _NotificationTile extends ConsumerWidget {
     final data = notification['data'];
     if (data is! Map) return null;
     if (data['consultation_id'] != null) return '/consultations/${data['consultation_id']}';
+    if (data['commande_id'] != null) {
+      final role = ref.read(authProvider).user?['role'];
+      return role == 'pharmacien' ? '/pharmacien/commandes' : '/commandes';
+    }
     if (data['rendez_vous_id'] != null) {
       final role = ref.read(authProvider).user?['role'];
       return role == 'medecin' ? '/medecin/rendez-vous' : '/rendez-vous';
@@ -185,7 +189,7 @@ class _NotificationTile extends ConsumerWidget {
     final dest = _destination(ref);
     if (dest != null && context.mounted) {
       // Les onglets (rendez-vous) se remplacent, les détails s'empilent
-      dest.startsWith('/consultations/') ? context.push(dest) : context.go(dest);
+      (dest.startsWith('/consultations/') || dest == '/commandes') ? context.push(dest) : context.go(dest);
     }
   }
 

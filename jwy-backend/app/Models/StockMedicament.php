@@ -32,6 +32,11 @@ class StockMedicament extends Model
         return $this->belongsTo(Medicament::class);
     }
 
+    public function getIsStockFaibleAttribute(): bool
+    {
+        return $this->isStockFaible();
+    }
+
     public function isStockFaible(): bool
     {
         return $this->quantite_disponible <= $this->quantite_minimale;

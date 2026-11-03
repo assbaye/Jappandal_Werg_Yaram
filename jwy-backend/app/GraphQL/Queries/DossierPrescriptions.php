@@ -14,6 +14,6 @@ class DossierPrescriptions
     {
         return Prescription::whereHas('consultation', function ($q) use ($dossier) {
             $q->where('dossier_medical_id', $dossier->id);
-        })->with('medicamentsPrescrites')->get();
+        })->with('medicamentsPrescrits')->get();
     }
 }

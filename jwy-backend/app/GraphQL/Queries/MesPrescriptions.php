@@ -10,7 +10,7 @@ class MesPrescriptions
     public function __invoke(mixed $root, array $args, GraphQLContext $context): array
     {
         $user  = $context->user();
-        $query = Prescription::query()->with(['medecin', 'medicamentsPrescrites.medicament']);
+        $query = Prescription::query()->with(['medecin', 'medicamentsPrescrits.medicament']);
 
         if ($user->patient) {
             $query->where('patient_id', $user->patient->id);

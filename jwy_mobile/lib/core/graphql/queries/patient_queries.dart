@@ -116,6 +116,7 @@ const String consultationDetailQuery = r'''
           duree_traitement
           instructions_speciales
           medicament {
+            id
             nom_commercial
             dosage
           }
@@ -147,6 +148,66 @@ const String medecinsPaginateQuery = r'''
         hasMorePages
         currentPage
         total
+      }
+    }
+  }
+''';
+
+const String pharmaciesAvecStockQuery = r'''
+  query PharmaciesAvecStock($latitude: Float!, $longitude: Float!, $rayon: Float) {
+    pharmaciesProches(latitude: $latitude, longitude: $longitude, rayon: $rayon) {
+      id
+      nom_pharmacie
+      adresse
+      distance
+      livraison_disponible
+      stocks {
+        quantite_disponible
+        prix_vente
+        medicament {
+          id
+        }
+      }
+    }
+  }
+''';
+
+const String commanderMedicamentsMutation = r'''
+  mutation CommanderMedicaments($input: CommandeInput!) {
+    commanderMedicaments(input: $input) {
+      id
+      numero_commande
+      montant_total
+      frais_livraison
+    }
+  }
+''';
+
+const String mesCommandesQuery = r'''
+  query MesCommandes($first: Int, $page: Int) {
+    mesCommandes(first: $first, page: $page) {
+      data {
+        id
+        numero_commande
+        statut
+        type_livraison
+        adresse_livraison
+        montant_total
+        frais_livraison
+        created_at
+        pharmacie {
+          nom_pharmacie
+          adresse
+          telephone
+        }
+        lignes {
+          quantite
+          prix_unitaire
+          medicament {
+            nom_commercial
+            dosage
+          }
+        }
       }
     }
   }

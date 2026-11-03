@@ -316,6 +316,7 @@ class _DetailBody extends ConsumerWidget {
                     _OrdonnanceItem(
                       numero: i + 1,
                       prescription: prescriptions[i] as Map<String, dynamic>,
+                      peutCommander: !isMedecin,
                     ),
                     if (i < prescriptions.length - 1) const Divider(height: 24),
                   ],
@@ -595,7 +596,8 @@ class _DossierLigne extends StatelessWidget {
 class _OrdonnanceItem extends StatelessWidget {
   final int numero;
   final Map<String, dynamic> prescription;
-  const _OrdonnanceItem({required this.numero, required this.prescription});
+  final bool peutCommander;
+  const _OrdonnanceItem({required this.numero, required this.prescription, this.peutCommander = false});
 
   @override
   Widget build(BuildContext context) {
@@ -641,6 +643,17 @@ class _OrdonnanceItem extends StatelessWidget {
         if (instructions != null && instructions.isNotEmpty)
           Text('Instructions : $instructions',
               style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+        if (peutCommander && meds.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.shopping_bag_outlined),
+              label: const Text('Commander en pharmacie'),
+              onPressed: () => context.push('/commandes/ordonnance', extra: prescription),
+            ),
+          ),
+        ],
       ],
     );
   }

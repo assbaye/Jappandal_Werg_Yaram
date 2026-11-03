@@ -17,6 +17,11 @@ import '../../features/medecin/screens/nouvelle_ordonnance_screen.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/rendez_vous/screens/rendez_vous_screen.dart';
 import '../../features/rendez_vous/screens/nouveau_rendez_vous_screen.dart';
+import '../../features/pharmacien/screens/dashboard_pharmacien_screen.dart';
+import '../../features/pharmacien/screens/commandes_pharmacien_screen.dart';
+import '../../features/pharmacien/screens/stock_screen.dart';
+import '../../features/commande/screens/commander_ordonnance_screen.dart';
+import '../../features/commande/screens/mes_commandes_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -24,7 +29,8 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   String homeForRole(String? r) => switch (r) {
         'medecin' => '/medecin',
-        'pharmacien' || 'admin' => '/acces-restreint',
+        'pharmacien' => '/pharmacien',
+        'admin' => '/acces-restreint',
         _ => '/',
       };
 
@@ -39,7 +45,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isLoggedIn && isAuthRoute) return homeForRole(role);
 
       // Cloisonnement par rôle
-      if (isLoggedIn && role == 'patient' && loc.startsWith('/medecin')) return '/';
+      if (isLoggedIn && role == 'patient' &&
+          (loc.startsWith('/medecin') || loc.startsWith('/pharmacien'))) {
+        return '/';
+      }
+      if (isLoggedIn && role == 'pharmacien') {
+        final isPharmacienRoute = loc.startsWith('/pharmacien') || loc == '/notifications';
+        if (!isPharmacienRoute) return '/pharmacien';
+      }
       if (isLoggedIn && role == 'medecin') {
         final isMedecinRoute = loc.startsWith('/medecin') ||
             loc.startsWith('/consultations/') ||
@@ -79,7 +92,24 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
+      // ── Shell pharmacien ──────────────────────────────────────────────────
+      ShellRoute(
+        builder: (context, state, child) => PharmacienShell(child: child),
+        routes: [
+          GoRoute(path: '/pharmacien', builder: (_, __) => const DashboardPharmacienTab()),
+          GoRoute(path: '/pharmacien/commandes', builder: (_, __) => const CommandesPharmacienScreen()),
+          GoRoute(path: '/pharmacien/stock', builder: (_, __) => const StockScreen()),
+        ],
+      ),
+
       // ── Hors shell (plein écran) ──────────────────────────────────────────
+      GoRoute(path: '/commandes', builder: (_, __) => const MesCommandesScreen()),
+      GoRoute(
+        path: '/commandes/ordonnance',
+        builder: (_, state) => CommanderOrdonnanceScreen(
+          prescription: state.extra as Map<String, dynamic>,
+        ),
+      ),
       GoRoute(path: '/notifications', builder: (_, __) => const NotificationsScreen()),
       GoRoute(path: '/rendez-vous/nouveau', builder: (_, __) => const NouveauRendezVousScreen()),
       GoRoute(

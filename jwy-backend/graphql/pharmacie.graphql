@@ -102,14 +102,42 @@ type Commande {
     pharmacie: Pharmacie! @belongsTo
     prescription: Prescription @belongsTo
     numero_commande: String!
-    statut: String!
-    type_livraison: String!
+    statut: StatutCommande!
+    type_livraison: TypeLivraison!
     adresse_livraison: String
     montant_total: Float!
     frais_livraison: Float!
+    notes: String
     medicaments: [Medicament!]! @belongsToMany
+    "Médicaments commandés avec quantité et prix"
+    lignes: [LigneCommande!]! @field(resolver: "App\\GraphQL\\Fields\\LignesCommande")
     paiement: Paiement @morphOne
     created_at: DateTime!
+}
+
+type LigneCommande {
+    medicament: Medicament!
+    quantite: Int!
+    prix_unitaire: Float!
+}
+
+type CommandePaginator {
+    data: [Commande!]!
+    paginatorInfo: PaginatorInfo!
+}
+
+extend type Query {
+    "Pharmacie du pharmacien connecté"
+    maPharmacie: Pharmacie @guard
+        @field(resolver: "App\\GraphQL\\Queries\\MaPharmacie")
+
+    "Commandes reçues par la pharmacie (pharmacien)"
+    commandesPharmacie(statut: StatutCommande, first: Int = 20, page: Int): CommandePaginator! @guard
+        @field(resolver: "App\\GraphQL\\Queries\\CommandesPharmacie")
+
+    "Mes commandes (patient)"
+    mesCommandes(first: Int = 20, page: Int): CommandePaginator! @guard
+        @field(resolver: "App\\GraphQL\\Queries\\MesCommandes")
 }
 
 extend type Mutation {
@@ -121,8 +149,10 @@ extend type Mutation {
     "Mettre à jour le stock (pharmacien)"
     updateStock(
         medicament_id: ID!
-        quantite_disponible: Int!
-        prix_vente: Float
+        quantite_disponible: Int! @rules(apply: ["integer", "min:0"], messages: [{ rule: "min", message: "La quantité ne peut pas être négative." }])
+        prix_vente: Float @rules(apply: ["nullable", "numeric", "min:0"])
+        quantite_minimale: Int @rules(apply: ["nullable", "integer", "min:0"])
+        date_expiration: String
     ): StockMedicament!
         @guard
         @field(resolver: "App\\GraphQL\\Mutations\\UpdateStock")

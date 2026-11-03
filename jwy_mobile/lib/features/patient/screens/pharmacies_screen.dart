@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import '../../../core/theme/app_theme.dart';
@@ -59,6 +60,11 @@ class PharmaciesScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Pharmacies proches'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.shopping_bag_outlined),
+            tooltip: 'Mes commandes',
+            onPressed: () => context.push('/commandes'),
+          ),
           IconButton(
             icon: const Icon(Icons.my_location),
             tooltip: 'Actualiser la position',
