@@ -96,7 +96,7 @@ class _OrdonnanceCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Text(
-                  '• ${m['medicament']?['nom_commercial'] ?? ''} × ${m['quantite']} — ${m['posologie']}',
+                  '• ${m['nom'] ?? m['medicament']?['nom_commercial'] ?? ''} × ${m['quantite']} — ${m['posologie']}',
                   style: const TextStyle(fontSize: 13),
                 ),
               ),

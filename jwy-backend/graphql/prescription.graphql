@@ -14,7 +14,13 @@ type Prescription {
 
 type MedicamentPrescrit {
     id: ID!
-    medicament: Medicament! @belongsTo
+    "Absent pour un médicament hors catalogue"
+    medicament: Medicament @belongsTo
+    "Nom saisi par le médecin pour un médicament hors catalogue"
+    nom_libre: String
+    "Nom à afficher (catalogue ou saisie libre)"
+    nom: String!
+    hors_catalogue: Boolean!
     quantite: Int!
     posologie: String!
     duree_traitement: Int!
@@ -31,7 +37,10 @@ input CreerPrescriptionInput {
 }
 
 input MedicamentPrescritInput {
-    medicament_id: ID!
+    "Médicament du catalogue…"
+    medicament_id: ID
+    "…ou nom libre pour un médicament hors catalogue (l'un des deux)"
+    nom_libre: String
     quantite: Int!
     posologie: String!
     duree_traitement: Int!

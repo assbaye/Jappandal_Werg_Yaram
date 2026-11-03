@@ -52,8 +52,18 @@ class _CommanderOrdonnanceScreenState extends ConsumerState<CommanderOrdonnanceS
   final _adresseCtrl = TextEditingController();
   bool _loading = false;
 
-  List<Map<String, dynamic>> get _lignes =>
+  List<Map<String, dynamic>> get _toutes =>
       (widget.prescription['medicaments_prescrits'] as List<dynamic>? ?? []).cast<Map<String, dynamic>>();
+
+  /// Lignes commandables : seules celles du catalogue JWY peuvent être en stock
+  List<Map<String, dynamic>> get _lignes => _toutes.where((l) => l['hors_catalogue'] != true).toList();
+
+  /// Nom d'une ligne d'ordonnance, jamais « null » (catalogue, saisie libre, ou repli)
+  String _nom(Map<String, dynamic> l) =>
+      (l['nom'] ?? l['medicament']?['nom_commercial'] ?? 'Médicament').toString();
+
+  /// Médicaments hors catalogue : à acheter par le patient lui-même
+  List<Map<String, dynamic>> get _horsCatalogue => _toutes.where((l) => l['hors_catalogue'] == true).toList();
 
   @override
   void dispose() {
@@ -142,6 +152,19 @@ class _CommanderOrdonnanceScreenState extends ConsumerState<CommanderOrdonnanceS
             });
           final choisie = offres.where((o) => o.pharmacie['id'] == _pharmacieId).firstOrNull;
 
+          if (_lignes.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Text(
+                  'Les médicaments de cette ordonnance ne sont pas au catalogue JWY : '
+                  'présentez-la directement en pharmacie.',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppTheme.inkSoft, height: 1.5),
+                ),
+              ),
+            );
+          }
           if (offres.isEmpty) {
             return Center(
               child: Padding(
@@ -247,7 +270,7 @@ class _CommanderOrdonnanceScreenState extends ConsumerState<CommanderOrdonnanceS
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Row(
                   children: [
-                    Expanded(child: Text('${l['quantite']} × ${l['medicament']?['nom_commercial']}')),
+                    Expanded(child: Text('${l['quantite']} × ${_nom(l)}')),
                     Text('${fcfa.format(prix * (l['quantite'] as num))} F'),
                   ],
                 ),
@@ -255,8 +278,14 @@ class _CommanderOrdonnanceScreenState extends ConsumerState<CommanderOrdonnanceS
             for (final l in o.manquants)
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
-                child: Text('${l['medicament']?['nom_commercial']} — indisponible ici',
+                child: Text('${_nom(l)} — indisponible ici',
                     style: const TextStyle(color: AppTheme.errorColor, fontSize: 13)),
+              ),
+            for (final l in _horsCatalogue)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text('${_nom(l)} — hors catalogue, à acheter vous-même',
+                    style: const TextStyle(color: AppTheme.inkSoft, fontSize: 13)),
               ),
             if (frais > 0)
               Row(children: [const Expanded(child: Text('Livraison')), Text('${fcfa.format(frais)} F')]),

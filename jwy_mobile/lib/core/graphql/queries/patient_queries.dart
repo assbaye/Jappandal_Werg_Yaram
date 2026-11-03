@@ -119,6 +119,8 @@ const String consultationDetailQuery = r'''
         created_at
         medicaments_prescrits {
           id
+          nom
+          hors_catalogue
           quantite
           posologie
           duree_traitement
@@ -272,6 +274,8 @@ const String mesPrescriptionsQuery = r'''
         }
         medicaments_prescrits {
           id
+          nom
+          hors_catalogue
           quantite
           posologie
           duree_traitement

@@ -10,7 +10,7 @@ class MedicamentPrescrit extends Model
     protected $table = 'medicaments_prescrits';
 
     protected $fillable = [
-        'prescription_id', 'medicament_id', 'quantite',
+        'prescription_id', 'medicament_id', 'nom_libre', 'quantite',
         'posologie', 'duree_traitement', 'instructions_speciales',
     ];
 
@@ -24,8 +24,19 @@ class MedicamentPrescrit extends Model
         return $this->belongsTo(Medicament::class);
     }
 
+    /** Nom affiché : celui du catalogue, ou celui saisi par le médecin (hors catalogue) */
+    public function getNomAttribute(): string
+    {
+        return $this->medicament?->nom_commercial ?? $this->nom_libre ?? '';
+    }
+
+    public function getHorsCatalogueAttribute(): bool
+    {
+        return $this->medicament_id === null;
+    }
+
     public function getCoutTotalAttribute(): float
     {
-        return $this->quantite * ($this->medicament->prix_unitaire ?? 0);
+        return $this->quantite * ($this->medicament?->prix_unitaire ?? 0);
     }
 }

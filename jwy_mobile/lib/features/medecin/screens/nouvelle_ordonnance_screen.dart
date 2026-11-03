@@ -60,7 +60,10 @@ class _NouvelleOrdonnanceScreenState extends ConsumerState<NouvelleOrdonnanceScr
       builder: (_) => const _RechercheMedicamentSheet(),
     );
     if (med == null || !mounted) return;
-    if (_lignes.any((l) => l.medicament['id'] == med['id'])) {
+    final nom = (med['nom_commercial'] as String).toLowerCase();
+    if (_lignes.any((l) => med['id'] != null
+        ? l.medicament['id'] == med['id']
+        : (l.medicament['nom_commercial'] as String).toLowerCase() == nom)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ce médicament est déjà sur l\'ordonnance')),
       );
@@ -95,7 +98,10 @@ class _NouvelleOrdonnanceScreenState extends ConsumerState<NouvelleOrdonnanceScr
               'medicaments': [
                 for (final l in _lignes)
                   {
-                    'medicament_id': l.medicament['id'],
+                    if (l.medicament['id'] != null)
+                      'medicament_id': l.medicament['id']
+                    else
+                      'nom_libre': l.medicament['nom_commercial'],
                     'quantite': int.parse(l.quantite.text),
                     'posologie': l.posologie.text.trim(),
                     'duree_traitement': int.parse(l.duree.text),
@@ -217,8 +223,11 @@ class _NouvelleOrdonnanceScreenState extends ConsumerState<NouvelleOrdonnanceScr
                     children: [
                       Text('${i + 1}. ${med['nom_commercial']}',
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                      Text('${med['principe_actif'] ?? ''} · ${med['forme']?.toString().toLowerCase() ?? ''}',
-                          style: TextStyle(color: AppTheme.inkSoft, fontSize: 12)),
+                      Text(
+                          med['hors_catalogue'] == true
+                              ? 'Hors catalogue'
+                              : '${med['principe_actif'] ?? ''} · ${med['forme']?.toString().toLowerCase() ?? ''}',
+                          style: const TextStyle(color: AppTheme.inkSoft, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -352,17 +361,29 @@ class _RechercheMedicamentSheetState extends ConsumerState<_RechercheMedicamentS
             Expanded(
               child: _erreur != null
                   ? Center(child: Text(_erreur!))
-                  : _resultats.isEmpty
-                      ? Center(
-                          child: Text(
-                            _terme.length < 2 ? 'Tapez au moins 2 lettres' : 'Aucun médicament trouvé',
-                            style: TextStyle(color: AppTheme.inkSoft),
-                          ),
+                  : _terme.length < 2
+                      ? const Center(
+                          child: Text('Tapez au moins 2 lettres', style: TextStyle(color: AppTheme.inkSoft)),
                         )
                       : ListView.separated(
-                          itemCount: _resultats.length,
+                          // Les résultats du catalogue, puis toujours la saisie libre
+                          itemCount: _resultats.length + 1,
                           separatorBuilder: (_, __) => const Divider(height: 1),
                           itemBuilder: (_, i) {
+                            if (i == _resultats.length) {
+                              return ListTile(
+                                leading: const Icon(PhosphorIconsRegular.pencilSimple, color: AppTheme.inkSoft),
+                                title: Text('Prescrire « $_terme » hors catalogue'),
+                                subtitle: Text(_resultats.isEmpty
+                                    ? 'Absent du catalogue JWY : le patient l\'achètera en pharmacie'
+                                    : 'Si le médicament voulu n\'est pas dans la liste'),
+                                onTap: () => Navigator.pop(context, {
+                                  'id': null,
+                                  'nom_commercial': _terme,
+                                  'hors_catalogue': true,
+                                }),
+                              );
+                            }
                             final m = _resultats[i] as Map<String, dynamic>;
                             return ListTile(
                               leading: const Icon(PhosphorIconsRegular.pill, color: AppTheme.primary),

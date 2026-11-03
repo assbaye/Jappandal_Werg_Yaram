@@ -39,12 +39,7 @@ final _dossierPatientProvider = FutureProvider.autoDispose
   return result.data?['dossierMedicalPatient'] as Map<String, dynamic>?;
 });
 
-String _messageErreur(OperationException? e) =>
-    e?.graphqlErrors.firstOrNull?.message ??
-    (e?.linkException != null
-        ? 'Impossible de joindre le serveur'
-        : 'Une erreur est survenue');
-
+String _messageErreur(OperationException? e) => messageErreur(e);
 class ConsultationDetailScreen extends ConsumerWidget {
   final String consultationId;
   const ConsultationDetailScreen({super.key, required this.consultationId});
@@ -755,7 +750,8 @@ class _OrdonnanceItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${m['medicament']?['nom_commercial'] ?? ''} × ${m['quantite']}',
+                        '${m['nom'] ?? m['medicament']?['nom_commercial'] ?? ''} × ${m['quantite']}'
+                        '${m['hors_catalogue'] == true ? '  (hors catalogue)' : ''}',
                         style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                       Text(

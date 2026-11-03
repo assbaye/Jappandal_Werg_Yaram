@@ -36,6 +36,21 @@ class CreerPrescription
             throw new Error('Ajoutez au moins un médicament à l\'ordonnance.');
         }
 
+        // Chaque ligne : un médicament du catalogue OU un nom libre, pas les deux
+        foreach ($args['medicaments'] as $med) {
+            $nomLibre = trim((string) ($med['nom_libre'] ?? ''));
+            $catalogue = ! empty($med['medicament_id']);
+            if ($catalogue === ($nomLibre !== '')) {
+                throw new Error('Chaque médicament doit venir du catalogue ou être saisi par son nom.');
+            }
+            if (mb_strlen($nomLibre) > 150) {
+                throw new Error('Nom de médicament trop long (150 caractères au plus).');
+            }
+            if ($catalogue && ! \App\Models\Medicament::whereKey($med['medicament_id'])->exists()) {
+                throw new Error('Médicament introuvable dans le catalogue.');
+            }
+        }
+
         return DB::transaction(function () use ($args, $user, $patient) {
             $prescription = Prescription::create([
                 'medecin_id'      => $user->medecin->id,
@@ -48,7 +63,8 @@ class CreerPrescription
             foreach ($args['medicaments'] as $med) {
                 MedicamentPrescrit::create([
                     'prescription_id'      => $prescription->id,
-                    'medicament_id'        => $med['medicament_id'],
+                    'medicament_id'        => $med['medicament_id'] ?? null,
+                    'nom_libre'            => empty($med['medicament_id']) ? trim($med['nom_libre']) : null,
                     'quantite'             => $med['quantite'],
                     'posologie'            => $med['posologie'],
                     'duree_traitement'     => $med['duree_traitement'],

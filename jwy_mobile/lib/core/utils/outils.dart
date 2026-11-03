@@ -32,6 +32,8 @@ String? groupeSanguinLabel(String? valeur) => valeur == null ? null : groupesSan
 
 /// Message lisible pour l'utilisateur à partir d'une erreur de requête (jamais l'exception brute).
 String messageErreur(Object? e) {
+  // Visible dans la console de « flutter run » : la cause exacte, que le message masque
+  debugPrint('[JWY] Erreur affichée à l\'utilisateur : $e');
   if (e is OperationException) {
     if (e.linkException != null) return 'Connexion au serveur impossible. Vérifiez votre connexion et réessayez.';
     final message = e.graphqlErrors.firstOrNull?.message;
