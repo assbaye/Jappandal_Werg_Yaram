@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -26,22 +27,21 @@ class PharmacienShell extends StatelessWidget {
       body: child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: index < 0 ? 0 : index,
-        indicatorColor: AppTheme.primary.withValues(alpha: 0.15),
         onDestinationSelected: (i) => context.go(_routes[i]),
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home, color: AppTheme.primary),
+            icon: Icon(PhosphorIconsRegular.house),
+            selectedIcon: Icon(PhosphorIconsFill.house),
             label: 'Accueil',
           ),
           NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long, color: AppTheme.primary),
+            icon: Icon(PhosphorIconsRegular.receipt),
+            selectedIcon: Icon(PhosphorIconsFill.receipt),
             label: 'Commandes',
           ),
           NavigationDestination(
-            icon: Icon(Icons.inventory_2_outlined),
-            selectedIcon: Icon(Icons.inventory_2, color: AppTheme.primary),
+            icon: Icon(PhosphorIconsRegular.package),
+            selectedIcon: Icon(PhosphorIconsFill.package),
             label: 'Stock',
           ),
         ],
@@ -84,12 +84,12 @@ class DashboardPharmacienTab extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('JWY — Pharmacie'),
+        title: const Text('Ma pharmacie'),
         actions: [
           const NotificationBell(),
           IconButton(
             tooltip: 'Mon profil',
-            icon: const Icon(Icons.person_outline),
+            icon: const Icon(PhosphorIconsRegular.user),
             onPressed: () async {
               await context.push('/profil');
               ref.invalidate(_maPharmacieProvider);
@@ -103,33 +103,33 @@ class DashboardPharmacienTab extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           children: [
             // ── En-tête pharmacie ────────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [AppTheme.primary, Color(0xFF42A5F5)]),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 26,
-                    backgroundColor: Colors.white24,
-                    child: Icon(Icons.local_pharmacy, color: Colors.white, size: 28),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(pharmacie?['nom_pharmacie'] as String? ?? 'Ma pharmacie',
-                            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 2),
-                        Text(pharmacie?['adresse'] as String? ?? '',
-                            style: const TextStyle(color: Colors.white70, fontSize: 13)),
-                      ],
+            Card(
+              margin: EdgeInsets.zero,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(color: AppTheme.primarySoft, borderRadius: BorderRadius.circular(12)),
+                      child: const Icon(PhosphorIconsRegular.firstAidKit, color: AppTheme.primary, size: 24),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(pharmacie?['nom_pharmacie'] as String? ?? 'Ma pharmacie',
+                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 2),
+                          Text(pharmacie?['adresse'] as String? ?? '',
+                              style: const TextStyle(color: AppTheme.inkSoft, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -147,7 +147,7 @@ class DashboardPharmacienTab extends ConsumerWidget {
                     onTap: () => context.go('/pharmacien/commandes')),
                 const SizedBox(width: 10),
                 _Stat(valeur: compter(['CONFIRMEE', 'EN_PREPARATION']), label: 'En préparation',
-                    couleur: const Color(0xFF7B1FA2), onTap: () => context.go('/pharmacien/commandes')),
+                    couleur: AppTheme.secondary, onTap: () => context.go('/pharmacien/commandes')),
                 const SizedBox(width: 10),
                 _Stat(valeur: compter(['PRETE', 'EN_LIVRAISON']), label: 'Prêtes',
                     couleur: AppTheme.primary, onTap: () => context.go('/pharmacien/commandes')),
@@ -158,16 +158,16 @@ class DashboardPharmacienTab extends ConsumerWidget {
             // ── Alertes de stock ─────────────────────────────────────────
             if (faibles.isNotEmpty) ...[
               Card(
-                color: const Color(0xFFFFF3E0),
+                color: AppTheme.warningSoft,
                 child: ListTile(
-                  leading: const Icon(Icons.warning_amber_rounded, color: AppTheme.warningColor),
+                  leading: const Icon(PhosphorIconsRegular.warning, color: AppTheme.warningColor),
                   title: Text('${faibles.length} produit(s) en stock faible'),
                   subtitle: Text(
                     faibles.take(3).map((s) => s['medicament']?['nom_commercial']).join(', '),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  trailing: const Icon(Icons.chevron_right),
+                  trailing: const Icon(PhosphorIconsRegular.caretRight),
                   onTap: () => context.go('/pharmacien/stock'),
                 ),
               ),
@@ -184,7 +184,7 @@ class DashboardPharmacienTab extends ConsumerWidget {
                   ? Padding(
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Center(
-                        child: Text('Aucune nouvelle commande', style: TextStyle(color: Colors.grey[600])),
+                        child: Text('Aucune nouvelle commande', style: TextStyle(color: AppTheme.inkSoft)),
                       ),
                     )
                   : Column(
@@ -221,7 +221,7 @@ class _Stat extends StatelessWidget {
               children: [
                 Text('$valeur', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: couleur)),
                 const SizedBox(height: 2),
-                Text(label, textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+                Text(label, textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: AppTheme.inkSoft)),
               ],
             ),
           ),
@@ -292,15 +292,15 @@ class _GardeCardState extends ConsumerState<_GardeCard> {
   @override
   Widget build(BuildContext context) {
     final deGarde = widget.pharmacie['est_de_garde'] == true;
-    final couleur = deGarde ? const Color(0xFF0D47A1) : Colors.grey.shade700;
+    final couleur = deGarde ? AppTheme.primary : AppTheme.inkSoft;
 
     return Card(
-      color: deGarde ? const Color(0xFFE3F2FD) : null,
+      color: deGarde ? AppTheme.primarySoft : null,
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(
           children: [
-            Icon(Icons.nightlight_round, color: couleur, size: 30),
+            Icon(PhosphorIconsFill.moonStars, color: couleur, size: 30),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -309,7 +309,7 @@ class _GardeCardState extends ConsumerState<_GardeCard> {
                   Text(deGarde ? 'Pharmacie de garde' : 'Pas de garde en cours',
                       style: TextStyle(fontWeight: FontWeight.bold, color: couleur)),
                   Text(widget.pharmacie['statut_ouverture'] as String? ?? '',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+                      style: TextStyle(fontSize: 12, color: AppTheme.inkSoft)),
                 ],
               ),
             ),

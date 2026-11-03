@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -191,7 +193,7 @@ class _TeleConsultationScreenState extends ConsumerState<TeleConsultationScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 64),
+                const Icon(PhosphorIconsRegular.warningCircle, color: Colors.red, size: 64),
                 const SizedBox(height: 16),
                 Text(_error!, style: const TextStyle(color: Colors.white), textAlign: TextAlign.center),
                 const SizedBox(height: 24),
@@ -224,7 +226,7 @@ class _TeleConsultationScreenState extends ConsumerState<TeleConsultationScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.person_outline, color: Colors.white54, size: 80),
+                  Icon(PhosphorIconsRegular.user, color: Colors.white54, size: 80),
                   SizedBox(height: 12),
                   Text('En attente du médecin...', style: TextStyle(color: Colors.white54)),
                 ],
@@ -264,7 +266,7 @@ class _TeleConsultationScreenState extends ConsumerState<TeleConsultationScreen>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.fiber_manual_record, color: Colors.red, size: 12),
+                    const Icon(PhosphorIconsFill.circle, color: Colors.red, size: 12),
                     const SizedBox(width: 8),
                     Text(
                       _formatDuration(_duration),
@@ -287,20 +289,20 @@ class _TeleConsultationScreenState extends ConsumerState<TeleConsultationScreen>
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
-                  colors: [Colors.black87, Colors.transparent],
+                  colors: [AppTheme.ink, Colors.transparent],
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _ControlButton(
-                    icon: _localAudioMuted ? Icons.mic_off : Icons.mic,
+                    icon: _localAudioMuted ? PhosphorIconsRegular.microphoneSlash : PhosphorIconsRegular.microphone,
                     label: _localAudioMuted ? 'Micro off' : 'Micro',
                     color: _localAudioMuted ? Colors.red : Colors.white,
                     onTap: _toggleAudio,
                   ),
                   _ControlButton(
-                    icon: Icons.call_end,
+                    icon: PhosphorIconsRegular.phoneDisconnect,
                     label: 'Raccrocher',
                     color: Colors.red,
                     backgroundColor: Colors.red,
@@ -309,7 +311,7 @@ class _TeleConsultationScreenState extends ConsumerState<TeleConsultationScreen>
                     large: true,
                   ),
                   _ControlButton(
-                    icon: _localVideoMuted ? Icons.videocam_off : Icons.videocam,
+                    icon: _localVideoMuted ? PhosphorIconsRegular.videoCameraSlash : PhosphorIconsRegular.videoCamera,
                     label: _localVideoMuted ? 'Caméra off' : 'Caméra',
                     color: _localVideoMuted ? Colors.red : Colors.white,
                     onTap: _toggleVideo,

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -77,13 +78,13 @@ class _PaiementSuiviScreenState extends ConsumerState<PaiementSuiviScreen> with 
     final facture = _paiement?['facture'] as Map<String, dynamic>?;
 
     final (icone, couleur, titre, texte) = switch (_statut) {
-      'CONFIRME' => (Icons.verified, AppTheme.successColor, 'Paiement confirmé',
+      'CONFIRME' => (PhosphorIconsFill.sealCheck, AppTheme.successColor, 'Paiement confirmé',
           'Wave a confirmé votre paiement de ${fcfa.format(_paiement?['montant'] ?? 0)} FCFA.'),
-      'ECHEC' => (Icons.error_outline, AppTheme.errorColor, 'Paiement non abouti',
+      'ECHEC' => (PhosphorIconsRegular.warningCircle, AppTheme.errorColor, 'Paiement non abouti',
           'Le paiement a été annulé ou a expiré. Vous n\'avez pas été débité.'),
-      _ when expire => (Icons.timer_off_outlined, AppTheme.warningColor, 'Délai dépassé',
+      _ when expire => (PhosphorIconsRegular.timer, AppTheme.warningColor, 'Délai dépassé',
           'Nous n\'avons pas reçu de confirmation de Wave. Si vous avez payé, elle arrivera par notification.'),
-      _ => (Icons.waves, const Color(0xFF1BAAE1), 'En attente de Wave',
+      _ => (PhosphorIconsRegular.waves, const Color(0xFF1BAAE1), 'En attente de Wave',
           'Finalisez le paiement dans l\'application Wave, puis revenez ici.'),
     };
 
@@ -107,7 +108,7 @@ class _PaiementSuiviScreenState extends ConsumerState<PaiementSuiviScreen> with 
                 ],
                 if (facture != null) ...[
                   const SizedBox(height: 16),
-                  Text('Facture ${facture['numero_facture']}', style: TextStyle(color: Colors.grey[700])),
+                  Text('Facture ${facture['numero_facture']}', style: TextStyle(color: AppTheme.inkSoft)),
                 ],
                 const SizedBox(height: 32),
                 ElevatedButton(

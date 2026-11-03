@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
@@ -40,9 +41,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
-    final success = await ref
-        .read(authProvider.notifier)
-        .login(_emailCtrl.text.trim(), _passwordCtrl.text, rememberMe: _rememberMe);
+    final success = await ref.read(authProvider.notifier).login(
+        _emailCtrl.text.trim(), _passwordCtrl.text,
+        rememberMe: _rememberMe);
     if (!success && mounted) {
       final error = ref.read(authProvider).error;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -50,7 +51,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           content: Text(error ?? 'Identifiants incorrects'),
           backgroundColor: AppTheme.errorColor,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
@@ -61,78 +63,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final isLoading = ref.watch(authProvider).isLoading;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          // ── En-tête avec gradient ────────────────────────────────────────
-          Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppTheme.primary, Color(0xFF42A5F5)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(32),
-                bottomRight: Radius.circular(32),
-              ),
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 32, 24, 40),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Logo
-                    Container(
-                      width: 88,
-                      height: 88,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(22),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.all(3),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(19),
-                        child: Image.asset('assets/icon/app_icon.png'),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Connectez-vous à votre espace santé',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // ── Formulaire ───────────────────────────────────────────────────
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+      backgroundColor: AppTheme.cardColor,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Text('Connexion',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 4),
-                    Text('Entrez vos identifiants pour continuer',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                    // ── Logo ───────────────────────────────────────────────
+                    Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset('assets/icon/app_icon.png',
+                            width: 76, height: 76),
+                      ),
+                    ),
                     const SizedBox(height: 28),
+                    const Text('Connexion',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5)),
+                    const SizedBox(height: 6),
+                    const Text('Accédez à votre espace santé JWY',
+                        textAlign: TextAlign.center,
+                        style:
+                            TextStyle(color: AppTheme.inkSoft, fontSize: 14)),
+                    const SizedBox(height: 32),
 
                     // Email
                     TextFormField(
@@ -141,7 +104,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       textInputAction: TextInputAction.next,
                       decoration: const InputDecoration(
                         labelText: 'Adresse email',
-                        prefixIcon: Icon(Icons.email_outlined),
+                        prefixIcon: Icon(PhosphorIconsRegular.envelopeSimple),
                         hintText: 'exemple@email.com',
                       ),
                       validator: (v) {
@@ -160,15 +123,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       onFieldSubmitted: (_) => _login(),
                       decoration: InputDecoration(
                         labelText: 'Mot de passe',
-                        prefixIcon: const Icon(Icons.lock_outlined),
+                        prefixIcon: const Icon(PhosphorIconsRegular.lock),
                         suffixIcon: IconButton(
-                          icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-                          onPressed: () =>
-                              setState(() => _obscurePassword = !_obscurePassword),
+                          icon: Icon(_obscurePassword
+                              ? PhosphorIconsRegular.eyeSlash
+                              : PhosphorIconsRegular.eye),
+                          onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
                         ),
                       ),
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'Mot de passe requis';
+                        if (v == null || v.isEmpty) {
+                          return 'Mot de passe requis';
+                        }
                         if (v.length < 6) return 'Minimum 6 caractères';
                         return null;
                       },
@@ -183,16 +150,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           height: 24,
                           child: Checkbox(
                             value: _rememberMe,
-                            onChanged: (v) => setState(() => _rememberMe = v ?? true),
+                            onChanged: (v) =>
+                                setState(() => _rememberMe = v ?? true),
                             activeColor: AppTheme.primary,
                             visualDensity: VisualDensity.compact,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4)),
                           ),
                         ),
                         const SizedBox(width: 8),
                         GestureDetector(
-                          onTap: () => setState(() => _rememberMe = !_rememberMe),
-                          child: const Text('Se souvenir de moi', style: TextStyle(fontSize: 13)),
+                          onTap: () =>
+                              setState(() => _rememberMe = !_rememberMe),
+                          child: const Text('Se souvenir de moi',
+                              style: TextStyle(fontSize: 13)),
                         ),
                       ],
                     ),
@@ -201,18 +172,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     // Bouton connexion
                     ElevatedButton(
                       onPressed: isLoading ? null : _login,
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 52),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      ),
                       child: isLoading
                           ? const SizedBox(
                               height: 22,
                               width: 22,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                              child: CircularProgressIndicator(
+                                  color: Colors.white, strokeWidth: 2.5),
                             )
-                          : const Text('Se connecter',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                          : const Text('Se connecter'),
                     ),
                     const SizedBox(height: 20),
 
@@ -220,18 +187,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Pas encore de compte ?",
-                            style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                        const Text("Pas encore de compte ?",
+                            style: TextStyle(
+                                color: AppTheme.inkSoft, fontSize: 13)),
                         TextButton(
                           onPressed: () => context.go('/auth/register'),
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                           ),
                           child: const Text("S'inscrire",
-                              style: TextStyle(
-                                  color: AppTheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13)),
+                              style: TextStyle(fontSize: 13)),
                         ),
                       ],
                     ),
@@ -240,7 +205,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

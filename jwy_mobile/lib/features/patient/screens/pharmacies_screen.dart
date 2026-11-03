@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:geolocator/geolocator.dart';
@@ -69,7 +70,7 @@ class PharmaciesScreen extends ConsumerWidget {
         title: const Text('Pharmacies'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.my_location),
+            icon: const Icon(PhosphorIconsRegular.crosshair),
             tooltip: 'Actualiser la position',
             onPressed: () => ref.invalidate(locationProvider),
           ),
@@ -82,7 +83,7 @@ class PharmaciesScreen extends ConsumerWidget {
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 16),
-              Text('Localisation en cours...', style: TextStyle(color: Colors.grey)),
+              Text('Localisation en cours...', style: TextStyle(color: AppTheme.inkMuted)),
             ],
           ),
         ),
@@ -148,7 +149,7 @@ class _PharmaciesListState extends ConsumerState<_PharmaciesList> {
               color: AppTheme.warningColor.withValues(alpha: 0.1),
               child: Row(
                 children: [
-                  const Icon(Icons.location_off, color: AppTheme.warningColor, size: 16),
+                  const Icon(PhosphorIconsRegular.mapPin, color: AppTheme.warningColor, size: 16),
                   const SizedBox(width: 8),
                   const Expanded(
                     child: Text('Localisation non disponible — affichage autour de Dakar',
@@ -170,7 +171,7 @@ class _PharmaciesListState extends ConsumerState<_PharmaciesList> {
               children: [
                 Expanded(
                   child: _Raccourci(
-                    icon: Icons.description_outlined,
+                    icon: PhosphorIconsRegular.fileText,
                     label: 'Commander une ordonnance',
                     onTap: () => context.push('/ordonnances'),
                   ),
@@ -178,7 +179,7 @@ class _PharmaciesListState extends ConsumerState<_PharmaciesList> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _Raccourci(
-                    icon: Icons.shopping_bag_outlined,
+                    icon: PhosphorIconsRegular.shoppingBag,
                     label: 'Mes commandes',
                     onTap: () => context.push('/commandes'),
                   ),
@@ -206,7 +207,7 @@ class _PharmaciesListState extends ConsumerState<_PharmaciesList> {
                   onSelected: (_) => setState(() => _filtre = _Filtre.toutes),
                 ),
                 ChoiceChip(
-                  avatar: const Icon(Icons.nightlight_round, size: 16),
+                  avatar: const Icon(PhosphorIconsFill.moonStars, size: 16),
                   label: Text('De garde (${deGarde.length})'),
                   selected: _filtre == _Filtre.deGarde,
                   onSelected: (_) => setState(() => _filtre = _Filtre.deGarde),
@@ -241,7 +242,7 @@ class _PharmaciesListState extends ConsumerState<_PharmaciesList> {
                           _Filtre.toutes => 'Aucune pharmacie dans un rayon de 15 km.',
                         },
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey[600]),
+                        style: TextStyle(color: AppTheme.inkSoft),
                       ),
                     ),
                   ]
@@ -297,7 +298,7 @@ class _GardeBandeau extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF0D47A1),
+        color: AppTheme.primary,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -305,7 +306,7 @@ class _GardeBandeau extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.nightlight_round, color: Colors.white, size: 18),
+              const Icon(PhosphorIconsFill.moonStars, color: Colors.white, size: 18),
               const SizedBox(width: 6),
               Text(
                 nombre > 1 ? 'Pharmacie de garde la plus proche' : 'Pharmacie de garde',
@@ -324,10 +325,10 @@ class _GardeBandeau extends StatelessWidget {
           Row(
             children: [
               if (tel != null)
-                _BoutonClair(icon: Icons.call, label: 'Appeler', onTap: () => appeler(context, tel)),
+                _BoutonClair(icon: PhosphorIconsRegular.phone, label: 'Appeler', onTap: () => appeler(context, tel)),
               if (tel != null) const SizedBox(width: 8),
               _BoutonClair(
-                icon: Icons.directions,
+                icon: PhosphorIconsRegular.navigationArrow,
                 label: 'Itinéraire',
                 onTap: () => ouvrirCarte(
                   (pharmacie['latitude'] as num?)?.toDouble() ?? 0,
@@ -371,7 +372,7 @@ class _PharmacieCard extends StatelessWidget {
     final deGarde = pharmacie['est_de_garde'] == true;
     final ouverte = pharmacie['est_ouverte'] == true;
     final couleurStatut = deGarde
-        ? const Color(0xFF0D47A1)
+        ? AppTheme.primary
         : ouverte
             ? AppTheme.successColor
             : AppTheme.errorColor;
@@ -392,7 +393,7 @@ class _PharmacieCard extends StatelessWidget {
                   color: couleurStatut.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(deGarde ? Icons.nightlight_round : Icons.local_pharmacy, color: couleurStatut),
+                child: Icon(deGarde ? PhosphorIconsFill.moonStars : PhosphorIconsFill.firstAidKit, color: couleurStatut),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -406,7 +407,7 @@ class _PharmacieCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.near_me, size: 14, color: AppTheme.primary),
+                        const Icon(PhosphorIconsRegular.mapPin, size: 14, color: AppTheme.primary),
                         const SizedBox(width: 4),
                         Text(_formatDistance(pharmacie['distance'] as num?),
                             style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold, fontSize: 12)),
@@ -415,7 +416,7 @@ class _PharmacieCard extends StatelessWidget {
                           child: Text(pharmacie['adresse'] as String? ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                              style: TextStyle(color: AppTheme.inkSoft, fontSize: 12)),
                         ),
                       ],
                     ),
@@ -423,7 +424,7 @@ class _PharmacieCard extends StatelessWidget {
                       const Padding(
                         padding: EdgeInsets.only(top: 2),
                         child: Row(children: [
-                          Icon(Icons.delivery_dining, size: 14, color: AppTheme.successColor),
+                          Icon(PhosphorIconsRegular.moped, size: 14, color: AppTheme.successColor),
                           SizedBox(width: 4),
                           Text('Livraison', style: TextStyle(color: AppTheme.successColor, fontSize: 12)),
                         ]),
@@ -431,7 +432,7 @@ class _PharmacieCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Colors.grey),
+              const Icon(PhosphorIconsRegular.caretRight, color: AppTheme.inkMuted),
             ],
           ),
         ),

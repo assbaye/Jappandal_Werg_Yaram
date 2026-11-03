@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -145,7 +146,7 @@ class _CommanderOrdonnanceScreenState extends ConsumerState<CommanderOrdonnanceS
               child: Padding(
                 padding: const EdgeInsets.all(32),
                 child: Text('Aucune pharmacie proche n\'a ces médicaments en stock.',
-                    textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[700])),
+                    textAlign: TextAlign.center, style: TextStyle(color: AppTheme.inkSoft)),
               ),
             );
           }
@@ -162,10 +163,10 @@ class _CommanderOrdonnanceScreenState extends ConsumerState<CommanderOrdonnanceS
                 const SizedBox(height: 10),
                 SegmentedButton<bool>(
                   segments: [
-                    const ButtonSegment(value: false, icon: Icon(Icons.storefront), label: Text('Retrait')),
+                    const ButtonSegment(value: false, icon: Icon(PhosphorIconsRegular.storefront), label: Text('Retrait')),
                     ButtonSegment(
                       value: true,
-                      icon: const Icon(Icons.delivery_dining),
+                      icon: const Icon(PhosphorIconsRegular.moped),
                       label: const Text('Livraison'),
                       enabled: choisie.pharmacie['livraison_disponible'] == true,
                     ),
@@ -193,7 +194,7 @@ class _CommanderOrdonnanceScreenState extends ConsumerState<CommanderOrdonnanceS
                 ),
                 const SizedBox(height: 8),
                 Text('Le paiement se fait à la pharmacie, au retrait ou à la livraison.',
-                    textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                    textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: AppTheme.inkSoft)),
               ],
             ],
           );
@@ -216,7 +217,7 @@ class _CommanderOrdonnanceScreenState extends ConsumerState<CommanderOrdonnanceS
           _pharmacieId = o.pharmacie['id'] as String;
           if (o.pharmacie['livraison_disponible'] != true) _livraison = false;
         }),
-        leading: Icon(Icons.local_pharmacy, color: complet ? AppTheme.successColor : AppTheme.warningColor),
+        leading: Icon(PhosphorIconsFill.firstAidKit, color: complet ? AppTheme.successColor : AppTheme.warningColor),
         title: Text(o.pharmacie['nom_pharmacie'] as String? ?? ''),
         subtitle: Text(
           '${distance == null ? '' : '$distance km · '}'

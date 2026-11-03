@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart' show OperationException;
 import 'package:url_launcher/url_launcher.dart';
 
 /// Lance un appel téléphonique ; affiche un message si l'appareil ne peut pas appeler.
@@ -28,3 +29,13 @@ const groupesSanguins = {
 
 /// « O_POS » → « O+ » ; renvoie la valeur telle quelle si elle est déjà lisible (ex. « O+ »).
 String? groupeSanguinLabel(String? valeur) => valeur == null ? null : groupesSanguins[valeur] ?? valeur;
+
+/// Message lisible pour l'utilisateur à partir d'une erreur de requête (jamais l'exception brute).
+String messageErreur(Object? e) {
+  if (e is OperationException) {
+    if (e.linkException != null) return 'Connexion au serveur impossible. Vérifiez votre connexion et réessayez.';
+    final message = e.graphqlErrors.firstOrNull?.message;
+    if (message != null && message != 'Internal server error') return message;
+  }
+  return 'Une erreur est survenue. Réessayez.';
+}

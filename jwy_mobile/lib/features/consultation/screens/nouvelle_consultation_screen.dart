@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/outils.dart';
 import '../../../core/graphql/queries/patient_queries.dart';
 import '../../auth/providers/auth_provider.dart';
 
@@ -24,9 +26,9 @@ class _NouvelleConsultationScreenState extends ConsumerState<NouvelleConsultatio
   bool _isLoading = false;
 
   static const _types = [
-    {'value': 'VIDEO', 'label': 'Téléconsultation vidéo', 'icon': Icons.video_call},
-    {'value': 'CHAT', 'label': 'Chat médical', 'icon': Icons.chat_bubble_outline},
-    {'value': 'PHYSIQUE', 'label': 'Consultation physique', 'icon': Icons.local_hospital_outlined},
+    {'value': 'VIDEO', 'label': 'Téléconsultation vidéo', 'icon': PhosphorIconsRegular.videoCamera},
+    {'value': 'CHAT', 'label': 'Chat médical', 'icon': PhosphorIconsRegular.chatCircle},
+    {'value': 'PHYSIQUE', 'label': 'Consultation physique', 'icon': PhosphorIconsRegular.hospital},
   ];
 
   String? get _specialiteConseillee => widget.triage?['specialite_recommandee'] as String?;
@@ -111,12 +113,12 @@ class _NouvelleConsultationScreenState extends ConsumerState<NouvelleConsultatio
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.auto_awesome, color: AppTheme.primary, size: 20),
+                    const Icon(PhosphorIconsRegular.stethoscope, color: AppTheme.primary, size: 20),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Pré-rempli d\'après l\'assistant IA · spécialité conseillée : $_specialiteConseillee. '
-                        'Le médecin verra le résumé de l\'analyse.',
+                        'Pré-rempli d\'après votre orientation · spécialité conseillée : $_specialiteConseillee. '
+                        'Le médecin verra le résumé.',
                         style: const TextStyle(fontSize: 13),
                       ),
                     ),
@@ -171,7 +173,7 @@ class _NouvelleConsultationScreenState extends ConsumerState<NouvelleConsultatio
             ElevatedButton.icon(
               icon: _isLoading
                   ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : const Icon(Icons.send),
+                  : const Icon(PhosphorIconsRegular.paperPlaneTilt),
               label: Text(_isLoading ? 'Envoi...' : 'Demander la consultation'),
               onPressed: _isLoading ? null : _soumettre,
             ),
@@ -207,18 +209,18 @@ class _TypeCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? AppTheme.primary.withValues(alpha: 0.08) : Colors.white,
           border: Border.all(
-            color: selected ? AppTheme.primary : Colors.grey.shade300,
+            color: selected ? AppTheme.primary : AppTheme.border,
             width: selected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            Icon(icon, color: selected ? AppTheme.primary : Colors.grey),
+            Icon(icon, color: selected ? AppTheme.primary : AppTheme.inkMuted),
             const SizedBox(width: 12),
             Text(label, style: TextStyle(fontWeight: selected ? FontWeight.bold : FontWeight.normal)),
             const Spacer(),
-            if (selected) const Icon(Icons.check_circle, color: AppTheme.primary),
+            if (selected) const Icon(PhosphorIconsFill.checkCircle, color: AppTheme.primary),
           ],
         ),
       ),
@@ -253,7 +255,7 @@ class _MedecinSelector extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const CircleAvatar(child: Icon(Icons.person)),
+              const CircleAvatar(child: Icon(PhosphorIconsRegular.user)),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -262,11 +264,11 @@ class _MedecinSelector extends StatelessWidget {
                     Text('Dr. ${selectedMedecin!['prenom'] ?? ''} ${selectedMedecin!['nom'] ?? ''}',
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                     Text(selectedMedecin!['specialite'] as String? ?? '',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                        style: TextStyle(color: AppTheme.inkSoft, fontSize: 12)),
                   ],
                 ),
               ),
-              const Icon(Icons.edit, color: AppTheme.primary),
+              const Icon(PhosphorIconsRegular.pencilSimple, color: AppTheme.primary),
             ],
           ),
         ),
@@ -274,7 +276,7 @@ class _MedecinSelector extends StatelessWidget {
     }
 
     return OutlinedButton.icon(
-      icon: const Icon(Icons.search),
+      icon: const Icon(PhosphorIconsRegular.magnifyingGlass),
       label: const Text('Rechercher un médecin'),
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(double.infinity, 50),
@@ -348,7 +350,7 @@ class _MedecinPickerSheetState extends State<_MedecinPickerSheet> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text('Erreur: ${snapshot.error}'));
+                  return Center(child: Text(messageErreur(snapshot.error)));
                 }
                 // Spécialité conseillée par l'assistant IA en premier
                 final conseil = widget.specialiteConseillee;
@@ -360,7 +362,7 @@ class _MedecinPickerSheetState extends State<_MedecinPickerSheet> {
                   itemBuilder: (_, i) {
                     final m = medecins[i] as Map<String, dynamic>;
                     return ListTile(
-                      leading: const CircleAvatar(child: Icon(Icons.person)),
+                      leading: const CircleAvatar(child: Icon(PhosphorIconsRegular.user)),
                       title: Text('Dr. ${m['prenom'] ?? ''} ${m['nom'] ?? ''}'),
                       subtitle: Row(
                         children: [

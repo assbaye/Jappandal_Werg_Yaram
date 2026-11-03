@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -48,7 +49,7 @@ class NotificationBell extends ConsumerWidget {
       icon: Badge(
         isLabelVisible: count > 0,
         label: Text(count > 99 ? '99+' : '$count'),
-        child: const Icon(Icons.notifications_outlined),
+        child: const Icon(PhosphorIconsRegular.bell),
       ),
       onPressed: () async {
         await context.push('/notifications');
@@ -92,7 +93,6 @@ class NotificationsScreen extends ConsumerWidget {
           if (aDesNonLues)
             TextButton(
               onPressed: () => _toutLire(context, ref),
-              style: TextButton.styleFrom(foregroundColor: Colors.white),
               child: const Text('Tout lire'),
             ),
         ],
@@ -118,11 +118,11 @@ class NotificationsScreen extends ConsumerWidget {
               ? ListView(
                   children: [
                     const SizedBox(height: 120),
-                    Icon(Icons.notifications_none, size: 64, color: Colors.grey[400]),
+                    Icon(PhosphorIconsRegular.bell, size: 64, color: AppTheme.inkMuted),
                     const SizedBox(height: 12),
                     Center(
                       child: Text('Aucune notification',
-                          style: TextStyle(color: Colors.grey[600], fontSize: 15)),
+                          style: TextStyle(color: AppTheme.inkSoft, fontSize: 15)),
                     ),
                   ],
                 )
@@ -142,12 +142,12 @@ class _NotificationTile extends ConsumerWidget {
   const _NotificationTile({required this.notification});
 
   (IconData, Color) _style(String? type) => switch (type) {
-        'CONSULTATION' => (Icons.medical_services_outlined, AppTheme.primary),
-        'RENDEZ_VOUS' => (Icons.event_outlined, const Color(0xFF7B1FA2)),
-        'PRESCRIPTION' => (Icons.medication_outlined, AppTheme.warningColor),
-        'PAIEMENT' => (Icons.payments_outlined, AppTheme.successColor),
-        'URGENCE' || 'ALERTE_SANTE' => (Icons.warning_amber_rounded, AppTheme.errorColor),
-        _ => (Icons.notifications_outlined, Colors.grey.shade700),
+        'CONSULTATION' => (PhosphorIconsRegular.stethoscope, AppTheme.primary),
+        'RENDEZ_VOUS' => (PhosphorIconsRegular.calendarBlank, AppTheme.secondary),
+        'PRESCRIPTION' => (PhosphorIconsRegular.pill, AppTheme.warningColor),
+        'PAIEMENT' => (PhosphorIconsRegular.wallet, AppTheme.successColor),
+        'URGENCE' || 'ALERTE_SANTE' => (PhosphorIconsRegular.warning, AppTheme.errorColor),
+        _ => (PhosphorIconsRegular.bell, AppTheme.inkSoft),
       };
 
   String _quand(String? d) {
@@ -220,7 +220,7 @@ class _NotificationTile extends ConsumerWidget {
           Text(notification['message'] as String? ?? ''),
           const SizedBox(height: 4),
           Text(_quand(notification['created_at'] as String?),
-              style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+              style: TextStyle(fontSize: 11, color: AppTheme.inkMuted)),
         ],
       ),
       trailing: nonLue

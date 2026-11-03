@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -249,7 +250,7 @@ class _FormulaireState extends ConsumerState<_Formulaire> {
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: OutlinedButton.icon(
-                icon: const Icon(Icons.cake_outlined),
+                icon: const Icon(PhosphorIconsRegular.cake),
                 label: Text(_naissance == null
                     ? 'Date de naissance'
                     : 'Né(e) le ${DateFormat('d MMMM yyyy', 'fr_FR').format(_naissance!)}'),
@@ -303,7 +304,7 @@ class _FormulaireState extends ConsumerState<_Formulaire> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text('N° d\'ordre : ${_medecin!['numero_ordre']}',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                    style: TextStyle(color: AppTheme.inkSoft, fontSize: 13)),
               ),
             champ('specialite', 'Spécialité', validator: requis),
             champ('hopital_rattachement', 'Hôpital / clinique de rattachement'),
@@ -358,9 +359,9 @@ class _FormulaireState extends ConsumerState<_Formulaire> {
           const _Section('Sécurité'),
           Card(
             child: ListTile(
-              leading: const Icon(Icons.lock_outline, color: AppTheme.primary),
+              leading: const Icon(PhosphorIconsRegular.lock, color: AppTheme.primary),
               title: const Text('Changer le mot de passe'),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: const Icon(PhosphorIconsRegular.caretRight),
               onTap: () => showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
@@ -371,7 +372,7 @@ class _FormulaireState extends ConsumerState<_Formulaire> {
           ),
           Card(
             child: ListTile(
-              leading: const Icon(Icons.logout, color: AppTheme.errorColor),
+              leading: const Icon(PhosphorIconsRegular.signOut, color: AppTheme.errorColor),
               title: const Text('Se déconnecter', style: TextStyle(color: AppTheme.errorColor)),
               onTap: () => ref.read(authProvider.notifier).logout(),
             ),
@@ -392,7 +393,7 @@ class _Section extends StatelessWidget {
         padding: const EdgeInsets.only(top: 12, bottom: 10),
         child: Text(titre.toUpperCase(),
             style: TextStyle(
-                fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 0.8, color: Colors.grey[600])),
+                fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 0.8, color: AppTheme.inkSoft)),
       );
 }
 
@@ -447,7 +448,7 @@ class _MotDePasseSheetState extends ConsumerState<_MotDePasseSheet> {
   @override
   Widget build(BuildContext context) {
     final oeil = IconButton(
-      icon: Icon(_masque ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+      icon: Icon(_masque ? PhosphorIconsRegular.eye : PhosphorIconsRegular.eyeSlash),
       onPressed: () => setState(() => _masque = !_masque),
     );
 

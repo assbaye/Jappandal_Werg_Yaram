@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -9,11 +10,11 @@ import '../../auth/providers/auth_provider.dart';
 
 /// Présentation de chaque niveau d'urgence renvoyé par l'assistant.
 (String, String, Color, IconData) _niveau(String? n) => switch (n) {
-      'URGENCE_VITALE' => ('Urgence', 'Appelez les secours maintenant', AppTheme.errorColor, Icons.emergency),
-      'AUJOURDHUI' => ('À voir aujourd\'hui', 'Consultez un médecin dans la journée', AppTheme.warningColor, Icons.schedule),
-      'SOUS_48H' => ('Sous 48 heures', 'Consultez dans les deux prochains jours', AppTheme.primary, Icons.event),
-      'CONSEIL' => ('Pas d\'urgence', 'Consultez si cela dure ou s\'aggrave', AppTheme.successColor, Icons.check_circle_outline),
-      _ => ('Orientation', '', Colors.grey, Icons.help_outline),
+      'URGENCE_VITALE' => ('Urgence', 'Appelez les secours maintenant', AppTheme.errorColor, PhosphorIconsRegular.siren),
+      'AUJOURDHUI' => ('À voir aujourd\'hui', 'Consultez un médecin dans la journée', AppTheme.warningColor, PhosphorIconsRegular.clock),
+      'SOUS_48H' => ('Sous 48 heures', 'Consultez dans les deux prochains jours', AppTheme.primary, PhosphorIconsFill.calendarBlank),
+      'CONSEIL' => ('Pas d\'urgence', 'Consultez si cela dure ou s\'aggrave', AppTheme.successColor, PhosphorIconsRegular.checkCircle),
+      _ => ('Orientation', '', AppTheme.inkMuted, PhosphorIconsRegular.question),
     };
 
 class TriageScreen extends ConsumerStatefulWidget {
@@ -72,7 +73,7 @@ class _TriageScreenState extends ConsumerState<TriageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Assistant santé')),
+      appBar: AppBar(title: const Text('Orientation')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -87,7 +88,7 @@ class _TriageScreenState extends ConsumerState<TriageScreen> {
           Text(
             'L\'assistant utilise une intelligence artificielle (Claude, d\'Anthropic). Il oriente mais ne remplace pas '
             'un médecin et ne pose pas de diagnostic. Votre nom et vos coordonnées ne lui sont pas transmis.',
-            style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 11, color: AppTheme.inkSoft),
           ),
         ],
       ),
@@ -95,25 +96,11 @@ class _TriageScreenState extends ConsumerState<TriageScreen> {
   }
 
   List<Widget> _formulaire() => [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [AppTheme.primary, Color(0xFF42A5F5)]),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.auto_awesome, color: Colors.white, size: 32),
-              SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Décrivez ce que vous ressentez : l\'assistant vous dit à quel point c\'est urgent '
-                  'et quel médecin consulter.',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-            ],
-          ),
+        const Text('Que ressentez-vous ?', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -0.3)),
+        const SizedBox(height: 6),
+        const Text(
+          'Décrivez vos symptômes : nous évaluons l\'urgence et vous indiquons quel médecin consulter.',
+          style: TextStyle(color: AppTheme.inkSoft, height: 1.45),
         ),
         const SizedBox(height: 16),
         TextField(
@@ -129,19 +116,19 @@ class _TriageScreenState extends ConsumerState<TriageScreen> {
         ),
         Text(
           'Précisez depuis quand, l\'intensité, et ce qui aggrave ou soulage.',
-          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          style: TextStyle(fontSize: 12, color: AppTheme.inkSoft),
         ),
         const SizedBox(height: 16),
         ElevatedButton.icon(
           icon: _loading
               ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Icon(Icons.auto_awesome),
-          label: Text(_loading ? 'Analyse en cours…' : 'Analyser mes symptômes'),
+              : const Icon(PhosphorIconsRegular.arrowRight),
+          label: Text(_loading ? 'Analyse en cours…' : 'Être orienté'),
           onPressed: _loading ? null : _analyser,
         ),
         const SizedBox(height: 12),
         OutlinedButton.icon(
-          icon: const Icon(Icons.sos, color: AppTheme.errorColor),
+          icon: const Icon(PhosphorIconsRegular.siren, color: AppTheme.errorColor),
           label: const Text('Urgence grave ? SOS', style: TextStyle(color: AppTheme.errorColor)),
           style: OutlinedButton.styleFrom(
             minimumSize: const Size(double.infinity, 48),
@@ -190,14 +177,14 @@ class _Resultat extends StatelessWidget {
 
         if (vitale) ...[
           FilledButton.icon(
-            icon: const Icon(Icons.call),
+            icon: const Icon(PhosphorIconsRegular.phone),
             label: const Text('Appeler le SAMU (1515)'),
             style: FilledButton.styleFrom(backgroundColor: AppTheme.errorColor, minimumSize: const Size(double.infinity, 52)),
             onPressed: () => appeler(context, '1515'),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
-            icon: const Icon(Icons.sos),
+            icon: const Icon(PhosphorIconsRegular.siren),
             label: const Text('Alerter un médecin (SOS)'),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppTheme.errorColor,
@@ -215,7 +202,7 @@ class _Resultat extends StatelessWidget {
             titre: 'Médecin conseillé',
             child: Row(
               children: [
-                const Icon(Icons.medical_services_outlined, color: AppTheme.primary),
+                const Icon(PhosphorIconsRegular.stethoscope, color: AppTheme.primary),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -248,7 +235,7 @@ class _Resultat extends StatelessWidget {
         const SizedBox(height: 8),
         if (!vitale)
           ElevatedButton.icon(
-            icon: const Icon(Icons.arrow_forward),
+            icon: const Icon(PhosphorIconsRegular.arrowRight),
             label: const Text('Demander une consultation'),
             onPressed: () => context.push('/consultations/nouvelle', extra: resultat),
           ),
@@ -275,7 +262,7 @@ class _Bloc extends StatelessWidget {
           children: [
             Text(titre.toUpperCase(),
                 style: TextStyle(
-                    fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.8, color: couleur ?? Colors.grey[600])),
+                    fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.8, color: couleur ?? AppTheme.inkSoft)),
             const SizedBox(height: 8),
             child,
           ],

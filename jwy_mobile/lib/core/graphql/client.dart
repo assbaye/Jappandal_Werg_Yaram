@@ -23,6 +23,8 @@ GraphQLClient buildGraphQLClient(String? token) {
   return GraphQLClient(
     cache: GraphQLCache(store: InMemoryStore()),
     link: link,
+    // 5 s par défaut : trop court sur les réseaux mobiles lents (et serveur de développement)
+    queryRequestTimeout: const Duration(seconds: 30),
     defaultPolicies: DefaultPolicies(
       query: Policies(fetch: FetchPolicy.networkOnly),
       mutate: Policies(fetch: FetchPolicy.networkOnly),

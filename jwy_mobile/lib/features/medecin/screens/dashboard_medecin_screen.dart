@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/outils.dart';
 import '../../../core/graphql/queries/medecin_queries.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../notifications/screens/notifications_screen.dart';
@@ -24,24 +26,25 @@ class MedecinShell extends StatelessWidget {
 
     return Scaffold(
       body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: index < 0 ? 0 : index,
-        selectedItemColor: AppTheme.primary,
-        unselectedItemColor: Colors.grey,
-        onTap: (i) => context.go(_routes[i]),
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Accueil'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.medical_services_outlined),
-              activeIcon: Icon(Icons.medical_services),
-              label: 'Consultations'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.event_outlined),
-              activeIcon: Icon(Icons.event),
-              label: 'Rendez-vous'),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: index < 0 ? 0 : index,
+        onDestinationSelected: (i) => context.go(_routes[i]),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(PhosphorIconsRegular.house),
+            selectedIcon: Icon(PhosphorIconsFill.house),
+            label: 'Accueil',
+          ),
+          NavigationDestination(
+            icon: Icon(PhosphorIconsRegular.stethoscope),
+            selectedIcon: Icon(PhosphorIconsFill.stethoscope),
+            label: 'Consultations',
+          ),
+          NavigationDestination(
+            icon: Icon(PhosphorIconsRegular.calendarBlank),
+            selectedIcon: Icon(PhosphorIconsFill.calendarBlank),
+            label: 'Rendez-vous',
+          ),
         ],
       ),
     );
@@ -87,18 +90,18 @@ class DashboardMedecinTab extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('JWY — Médecin'),
+        title: const Text('Accueil'),
         actions: [
           const NotificationBell(),
           IconButton(
-            icon: const Icon(Icons.person_outline),
+            icon: const Icon(PhosphorIconsRegular.user),
             onPressed: () => _showProfile(context, ref),
           ),
         ],
       ),
       body: medecinAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Erreur: $e')),
+        error: (e, _) => Center(child: Text(messageErreur(e), textAlign: TextAlign.center)),
         data: (medecin) => RefreshIndicator(
           onRefresh: () async => ref.invalidate(_medecinInfoProvider),
           child: SingleChildScrollView(
@@ -142,63 +145,53 @@ class _MedecinWelcomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final prenom = medecin?['prenom'] ?? user?['email'] ?? 'Médecin';
+    final prenom = medecin?['prenom'] as String? ?? '';
+    final nom = medecin?['nom'] as String? ?? '';
     final specialite = medecin?['specialite'] as String? ?? '';
     final note = (medecin?['note_moyenne'] as num?)?.toDouble() ?? 0.0;
     final nbConsultations = medecin?['nombre_consultations'] as int? ?? 0;
+    final initiales = '${prenom.isNotEmpty ? prenom[0] : ''}${nom.isNotEmpty ? nom[0] : ''}'.toUpperCase();
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primary, Color(0xFF0D47A1)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Colors.white24,
-                  child: Icon(Icons.person, color: Colors.white, size: 32)),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Dr. $prenom',
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold)),
-                    Text(specialite,
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 13)),
-                  ],
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 26,
+                  backgroundColor: AppTheme.primarySoft,
+                  child: Text(initiales,
+                      style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w700, fontSize: 17)),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              _StatChip(
-                  icon: Icons.star,
-                  value: note.toStringAsFixed(1),
-                  label: 'Note'),
-              const SizedBox(width: 12),
-              _StatChip(
-                  icon: Icons.medical_services,
-                  value: '$nbConsultations',
-                  label: 'Consultations'),
-            ],
-          ),
-        ],
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Dr $prenom $nom'.trim(),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                      Text(specialite, style: const TextStyle(color: AppTheme.inkSoft, fontSize: 13)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                _StatChip(icon: PhosphorIconsRegular.star, value: note.toStringAsFixed(1), label: 'Note moyenne'),
+                const SizedBox(width: 12),
+                _StatChip(icon: PhosphorIconsRegular.stethoscope, value: '$nbConsultations', label: 'Consultations'),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -208,22 +201,22 @@ class _StatChip extends StatelessWidget {
   final IconData icon;
   final String value;
   final String label;
-  const _StatChip(
-      {required this.icon, required this.value, required this.label});
+  const _StatChip({required this.icon, required this.value, required this.label});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-          color: Colors.white24, borderRadius: BorderRadius.circular(20)),
+    return Expanded(
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 16),
-          const SizedBox(width: 6),
-          Text('$value  $label',
-              style: const TextStyle(color: Colors.white, fontSize: 12)),
+          Icon(icon, color: AppTheme.primary, size: 20),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+              Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.inkSoft)),
+            ],
+          ),
         ],
       ),
     );
@@ -247,13 +240,13 @@ class _DisponibiliteCard extends ConsumerWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: (disponible ? AppTheme.successColor : Colors.grey)
+                color: (disponible ? AppTheme.successColor : AppTheme.inkMuted)
                     .withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
-                disponible ? Icons.wifi_tethering : Icons.wifi_tethering_off,
-                color: disponible ? AppTheme.successColor : Colors.grey,
+                disponible ? PhosphorIconsRegular.wifiHigh : PhosphorIconsRegular.wifiSlash,
+                color: disponible ? AppTheme.successColor : AppTheme.inkMuted,
               ),
             ),
             const SizedBox(width: 16),
@@ -266,14 +259,14 @@ class _DisponibiliteCard extends ConsumerWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color:
-                          disponible ? AppTheme.successColor : Colors.grey[700],
+                          disponible ? AppTheme.successColor : AppTheme.inkSoft,
                     ),
                   ),
                   Text(
                     disponible
                         ? 'Les patients peuvent vous contacter'
                         : 'Vous n\'apparaissez pas dans les recherches',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 12, color: AppTheme.inkSoft),
                   ),
                 ],
               ),
@@ -316,7 +309,7 @@ class _RecentConsultations extends ConsumerWidget {
 
     return consultationsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Text('Erreur: $e',
+      error: (e, _) => Text(messageErreur(e),
           style: const TextStyle(color: AppTheme.errorColor)),
       data: (consultations) {
         if (consultations.isEmpty) {
@@ -324,7 +317,7 @@ class _RecentConsultations extends ConsumerWidget {
             child: Padding(
               padding: EdgeInsets.all(24),
               child: Text('Aucune consultation pour le moment',
-                  style: TextStyle(color: Colors.grey)),
+                  style: TextStyle(color: AppTheme.inkMuted)),
             ),
           );
         }
@@ -362,10 +355,10 @@ class ConsultationsMedecinScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline,
+              const Icon(PhosphorIconsRegular.warningCircle,
                   size: 48, color: AppTheme.errorColor),
               const SizedBox(height: 12),
-              Text(e.toString()),
+              Text(messageErreur(e), textAlign: TextAlign.center),
               TextButton(
                 onPressed: () => ref.invalidate(_consultationsMedecinProvider),
                 child: const Text('Réessayer'),
@@ -379,11 +372,11 @@ class ConsultationsMedecinScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.medical_services_outlined,
-                      size: 64, color: Colors.grey),
+                  Icon(PhosphorIconsRegular.stethoscope,
+                      size: 64, color: AppTheme.inkMuted),
                   SizedBox(height: 16),
                   Text('Aucune consultation',
-                      style: TextStyle(fontSize: 18, color: Colors.grey)),
+                      style: TextStyle(fontSize: 18, color: AppTheme.inkMuted)),
                 ],
               ),
             );
@@ -424,16 +417,16 @@ class _ConsultationMedecinCard extends ConsumerWidget {
         'EN_ATTENTE' => AppTheme.warningColor,
         'CONFIRMEE' => AppTheme.secondary,
         'EN_COURS' => AppTheme.primary,
-        'TERMINEE' => Colors.grey,
+        'TERMINEE' => AppTheme.inkMuted,
         'ANNULEE' => AppTheme.errorColor,
-        _ => Colors.grey,
+        _ => AppTheme.inkMuted,
       };
 
   IconData _typeIcon(String t) => switch (t) {
-        'VIDEO' => Icons.video_call,
-        'CHAT' => Icons.chat,
-        'PHYSIQUE' => Icons.local_hospital,
-        _ => Icons.medical_services,
+        'VIDEO' => PhosphorIconsRegular.videoCamera,
+        'CHAT' => PhosphorIconsRegular.chatCircle,
+        'PHYSIQUE' => PhosphorIconsRegular.hospital,
+        _ => PhosphorIconsFill.stethoscope,
       };
 
   String _formatDate(String? d) {
@@ -496,7 +489,7 @@ class _ConsultationMedecinCard extends ConsumerWidget {
               ),
               const SizedBox(height: 6),
               Text(_formatDate(consultation['created_at'] as String?),
-                  style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                  style: TextStyle(color: AppTheme.inkMuted, fontSize: 12)),
               if (consultation['symptomes'] != null) ...[
                 const SizedBox(height: 6),
                 Text(
@@ -512,7 +505,7 @@ class _ConsultationMedecinCard extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    icon: const Icon(Icons.video_call),
+                    icon: const Icon(PhosphorIconsRegular.videoCamera),
                     label: const Text('Démarrer la téléconsultation'),
                     style: ElevatedButton.styleFrom(
                         minimumSize: const Size(0, 40)),
@@ -548,21 +541,21 @@ class _MedecinProfileSheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const CircleAvatar(radius: 32, child: Icon(Icons.person, size: 32)),
+          const CircleAvatar(radius: 32, child: Icon(PhosphorIconsRegular.user, size: 32)),
           const SizedBox(height: 12),
           Text(nom,
               style:
                   const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           if (medecin?['specialite'] != null)
             Text(medecin!['specialite'] as String,
-                style: TextStyle(color: Colors.grey[600])),
+                style: TextStyle(color: AppTheme.inkSoft)),
           Text(user?['email'] ?? '',
-              style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+              style: TextStyle(color: AppTheme.inkMuted, fontSize: 12)),
           const SizedBox(height: 24),
           ListTile(
-            leading: const Icon(Icons.edit_outlined, color: AppTheme.primary),
+            leading: const Icon(PhosphorIconsRegular.pencilSimple, color: AppTheme.primary),
             title: const Text('Modifier mon profil'),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: const Icon(PhosphorIconsRegular.caretRight),
             onTap: () async {
               final router = GoRouter.of(context); // le contexte de la fiche disparaît au pop
               Navigator.pop(context);
@@ -571,7 +564,7 @@ class _MedecinProfileSheet extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.logout, color: AppTheme.errorColor),
+            leading: const Icon(PhosphorIconsRegular.signOut, color: AppTheme.errorColor),
             title: const Text('Se déconnecter',
                 style: TextStyle(color: AppTheme.errorColor)),
             onTap: () async {

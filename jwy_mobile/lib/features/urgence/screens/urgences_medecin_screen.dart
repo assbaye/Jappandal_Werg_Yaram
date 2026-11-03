@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -55,7 +56,7 @@ class BandeauUrgences extends ConsumerWidget {
             padding: const EdgeInsets.all(14),
             child: Row(
               children: [
-                const Icon(Icons.emergency, color: Colors.white, size: 30),
+                const Icon(PhosphorIconsRegular.siren, color: Colors.white, size: 30),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -66,7 +67,7 @@ class BandeauUrgences extends ConsumerWidget {
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: Colors.white),
+                const Icon(PhosphorIconsRegular.caretRight, color: Colors.white),
               ],
             ),
           ),
@@ -86,7 +87,7 @@ class UrgencesMedecinScreen extends ConsumerWidget {
     final async = ref.watch(alertesUrgenceProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Urgences'), backgroundColor: AppTheme.errorColor),
+      appBar: AppBar(title: const Text('Urgences')),
       body: async.when(
         skipLoadingOnRefresh: true,
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -101,9 +102,9 @@ class UrgencesMedecinScreen extends ConsumerWidget {
           child: alertes.isEmpty
               ? ListView(children: [
                   const SizedBox(height: 120),
-                  Icon(Icons.verified_user_outlined, size: 64, color: Colors.grey[400]),
+                  Icon(PhosphorIconsRegular.shieldCheck, size: 64, color: AppTheme.inkMuted),
                   const SizedBox(height: 12),
-                  Center(child: Text('Aucune urgence en cours', style: TextStyle(color: Colors.grey[600]))),
+                  Center(child: Text('Aucune urgence en cours', style: TextStyle(color: AppTheme.inkSoft))),
                 ])
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
@@ -159,9 +160,9 @@ class _AlerteCardState extends ConsumerState<_AlerteCard> {
     final (label, couleur) = switch (statut) {
       'ACTIVE' => ('En attente', AppTheme.errorColor),
       'PRISE_EN_CHARGE' => ('Prise en charge par vous', AppTheme.successColor),
-      'CLOTUREE' => ('Clôturée', Colors.grey.shade600),
-      'ANNULEE' => ('Annulée par le patient', Colors.grey.shade600),
-      _ => (statut, Colors.grey),
+      'CLOTUREE' => ('Clôturée', AppTheme.inkSoft),
+      'ANNULEE' => ('Annulée par le patient', AppTheme.inkSoft),
+      _ => (statut, AppTheme.inkMuted),
     };
 
     return Card(
@@ -179,13 +180,13 @@ class _AlerteCardState extends ConsumerState<_AlerteCard> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.emergency, color: couleur),
+                  Icon(PhosphorIconsRegular.siren, color: couleur),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(a['type_urgence'] as String? ?? '',
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   ),
-                  Text(_depuis(a['created_at'] as String?), style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                  Text(_depuis(a['created_at'] as String?), style: TextStyle(color: AppTheme.inkSoft, fontSize: 12)),
                 ],
               ),
               const SizedBox(height: 4),
@@ -200,7 +201,7 @@ class _AlerteCardState extends ConsumerState<_AlerteCard> {
               if (allergies.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
-                  child: Text('⚠ Allergies : ${allergies.join(', ')}',
+                  child: Text('Allergies : ${allergies.join(', ')}',
                       style: const TextStyle(color: AppTheme.errorColor, fontSize: 13)),
                 ),
               if (a['description'] != null && (a['description'] as String).isNotEmpty)
@@ -215,7 +216,7 @@ class _AlerteCardState extends ConsumerState<_AlerteCard> {
                   runSpacing: 4,
                   children: [
                     ActionChip(
-                      avatar: const Icon(Icons.map_outlined, size: 18),
+                      avatar: const Icon(PhosphorIconsRegular.mapTrifold, size: 18),
                       label: const Text('Position'),
                       onPressed: () => ouvrirCarte(
                         (a['latitude'] as num).toDouble(),
@@ -224,19 +225,19 @@ class _AlerteCardState extends ConsumerState<_AlerteCard> {
                     ),
                     if (tel != null)
                       ActionChip(
-                        avatar: const Icon(Icons.call, size: 18),
+                        avatar: const Icon(PhosphorIconsRegular.phone, size: 18),
                         label: const Text('Patient'),
                         onPressed: () => appeler(context, tel),
                       ),
                     if (contact != null && contact.isNotEmpty)
                       ActionChip(
-                        avatar: const Icon(Icons.contact_phone_outlined, size: 18),
+                        avatar: const Icon(PhosphorIconsRegular.addressBook, size: 18),
                         label: const Text('Proche'),
                         onPressed: () => appeler(context, contact),
                       ),
                     if (enCharge)
                       ActionChip(
-                        avatar: const Icon(Icons.folder_shared_outlined, size: 18),
+                        avatar: const Icon(PhosphorIconsRegular.folderUser, size: 18),
                         label: const Text('Dossier'),
                         onPressed: () => showModalBottomSheet(
                           context: context,
@@ -252,14 +253,14 @@ class _AlerteCardState extends ConsumerState<_AlerteCard> {
                   const Center(child: CircularProgressIndicator())
                 else if (active)
                   ElevatedButton.icon(
-                    icon: const Icon(Icons.health_and_safety),
+                    icon: const Icon(PhosphorIconsRegular.shieldCheck),
                     label: const Text('Je prends en charge'),
                     style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor),
                     onPressed: () => _action(prendreEnChargeUrgenceMutation, 'Urgence prise en charge — le patient est prévenu'),
                   )
                 else
                   OutlinedButton.icon(
-                    icon: const Icon(Icons.task_alt),
+                    icon: const Icon(PhosphorIconsRegular.checkCircle),
                     label: const Text('Clôturer l\'urgence'),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 48),

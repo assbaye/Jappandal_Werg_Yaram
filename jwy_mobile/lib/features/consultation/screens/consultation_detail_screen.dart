@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -8,9 +9,10 @@ import '../../../core/utils/outils.dart';
 import '../../../core/graphql/queries/patient_queries.dart';
 import '../../../core/graphql/queries/medecin_queries.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../pharmacien/screens/commandes_pharmacien_screen.dart' show fcfa;
 
-final consultationDetailProvider =
-    FutureProvider.autoDispose.family<Map<String, dynamic>?, String>((ref, id) async {
+final consultationDetailProvider = FutureProvider.autoDispose
+    .family<Map<String, dynamic>?, String>((ref, id) async {
   final client = ref.read(graphQLClientProvider);
   final result = await client.query(
     QueryOptions(
@@ -23,8 +25,8 @@ final consultationDetailProvider =
   return result.data?['consultation'] as Map<String, dynamic>?;
 });
 
-final _dossierPatientProvider =
-    FutureProvider.autoDispose.family<Map<String, dynamic>?, String>((ref, patientId) async {
+final _dossierPatientProvider = FutureProvider.autoDispose
+    .family<Map<String, dynamic>?, String>((ref, patientId) async {
   final client = ref.read(graphQLClientProvider);
   final result = await client.query(
     QueryOptions(
@@ -39,7 +41,9 @@ final _dossierPatientProvider =
 
 String _messageErreur(OperationException? e) =>
     e?.graphqlErrors.firstOrNull?.message ??
-    (e?.linkException != null ? 'Impossible de joindre le serveur' : 'Une erreur est survenue');
+    (e?.linkException != null
+        ? 'Impossible de joindre le serveur'
+        : 'Une erreur est survenue');
 
 class ConsultationDetailScreen extends ConsumerWidget {
   final String consultationId;
@@ -55,8 +59,9 @@ class ConsultationDetailScreen extends ConsumerWidget {
         leading: BackButton(onPressed: () => context.pop()),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.invalidate(consultationDetailProvider(consultationId)),
+            icon: const Icon(PhosphorIconsRegular.arrowClockwise),
+            onPressed: () =>
+                ref.invalidate(consultationDetailProvider(consultationId)),
           ),
         ],
       ),
@@ -68,17 +73,20 @@ class ConsultationDetailScreen extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, size: 56, color: AppTheme.errorColor),
+                const Icon(PhosphorIconsRegular.warningCircle,
+                    size: 56, color: AppTheme.errorColor),
                 const SizedBox(height: 16),
                 const Text('Impossible de charger la consultation',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text(e is OperationException ? _messageErreur(e) : e.toString(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                    style: TextStyle(color: AppTheme.inkSoft, fontSize: 13)),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () => ref.invalidate(consultationDetailProvider(consultationId)),
+                  onPressed: () => ref
+                      .invalidate(consultationDetailProvider(consultationId)),
                   child: const Text('Réessayer'),
                 ),
               ],
@@ -90,7 +98,8 @@ class ConsultationDetailScreen extends ConsumerWidget {
             return const Center(child: Text('Consultation introuvable'));
           }
           return RefreshIndicator(
-            onRefresh: () => ref.refresh(consultationDetailProvider(consultationId).future),
+            onRefresh: () =>
+                ref.refresh(consultationDetailProvider(consultationId).future),
             child: _DetailBody(consultation: consultation),
           );
         },
@@ -107,9 +116,9 @@ class _DetailBody extends ConsumerWidget {
         'EN_ATTENTE' => AppTheme.warningColor,
         'CONFIRMEE' => AppTheme.secondary,
         'EN_COURS' => AppTheme.primary,
-        'TERMINEE' => Colors.grey.shade600,
+        'TERMINEE' => AppTheme.inkSoft,
         'ANNULEE' => AppTheme.errorColor,
-        _ => Colors.grey,
+        _ => AppTheme.inkMuted,
       };
 
   String _statutLabel(String s) => switch (s) {
@@ -129,16 +138,17 @@ class _DetailBody extends ConsumerWidget {
       };
 
   IconData _typeIcon(String t) => switch (t) {
-        'VIDEO' => Icons.video_call,
-        'CHAT' => Icons.chat_bubble_outline,
-        'PHYSIQUE' => Icons.local_hospital_outlined,
-        _ => Icons.medical_services_outlined,
+        'VIDEO' => PhosphorIconsRegular.videoCamera,
+        'CHAT' => PhosphorIconsRegular.chatCircle,
+        'PHYSIQUE' => PhosphorIconsRegular.hospital,
+        _ => PhosphorIconsRegular.stethoscope,
       };
 
   String _formatDate(String? d) {
     if (d == null) return '—';
     try {
-      return DateFormat('dd MMMM yyyy à HH:mm', 'fr_FR').format(DateTime.parse(d));
+      return DateFormat('dd MMMM yyyy à HH:mm', 'fr_FR')
+          .format(DateTime.parse(d));
     } catch (_) {
       return d;
     }
@@ -187,17 +197,22 @@ class _DetailBody extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(_typeLabel(type),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15)),
                       const SizedBox(height: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: statutColor,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           _statutLabel(statut),
-                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
@@ -209,24 +224,27 @@ class _DetailBody extends ConsumerWidget {
           const SizedBox(height: 16),
 
           // ── Infos rapides ─────────────────────────────────────────────────
-          Row(
-            children: [
-              Expanded(
-                child: _InfoChip(
-                  icon: Icons.calendar_today_outlined,
-                  label: 'Date',
-                  value: _formatDate(consultation['created_at'] as String?),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: _InfoChip(
+                    icon: PhosphorIconsRegular.calendarBlank,
+                    label: 'Date',
+                    value: _formatDate(consultation['created_at'] as String?),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _InfoChip(
-                  icon: Icons.payments_outlined,
-                  label: 'Coût',
-                  value: '$cout FCFA',
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _InfoChip(
+                    icon: PhosphorIconsRegular.wallet,
+                    label: 'Coût',
+                    value: '${fcfa.format(cout)} FCFA',
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 12),
 
@@ -241,7 +259,7 @@ class _DetailBody extends ConsumerWidget {
           if (consultation['symptomes'] != null) ...[
             _SectionCard(
               title: 'Symptômes décrits',
-              icon: Icons.sick_outlined,
+              icon: PhosphorIconsRegular.thermometer,
               child: Text(
                 consultation['symptomes'] as String,
                 style: const TextStyle(fontSize: 14, height: 1.6),
@@ -253,8 +271,8 @@ class _DetailBody extends ConsumerWidget {
           // ── Pré-analyse IA (vue médecin) ──────────────────────────────────
           if (isMedecin && consultation['triage_ia'] != null) ...[
             _SectionCard(
-              title: 'Pré-analyse de l\'assistant IA',
-              icon: Icons.auto_awesome,
+              title: 'Pré-orientation du patient',
+              icon: PhosphorIconsRegular.clipboardText,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -268,11 +286,17 @@ class _DetailBody extends ConsumerWidget {
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 6),
-                  Text(consultation['triage_ia']['resume_medecin'] as String? ?? '',
+                  Text(
+                      consultation['triage_ia']['resume_medecin'] as String? ??
+                          '',
                       style: const TextStyle(fontSize: 14, height: 1.5)),
                   const SizedBox(height: 6),
-                  Text('Généré automatiquement — à vérifier.',
-                      style: TextStyle(fontSize: 11, color: Colors.grey[600], fontStyle: FontStyle.italic)),
+                  Text(
+                      'Résumé généré automatiquement à partir de la description du patient — à vérifier.',
+                      style: TextStyle(
+                          fontSize: 11,
+                          color: AppTheme.inkSoft,
+                          fontStyle: FontStyle.italic)),
                 ],
               ),
             ),
@@ -283,7 +307,7 @@ class _DetailBody extends ConsumerWidget {
           if (consultation['diagnostic'] != null) ...[
             _SectionCard(
               title: 'Diagnostic',
-              icon: Icons.local_hospital_outlined,
+              icon: PhosphorIconsRegular.stethoscope,
               iconColor: AppTheme.secondary,
               child: Text(
                 consultation['diagnostic'] as String,
@@ -297,7 +321,7 @@ class _DetailBody extends ConsumerWidget {
           if (consultation['recommandations'] != null) ...[
             _SectionCard(
               title: 'Recommandations',
-              icon: Icons.assignment_outlined,
+              icon: PhosphorIconsRegular.clipboardText,
               iconColor: AppTheme.successColor,
               child: Text(
                 consultation['recommandations'] as String,
@@ -311,8 +335,8 @@ class _DetailBody extends ConsumerWidget {
           if (isMedecin && consultation['notes_consultation'] != null) ...[
             _SectionCard(
               title: 'Notes (visibles par vous seul)',
-              icon: Icons.sticky_note_2_outlined,
-              iconColor: Colors.grey.shade700,
+              icon: PhosphorIconsRegular.note,
+              iconColor: AppTheme.inkSoft,
               child: Text(
                 consultation['notes_consultation'] as String,
                 style: const TextStyle(fontSize: 14, height: 1.6),
@@ -325,7 +349,7 @@ class _DetailBody extends ConsumerWidget {
           if (prescriptions.isNotEmpty) ...[
             _SectionCard(
               title: 'Ordonnance(s)',
-              icon: Icons.medication_outlined,
+              icon: PhosphorIconsRegular.pill,
               iconColor: AppTheme.warningColor,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,7 +373,8 @@ class _DetailBody extends ConsumerWidget {
             if (consultation['est_payee'] == true)
               const Card(
                 child: ListTile(
-                  leading: Icon(Icons.verified, color: AppTheme.successColor),
+                  leading: Icon(PhosphorIconsFill.sealCheck,
+                      color: AppTheme.successColor),
                   title: Text('Consultation payée'),
                 ),
               )
@@ -357,15 +382,18 @@ class _DetailBody extends ConsumerWidget {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  icon: const Icon(Icons.payments_outlined),
-                  label: Text('Payer la consultation ($cout FCFA)'),
+                  icon: const Icon(PhosphorIconsRegular.wallet),
+                  label:
+                      Text('Payer la consultation (${fcfa.format(cout)} FCFA)'),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(0, 50),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () async {
                     await context.push('/paiement/${consultation['id']}');
-                    ref.invalidate(consultationDetailProvider(consultation['id'] as String));
+                    ref.invalidate(consultationDetailProvider(
+                        consultation['id'] as String));
                   },
                 ),
               ),
@@ -377,10 +405,13 @@ class _DetailBody extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                icon: const Icon(Icons.video_call),
-                label: Text(isMedecin ? 'Démarrer la téléconsultation' : 'Rejoindre la téléconsultation'),
+                icon: const Icon(PhosphorIconsRegular.videoCamera),
+                label: Text(isMedecin
+                    ? 'Démarrer la téléconsultation'
+                    : 'Rejoindre la téléconsultation'),
                 style: ElevatedButton.styleFrom(minimumSize: const Size(0, 52)),
-                onPressed: () => context.push('/consultations/${consultation['id']}/video'),
+                onPressed: () =>
+                    context.push('/consultations/${consultation['id']}/video'),
               ),
             ),
             const SizedBox(height: 12),
@@ -406,14 +437,15 @@ class _MedecinCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return _SectionCard(
       title: 'Médecin',
-      icon: Icons.person_outline,
+      icon: PhosphorIconsRegular.user,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
             radius: 24,
             backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
-            child: const Icon(Icons.person, color: AppTheme.primary, size: 24),
+            child: const Icon(PhosphorIconsRegular.user,
+                color: AppTheme.primary, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -422,28 +454,33 @@ class _MedecinCard extends StatelessWidget {
               children: [
                 Text(
                   'Dr. ${medecin?['prenom'] ?? ''} ${medecin?['nom'] ?? ''}',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   medecin?['specialite'] as String? ?? '',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                  style: TextStyle(color: AppTheme.inkSoft, fontSize: 13),
                 ),
                 if (medecin?['hopital_rattachement'] != null) ...[
                   const SizedBox(height: 2),
                   Text(
                     medecin!['hopital_rattachement'] as String,
-                    style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                    style: TextStyle(color: AppTheme.inkMuted, fontSize: 12),
                   ),
                 ],
                 if (medecin?['est_certifie'] == true) ...[
                   const SizedBox(height: 6),
                   const Row(
                     children: [
-                      Icon(Icons.verified, color: AppTheme.primary, size: 14),
+                      Icon(PhosphorIconsFill.sealCheck,
+                          color: AppTheme.primary, size: 14),
                       SizedBox(width: 4),
                       Text('Médecin certifié',
-                          style: TextStyle(color: AppTheme.primary, fontSize: 12, fontWeight: FontWeight.w500)),
+                          style: TextStyle(
+                              color: AppTheme.primary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500)),
                     ],
                   ),
                 ],
@@ -471,7 +508,8 @@ class _PatientCard extends StatelessWidget {
       final String g => g,
       _ => null,
     };
-    final allergies = (patient?['allergies'] as List<dynamic>? ?? []).cast<String>();
+    final allergies =
+        (patient?['allergies'] as List<dynamic>? ?? []).cast<String>();
     final infos = [
       if (age != null) '$age ans',
       if (genre != null) genre,
@@ -481,7 +519,7 @@ class _PatientCard extends StatelessWidget {
 
     return _SectionCard(
       title: 'Patient',
-      icon: Icons.person_outline,
+      icon: PhosphorIconsRegular.user,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -490,7 +528,8 @@ class _PatientCard extends StatelessWidget {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
-                child: const Icon(Icons.person, color: AppTheme.primary, size: 24),
+                child: const Icon(PhosphorIconsRegular.user,
+                    color: AppTheme.primary, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -499,12 +538,14 @@ class _PatientCard extends StatelessWidget {
                   children: [
                     Text(
                       '${patient?['prenom'] ?? ''} ${patient?['nom'] ?? ''}',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 15),
                     ),
                     if (infos.isNotEmpty) ...[
                       const SizedBox(height: 2),
                       Text(infos.join(' · '),
-                          style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                          style:
+                              TextStyle(color: AppTheme.inkSoft, fontSize: 13)),
                     ],
                   ],
                 ),
@@ -516,11 +557,13 @@ class _PatientCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.warning_amber_rounded, color: AppTheme.errorColor, size: 16),
+                const Icon(PhosphorIconsRegular.warning,
+                    color: AppTheme.errorColor, size: 16),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text('Allergies : ${allergies.join(', ')}',
-                      style: const TextStyle(color: AppTheme.errorColor, fontSize: 13)),
+                      style: const TextStyle(
+                          color: AppTheme.errorColor, fontSize: 13)),
                 ),
               ],
             ),
@@ -529,7 +572,7 @@ class _PatientCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
-              icon: const Icon(Icons.folder_shared_outlined),
+              icon: const Icon(PhosphorIconsRegular.folderUser),
               label: const Text('Voir le dossier médical'),
               onPressed: patient?['id'] == null
                   ? null
@@ -537,7 +580,8 @@ class _PatientCard extends StatelessWidget {
                         context: context,
                         isScrollControlled: true,
                         showDragHandle: true,
-                        builder: (_) => DossierPatientSheet(patientId: patient!['id'] as String),
+                        builder: (_) => DossierPatientSheet(
+                            patientId: patient!['id'] as String),
                       ),
             ),
           ),
@@ -566,18 +610,23 @@ class DossierPatientSheet extends ConsumerWidget {
         error: (e, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: Text(e is OperationException ? _messageErreur(e) : e.toString(),
+            child: Text(
+                e is OperationException ? _messageErreur(e) : e.toString(),
                 textAlign: TextAlign.center),
           ),
         ),
         data: (dossier) {
           if (dossier == null) {
-            return const Center(child: Text('Aucun dossier médical pour ce patient'));
+            return const Center(
+                child: Text('Aucun dossier médical pour ce patient'));
           }
-          List<String> liste(String k) => (dossier[k] as List<dynamic>? ?? []).cast<String>();
+          List<String> liste(String k) =>
+              (dossier[k] as List<dynamic>? ?? []).cast<String>();
           String mesure(String k, String unite) {
             final v = dossier[k] as num?;
-            return v == null ? '—' : '${v.toStringAsFixed(v % 1 == 0 ? 0 : 1)} $unite';
+            return v == null
+                ? '—'
+                : '${v.toStringAsFixed(v % 1 == 0 ? 0 : 1)} $unite';
           }
 
           return ListView(
@@ -589,23 +638,45 @@ class DossierPatientSheet extends ConsumerWidget {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: _InfoChip(icon: Icons.bloodtype_outlined, label: 'Groupe', value: groupeSanguinLabel(dossier['groupe_sanguin'] as String?) ?? '—')),
+                  Expanded(
+                      child: _InfoChip(
+                          icon: PhosphorIconsRegular.drop,
+                          label: 'Groupe',
+                          value: groupeSanguinLabel(
+                                  dossier['groupe_sanguin'] as String?) ??
+                              '—')),
                   const SizedBox(width: 8),
-                  Expanded(child: _InfoChip(icon: Icons.monitor_weight_outlined, label: 'Poids', value: mesure('poids', 'kg'))),
+                  Expanded(
+                      child: _InfoChip(
+                          icon: PhosphorIconsRegular.scales,
+                          label: 'Poids',
+                          value: mesure('poids', 'kg'))),
                   const SizedBox(width: 8),
-                  Expanded(child: _InfoChip(icon: Icons.height, label: 'Taille', value: mesure('taille', 'cm'))),
+                  Expanded(
+                      child: _InfoChip(
+                          icon: PhosphorIconsRegular.ruler,
+                          label: 'Taille',
+                          value: mesure('taille', 'cm'))),
                 ],
               ),
               if (dossier['imc'] != null) ...[
                 const SizedBox(height: 8),
                 Text('IMC : ${(dossier['imc'] as num).toStringAsFixed(1)}',
-                    style: TextStyle(color: Colors.grey[700])),
+                    style: TextStyle(color: AppTheme.inkSoft)),
               ],
               const SizedBox(height: 12),
-              _DossierLigne(titre: 'Antécédents médicaux', valeur: dossier['antecedents_medicaux'] as String?),
-              _DossierLigne(titre: 'Allergies connues', valeur: liste('allergies_connues').join(', ')),
-              _DossierLigne(titre: 'Traitements en cours', valeur: liste('medicaments_actuels').join(', ')),
-              _DossierLigne(titre: 'Notes générales', valeur: dossier['notes_generales'] as String?),
+              _DossierLigne(
+                  titre: 'Antécédents médicaux',
+                  valeur: dossier['antecedents_medicaux'] as String?),
+              _DossierLigne(
+                  titre: 'Allergies connues',
+                  valeur: liste('allergies_connues').join(', ')),
+              _DossierLigne(
+                  titre: 'Traitements en cours',
+                  valeur: liste('medicaments_actuels').join(', ')),
+              _DossierLigne(
+                  titre: 'Notes générales',
+                  valeur: dossier['notes_generales'] as String?),
             ],
           );
         },
@@ -627,10 +698,15 @@ class _DossierLigne extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(titre, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w600)),
+          Text(titre,
+              style: TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.inkSoft,
+                  fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Text(vide ? 'Non renseigné' : valeur!,
-              style: TextStyle(fontSize: 14, color: vide ? Colors.grey : null)),
+              style: TextStyle(
+                  fontSize: 14, color: vide ? AppTheme.inkMuted : null)),
         ],
       ),
     );
@@ -643,7 +719,10 @@ class _OrdonnanceItem extends StatelessWidget {
   final int numero;
   final Map<String, dynamic> prescription;
   final bool peutCommander;
-  const _OrdonnanceItem({required this.numero, required this.prescription, this.peutCommander = false});
+  const _OrdonnanceItem(
+      {required this.numero,
+      required this.prescription,
+      this.peutCommander = false});
 
   @override
   Widget build(BuildContext context) {
@@ -653,7 +732,8 @@ class _OrdonnanceItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Ordonnance $numero · valable ${prescription['validite_jours'] ?? 30} jours',
+        Text(
+            'Ordonnance $numero · valable ${prescription['validite_jours'] ?? 30} jours',
             style: const TextStyle(fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         for (final m in meds.cast<Map<String, dynamic>>())
@@ -664,7 +744,8 @@ class _OrdonnanceItem extends StatelessWidget {
               children: [
                 const Padding(
                   padding: EdgeInsets.only(top: 2),
-                  child: Icon(Icons.medication, size: 18, color: AppTheme.warningColor),
+                  child: Icon(PhosphorIconsRegular.pill,
+                      size: 18, color: AppTheme.warningColor),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -675,11 +756,16 @@ class _OrdonnanceItem extends StatelessWidget {
                         '${m['medicament']?['nom_commercial'] ?? ''} × ${m['quantite']}',
                         style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
-                      Text('${m['posologie']} — pendant ${m['duree_traitement']} jours',
-                          style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+                      Text(
+                          '${m['posologie']} — pendant ${m['duree_traitement']} jours',
+                          style:
+                              TextStyle(color: AppTheme.inkSoft, fontSize: 13)),
                       if (m['instructions_speciales'] != null)
                         Text(m['instructions_speciales'] as String,
-                            style: TextStyle(color: Colors.grey[600], fontSize: 12, fontStyle: FontStyle.italic)),
+                            style: TextStyle(
+                                color: AppTheme.inkSoft,
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic)),
                     ],
                   ),
                 ),
@@ -688,15 +774,16 @@ class _OrdonnanceItem extends StatelessWidget {
           ),
         if (instructions != null && instructions.isNotEmpty)
           Text('Instructions : $instructions',
-              style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+              style: TextStyle(color: AppTheme.inkSoft, fontSize: 13)),
         if (peutCommander && meds.isNotEmpty) ...[
           const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
-              icon: const Icon(Icons.shopping_bag_outlined),
+              icon: const Icon(PhosphorIconsRegular.shoppingBag),
               label: const Text('Commander en pharmacie'),
-              onPressed: () => context.push('/commandes/ordonnance', extra: prescription),
+              onPressed: () =>
+                  context.push('/commandes/ordonnance', extra: prescription),
             ),
           ),
         ],
@@ -730,7 +817,8 @@ class _MedecinActionsState extends ConsumerState<_MedecinActions> {
   Future<void> _repondre(bool accepter) async {
     String? motif;
     if (!accepter) {
-      motif = await showDialog<String>(context: context, builder: (_) => const _RefusDialog());
+      motif = await showDialog<String>(
+          context: context, builder: (_) => const _RefusDialog());
       if (motif == null) return; // annulé
     }
     setState(() => _loading = true);
@@ -748,7 +836,9 @@ class _MedecinActionsState extends ConsumerState<_MedecinActions> {
       _snack(_messageErreur(result.exception), erreur: true);
       return;
     }
-    _snack(accepter ? 'Consultation acceptée — le patient est notifié' : 'Demande refusée');
+    _snack(accepter
+        ? 'Consultation acceptée — le patient est notifié'
+        : 'Demande refusée');
     ref.invalidate(consultationDetailProvider(_id));
   }
 
@@ -767,7 +857,8 @@ class _MedecinActionsState extends ConsumerState<_MedecinActions> {
 
   Future<void> _prescrire() async {
     final patientId = widget.consultation['patient']?['id'];
-    final ok = await context.push<bool>('/consultations/$_id/ordonnance?patient=$patientId');
+    final ok = await context
+        .push<bool>('/consultations/$_id/ordonnance?patient=$patientId');
     if (ok == true && mounted) {
       _snack('Ordonnance envoyée au patient');
       ref.invalidate(consultationDetailProvider(_id));
@@ -790,13 +881,14 @@ class _MedecinActionsState extends ConsumerState<_MedecinActions> {
         children: [
           Expanded(
             child: OutlinedButton.icon(
-              icon: const Icon(Icons.close),
+              icon: const Icon(PhosphorIconsRegular.x),
               label: const Text('Refuser'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppTheme.errorColor,
                 side: const BorderSide(color: AppTheme.errorColor),
                 minimumSize: const Size(0, 50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: () => _repondre(false),
             ),
@@ -804,7 +896,7 @@ class _MedecinActionsState extends ConsumerState<_MedecinActions> {
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton.icon(
-              icon: const Icon(Icons.check),
+              icon: const Icon(PhosphorIconsRegular.check),
               label: const Text('Accepter'),
               style: ElevatedButton.styleFrom(minimumSize: const Size(0, 50)),
               onPressed: () => _repondre(true),
@@ -822,11 +914,12 @@ class _MedecinActionsState extends ConsumerState<_MedecinActions> {
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
-            icon: const Icon(Icons.edit_note),
+            icon: const Icon(PhosphorIconsRegular.notePencil),
             label: const Text('Rédiger une ordonnance'),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(0, 50),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: _prescrire,
           ),
@@ -836,7 +929,7 @@ class _MedecinActionsState extends ConsumerState<_MedecinActions> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              icon: const Icon(Icons.task_alt),
+              icon: const Icon(PhosphorIconsRegular.checkCircle),
               label: const Text('Terminer la consultation'),
               style: ElevatedButton.styleFrom(minimumSize: const Size(0, 50)),
               onPressed: _terminer,
@@ -877,7 +970,9 @@ class _RefusDialogState extends State<_RefusDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
+        TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annuler')),
         TextButton(
           onPressed: () => Navigator.pop(context, _motifCtrl.text.trim()),
           style: TextButton.styleFrom(foregroundColor: AppTheme.errorColor),
@@ -916,7 +1011,8 @@ class _TerminerSheetState extends ConsumerState<_TerminerSheet> {
   Future<void> _valider() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
-    String? opt(TextEditingController c) => c.text.trim().isEmpty ? null : c.text.trim();
+    String? opt(TextEditingController c) =>
+        c.text.trim().isEmpty ? null : c.text.trim();
     final result = await ref.read(graphQLClientProvider).mutate(MutationOptions(
           document: gql(terminerConsultationMutation),
           variables: {
@@ -941,7 +1037,8 @@ class _TerminerSheetState extends ConsumerState<_TerminerSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(20, 0, 20, MediaQuery.of(context).viewInsets.bottom + 24),
+      padding: EdgeInsets.fromLTRB(
+          20, 0, 20, MediaQuery.of(context).viewInsets.bottom + 24),
       child: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -957,7 +1054,9 @@ class _TerminerSheetState extends ConsumerState<_TerminerSheet> {
                 maxLines: 3,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: const InputDecoration(labelText: 'Diagnostic *'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Le diagnostic est obligatoire' : null,
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? 'Le diagnostic est obligatoire'
+                    : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
@@ -984,8 +1083,10 @@ class _TerminerSheetState extends ConsumerState<_TerminerSheet> {
                 onPressed: _loading ? null : _valider,
                 child: _loading
                     ? const SizedBox(
-                        width: 22, height: 22,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
                     : const Text('Valider et notifier le patient'),
               ),
             ],
@@ -1015,6 +1116,7 @@ class _SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = iconColor ?? AppTheme.primary;
     return Card(
+      margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -1028,7 +1130,7 @@ class _SectionCard extends StatelessWidget {
                     style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
-                        color: Colors.grey[700])),
+                        color: AppTheme.inkSoft)),
               ],
             ),
             const SizedBox(height: 10),
@@ -1047,11 +1149,13 @@ class _InfoChip extends StatelessWidget {
   final String label;
   final String value;
 
-  const _InfoChip({required this.icon, required this.label, required this.value});
+  const _InfoChip(
+      {required this.icon, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Column(
@@ -1059,14 +1163,16 @@ class _InfoChip extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, size: 13, color: Colors.grey[500]),
+                Icon(icon, size: 13, color: AppTheme.inkMuted),
                 const SizedBox(width: 4),
-                Text(label, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                Text(label,
+                    style: TextStyle(fontSize: 11, color: AppTheme.inkMuted)),
               ],
             ),
             const SizedBox(height: 4),
             Text(value,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis),
           ],

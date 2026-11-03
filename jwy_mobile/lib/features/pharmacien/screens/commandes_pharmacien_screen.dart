@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
@@ -11,12 +12,12 @@ import '../../notifications/screens/notifications_screen.dart';
 (String, Color) statutCommandeInfo(String statut) => switch (statut) {
       'EN_ATTENTE' => ('Nouvelle', AppTheme.warningColor),
       'CONFIRMEE' => ('Acceptée', AppTheme.secondary),
-      'EN_PREPARATION' => ('En préparation', const Color(0xFF7B1FA2)),
+      'EN_PREPARATION' => ('En préparation', AppTheme.secondary),
       'PRETE' => ('Prête', AppTheme.primary),
-      'EN_LIVRAISON' => ('En livraison', const Color(0xFF0277BD)),
+      'EN_LIVRAISON' => ('En livraison', AppTheme.primary),
       'LIVREE' => ('Remise', AppTheme.successColor),
       'ANNULEE' => ('Annulée', AppTheme.errorColor),
-      _ => (statut, Colors.grey),
+      _ => (statut, AppTheme.inkMuted),
     };
 
 final fcfa = NumberFormat.decimalPattern('fr_FR');
@@ -52,9 +53,6 @@ class CommandesPharmacienScreen extends ConsumerWidget {
           title: const Text('Commandes'),
           actions: const [NotificationBell()],
           bottom: TabBar(
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            indicatorColor: Colors.white,
             tabs: [
               for (final (label, statuts) in _onglets)
                 Tab(
@@ -83,9 +81,9 @@ class CommandesPharmacienScreen extends ConsumerWidget {
                     if (liste.isEmpty) {
                       return ListView(children: [
                         const SizedBox(height: 120),
-                        Icon(Icons.inbox_outlined, size: 64, color: Colors.grey[400]),
+                        Icon(PhosphorIconsRegular.tray, size: 64, color: AppTheme.inkMuted),
                         const SizedBox(height: 12),
-                        Center(child: Text('Aucune commande', style: TextStyle(color: Colors.grey[600]))),
+                        Center(child: Text('Aucune commande', style: TextStyle(color: AppTheme.inkSoft))),
                       ]);
                     }
                     return ListView.builder(
@@ -195,7 +193,7 @@ class _CommandePharmacienCardState extends ConsumerState<CommandePharmacienCard>
                       Text(
                         '${c['numero_commande']}'
                         '${date == null ? '' : ' · ${DateFormat('dd/MM à HH:mm', 'fr_FR').format(date)}'}',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                        style: TextStyle(color: AppTheme.inkSoft, fontSize: 12),
                       ),
                     ],
                   ),
@@ -219,19 +217,19 @@ class _CommandePharmacienCardState extends ConsumerState<CommandePharmacienCard>
                     Text('${l['quantite']} ×  ', style: const TextStyle(fontWeight: FontWeight.w600)),
                     Expanded(child: Text('${l['medicament']?['nom_commercial'] ?? ''}')),
                     Text('${fcfa.format((l['prix_unitaire'] as num) * (l['quantite'] as num))} F',
-                        style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+                        style: TextStyle(color: AppTheme.inkSoft, fontSize: 13)),
                   ],
                 ),
               ),
             const SizedBox(height: 6),
             Row(
               children: [
-                Icon(livraison ? Icons.delivery_dining : Icons.storefront, size: 16, color: Colors.grey[700]),
+                Icon(livraison ? PhosphorIconsRegular.moped : PhosphorIconsRegular.storefront, size: 16, color: AppTheme.inkSoft),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     livraison ? 'Livraison : ${c['adresse_livraison'] ?? ''}' : 'Retrait en pharmacie',
-                    style: TextStyle(color: Colors.grey[700], fontSize: 13),
+                    style: TextStyle(color: AppTheme.inkSoft, fontSize: 13),
                   ),
                 ),
                 Text('${fcfa.format(total)} FCFA', style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -241,7 +239,7 @@ class _CommandePharmacienCardState extends ConsumerState<CommandePharmacienCard>
               const SizedBox(height: 6),
               const Row(
                 children: [
-                  Icon(Icons.description_outlined, size: 16, color: AppTheme.primary),
+                  Icon(PhosphorIconsRegular.fileText, size: 16, color: AppTheme.primary),
                   SizedBox(width: 6),
                   Text('Sur ordonnance', style: TextStyle(color: AppTheme.primary, fontSize: 13)),
                 ],

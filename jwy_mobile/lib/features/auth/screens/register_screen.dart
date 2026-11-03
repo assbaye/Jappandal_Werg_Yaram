@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
@@ -63,7 +64,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       appBar: AppBar(
         title: const Text('Créer un compte'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(PhosphorIconsRegular.arrowLeft),
           onPressed: () => context.go('/auth/login'),
         ),
       ),
@@ -82,7 +83,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Accédez à des soins de qualité où que vous soyez.',
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: TextStyle(color: AppTheme.inkSoft),
                 ),
                 const SizedBox(height: 24),
 
@@ -113,7 +114,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: Icon(Icons.email_outlined),
+                    prefixIcon: Icon(PhosphorIconsRegular.envelopeSimple),
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'Email requis';
@@ -128,7 +129,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(
                     labelText: 'Téléphone',
-                    prefixIcon: Icon(Icons.phone_outlined),
+                    prefixIcon: Icon(PhosphorIconsRegular.phone),
                     hintText: '+221 77 000 0000',
                   ),
                   validator: (v) => v == null || v.isEmpty ? 'Téléphone requis' : null,
@@ -140,9 +141,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
                     labelText: 'Mot de passe',
-                    prefixIcon: const Icon(Icons.lock_outlined),
+                    prefixIcon: const Icon(PhosphorIconsRegular.lock),
                     suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
+                      icon: Icon(_obscurePassword ? PhosphorIconsRegular.eye : PhosphorIconsRegular.eyeSlash),
                       onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                     ),
                   ),

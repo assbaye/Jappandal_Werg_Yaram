@@ -50,7 +50,7 @@ class DeclencherAlerteUrgence
         foreach ($medecins as $medecin) {
             $this->notif->sendToUser(
                 userId: $medecin->user_id,
-                titre: '🚨 Urgence : ' . $alerte->type_urgence,
+                titre: 'Urgence : ' . $alerte->type_urgence,
                 message: "{$patient->nom_complet} a déclenché une alerte d'urgence.",
                 type: 'urgence',
                 data: ['alerte_urgence_id' => $alerte->id],

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/outils.dart';
 import '../../../core/graphql/queries/patient_queries.dart';
 import '../../auth/providers/auth_provider.dart';
 import 'package:intl/intl.dart';
@@ -31,7 +33,7 @@ class ConsultationsScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Mes consultations')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/consultations/nouvelle'),
-        icon: const Icon(Icons.add),
+        icon: const Icon(PhosphorIconsRegular.plus),
         label: const Text('Nouvelle'),
         backgroundColor: AppTheme.primary,
       ),
@@ -43,17 +45,17 @@ class ConsultationsScreen extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, size: 56, color: AppTheme.errorColor),
+                const Icon(PhosphorIconsRegular.warningCircle, size: 56, color: AppTheme.errorColor),
                 const SizedBox(height: 16),
                 const Text('Impossible de charger les consultations',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                Text(e.toString(),
+                Text(messageErreur(e),
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                    style: TextStyle(color: AppTheme.inkSoft, fontSize: 13)),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
-                  icon: const Icon(Icons.refresh),
+                  icon: const Icon(PhosphorIconsRegular.arrowClockwise),
                   label: const Text('Réessayer'),
                   onPressed: () => ref.invalidate(_consultationsProvider),
                 ),
@@ -76,7 +78,7 @@ class ConsultationsScreen extends ConsumerWidget {
                         color: AppTheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Icon(Icons.medical_services_outlined, size: 40, color: AppTheme.primary),
+                      child: const Icon(PhosphorIconsRegular.stethoscope, size: 40, color: AppTheme.primary),
                     ),
                     const SizedBox(height: 20),
                     const Text('Aucune consultation',
@@ -84,10 +86,10 @@ class ConsultationsScreen extends ConsumerWidget {
                     const SizedBox(height: 8),
                     Text('Demandez votre première consultation médicale',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey[600])),
+                        style: TextStyle(color: AppTheme.inkSoft)),
                     const SizedBox(height: 28),
                     ElevatedButton.icon(
-                      icon: const Icon(Icons.add),
+                      icon: const Icon(PhosphorIconsRegular.plus),
                       label: const Text('Demander une consultation'),
                       onPressed: () => context.push('/consultations/nouvelle'),
                     ),
@@ -121,9 +123,9 @@ class _ConsultationCard extends StatelessWidget {
         'EN_ATTENTE' => AppTheme.warningColor,
         'CONFIRMEE' => AppTheme.secondary,
         'EN_COURS' => AppTheme.primary,
-        'TERMINEE' => Colors.grey.shade600,
+        'TERMINEE' => AppTheme.inkSoft,
         'ANNULEE' => AppTheme.errorColor,
-        _ => Colors.grey,
+        _ => AppTheme.inkMuted,
       };
 
   String _statutLabel(String s) => switch (s) {
@@ -136,10 +138,10 @@ class _ConsultationCard extends StatelessWidget {
       };
 
   IconData _typeIcon(String t) => switch (t) {
-        'VIDEO' => Icons.video_call,
-        'CHAT' => Icons.chat_bubble_outline,
-        'PHYSIQUE' => Icons.local_hospital_outlined,
-        _ => Icons.medical_services_outlined,
+        'VIDEO' => PhosphorIconsRegular.videoCamera,
+        'CHAT' => PhosphorIconsRegular.chatCircle,
+        'PHYSIQUE' => PhosphorIconsRegular.hospital,
+        _ => PhosphorIconsRegular.stethoscope,
       };
 
   String _typeLabel(String t) => switch (t) {
@@ -198,12 +200,12 @@ class _ConsultationCard extends StatelessWidget {
                         ),
                         Text(
                           medecin?['specialite'] as String? ?? '',
-                          style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                          style: TextStyle(color: AppTheme.inkSoft, fontSize: 12),
                         ),
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right, color: Colors.grey),
+                  const Icon(PhosphorIconsRegular.caretRight, color: AppTheme.inkMuted),
                 ],
               ),
               const SizedBox(height: 10),
@@ -229,13 +231,13 @@ class _ConsultationCard extends StatelessWidget {
                     ),
                     child: Text(
                       _typeLabel(type),
-                      style: TextStyle(color: Colors.grey[700], fontSize: 11),
+                      style: TextStyle(color: AppTheme.inkSoft, fontSize: 11),
                     ),
                   ),
                   const Spacer(),
                   Text(
                     _formatDate(consultation['created_at'] as String?),
-                    style: TextStyle(color: Colors.grey[500], fontSize: 11),
+                    style: TextStyle(color: AppTheme.inkMuted, fontSize: 11),
                   ),
                 ],
               ),
@@ -245,7 +247,7 @@ class _ConsultationCard extends StatelessWidget {
                   consultation['symptomes'] as String,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                  style: TextStyle(fontSize: 13, color: AppTheme.inkSoft),
                 ),
               ],
               if (type == 'VIDEO' && statut == 'EN_COURS' && teleconsult != null) ...[
@@ -253,7 +255,7 @@ class _ConsultationCard extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    icon: const Icon(Icons.video_call, size: 18),
+                    icon: const Icon(PhosphorIconsRegular.videoCamera, size: 18),
                     label: const Text('Rejoindre la téléconsultation'),
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(0, 40),

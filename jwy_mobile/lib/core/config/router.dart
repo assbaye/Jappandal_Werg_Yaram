@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/providers/auth_provider.dart';
@@ -190,7 +192,7 @@ class AccesRestreintScreen extends ConsumerWidget {
                     color: Colors.orange.shade50,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Icon(Icons.computer, color: Colors.orange, size: 48),
+                  child: const Icon(PhosphorIconsRegular.desktop, color: Colors.orange, size: 48),
                 ),
                 const SizedBox(height: 24),
                 Text(
@@ -201,12 +203,12 @@ class AccesRestreintScreen extends ConsumerWidget {
                 const SizedBox(height: 12),
                 Text(
                   'Cette interface est disponible uniquement sur le portail web.\nVeuillez vous connecter depuis un navigateur.',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  style: TextStyle(color: AppTheme.inkSoft, fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
                 OutlinedButton.icon(
-                  icon: const Icon(Icons.logout),
+                  icon: const Icon(PhosphorIconsRegular.signOut),
                   label: const Text('Se déconnecter'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red,

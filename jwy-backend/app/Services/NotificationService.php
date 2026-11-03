@@ -72,7 +72,7 @@ class NotificationService
                 foreach ($users as $user) {
                     $this->sendToUser(
                         userId: $user->id,
-                        titre: "⚠️ Alerte santé : {$alerte->type_alerte}",
+                        titre: "Alerte santé : {$alerte->type_alerte}",
                         message: $alerte->description,
                         type: 'alerte_sante',
                         data: ['alerte_id' => $alerte->id, 'zone' => $alerte->zone],
@@ -93,7 +93,7 @@ class NotificationService
     {
         return $this->sendToUser(
             userId: $userId,
-            titre: "💊 Rappel médicament",
+            titre: "Rappel de médicament",
             message: "Il est l'heure de prendre : {$medicamentNom} - {$posologie}",
             type: 'rappel_medicament',
             priorite: 'haute'

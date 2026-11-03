@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -115,14 +116,14 @@ class _NouveauRendezVousScreenState extends ConsumerState<NouveauRendezVousScree
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
-                        child: const Icon(Icons.person, color: AppTheme.primary),
+                        child: const Icon(PhosphorIconsRegular.user, color: AppTheme.primary),
                       ),
                       title: Text('Dr. ${m['prenom']} ${m['nom']}',
                           style: const TextStyle(fontWeight: FontWeight.w600)),
                       subtitle: Text(
                           '${m['specialite']} · ${(m['tarif_consultation'] as num?)?.toInt() ?? 0} FCFA'),
                       trailing: _medecin?['id'] == m['id']
-                          ? const Icon(Icons.check_circle, color: AppTheme.primary)
+                          ? const Icon(PhosphorIconsFill.checkCircle, color: AppTheme.primary)
                           : null,
                       onTap: () => setState(() => _medecin = m),
                     ),
@@ -134,8 +135,8 @@ class _NouveauRendezVousScreenState extends ConsumerState<NouveauRendezVousScree
           const _Titre('2. Type de rendez-vous'),
           SegmentedButton<String>(
             segments: const [
-              ButtonSegment(value: 'PHYSIQUE', icon: Icon(Icons.local_hospital_outlined), label: Text('Au cabinet')),
-              ButtonSegment(value: 'VIDEO', icon: Icon(Icons.videocam_outlined), label: Text('En vidéo')),
+              ButtonSegment(value: 'PHYSIQUE', icon: Icon(PhosphorIconsRegular.hospital), label: Text('Au cabinet')),
+              ButtonSegment(value: 'VIDEO', icon: Icon(PhosphorIconsRegular.videoCamera), label: Text('En vidéo')),
             ],
             selected: {_type},
             onSelectionChanged: (s) => setState(() => _type = s.first),
@@ -143,7 +144,7 @@ class _NouveauRendezVousScreenState extends ConsumerState<NouveauRendezVousScree
           const SizedBox(height: 20),
           const _Titre('3. Date et heure'),
           OutlinedButton.icon(
-            icon: const Icon(Icons.calendar_month),
+            icon: const Icon(PhosphorIconsRegular.calendar),
             label: Text(_date == null
                 ? 'Choisir une date'
                 : DateFormat('EEEE d MMMM yyyy à HH:mm', 'fr_FR').format(_date!)),

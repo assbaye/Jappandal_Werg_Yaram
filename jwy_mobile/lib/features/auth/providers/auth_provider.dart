@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -109,7 +110,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
       );
       return true;
-    } catch (e) {
+    } catch (e, pile) {
+      debugPrint('Connexion : échec inattendu : $e\n$pile');
       state = state.copyWith(isLoading: false, error: 'Impossible de joindre le serveur. Vérifiez votre connexion.');
       return false;
     }

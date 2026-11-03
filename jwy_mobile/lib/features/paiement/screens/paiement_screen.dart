@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -22,11 +23,11 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
   bool _isLoading = false;
 
   static const _methodes = [
-    (value: 'WAVE', label: 'Wave', icon: Icons.waves, color: Color(0xFF1BAAE1),
+    (value: 'WAVE', label: 'Wave', icon: PhosphorIconsRegular.waves, color: Color(0xFF1BAAE1),
         description: 'Paiement dans l\'application Wave'),
-    (value: 'ORANGE_MONEY', label: 'Orange Money', icon: Icons.phone_android, color: Color(0xFFFF6200),
+    (value: 'ORANGE_MONEY', label: 'Orange Money', icon: PhosphorIconsRegular.deviceMobile, color: Color(0xFFFF6200),
         description: 'Bientôt disponible'),
-    (value: 'CASH', label: 'En espèces', icon: Icons.payments, color: Color(0xFF388E3C),
+    (value: 'CASH', label: 'En espèces', icon: PhosphorIconsRegular.money, color: AppTheme.successColor,
         description: 'À régler auprès du médecin'),
   ];
 
@@ -103,7 +104,7 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
           if (c['est_payee'] == true) {
             return const Center(
               child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.verified, color: AppTheme.successColor, size: 56),
+                Icon(PhosphorIconsFill.sealCheck, color: AppTheme.successColor, size: 56),
                 SizedBox(height: 12),
                 Text('Cette consultation est déjà payée.', style: TextStyle(fontSize: 16)),
               ]),
@@ -154,7 +155,7 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
                     ),
                     title: Text(m.label, style: const TextStyle(fontWeight: FontWeight.w600)),
                     subtitle: Text(m.description),
-                    trailing: _methode == m.value ? Icon(Icons.check_circle, color: m.color) : null,
+                    trailing: _methode == m.value ? Icon(PhosphorIconsFill.checkCircle, color: m.color) : null,
                     onTap: () => setState(() => _methode = m.value),
                   ),
                 ),
@@ -163,7 +164,7 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
                 icon: _isLoading
                     ? const SizedBox(
                         width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : const Icon(Icons.lock_outline),
+                    : const Icon(PhosphorIconsRegular.lock),
                 label: Text(_methode == 'CASH' ? 'Confirmer le paiement en espèces' : 'Payer ${fcfa.format(montant)} FCFA'),
                 onPressed: _isLoading || montant <= 0 ? null : _payer,
               ),
@@ -171,7 +172,7 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
               Text(
                 'Le paiement n\'est validé qu\'après confirmation par Wave.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 12, color: AppTheme.inkSoft),
               ),
             ],
           );

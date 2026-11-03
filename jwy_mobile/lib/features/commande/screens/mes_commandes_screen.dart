@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
@@ -42,12 +43,12 @@ class MesCommandesScreen extends ConsumerWidget {
           child: commandes.isEmpty
               ? ListView(children: [
                   const SizedBox(height: 120),
-                  Icon(Icons.shopping_bag_outlined, size: 64, color: Colors.grey[400]),
+                  Icon(PhosphorIconsRegular.shoppingBag, size: 64, color: AppTheme.inkMuted),
                   const SizedBox(height: 12),
                   Text(
                     'Aucune commande.\nCommandez vos médicaments depuis une ordonnance.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(color: AppTheme.inkSoft),
                   ),
                 ])
               : ListView.builder(
@@ -95,7 +96,7 @@ class _CommandeCard extends StatelessWidget {
                       Text(
                         '${commande['numero_commande']}'
                         '${date == null ? '' : ' · ${DateFormat('dd/MM/yyyy', 'fr_FR').format(date)}'}',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                        style: TextStyle(color: AppTheme.inkSoft, fontSize: 12),
                       ),
                     ],
                   ),
@@ -120,12 +121,12 @@ class _CommandeCard extends StatelessWidget {
                       height: 12,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: i <= etape ? AppTheme.primary : Colors.grey.shade300,
+                        color: i <= etape ? AppTheme.primary : AppTheme.border,
                       ),
                     ),
                     if (i < _etapes.length - 1)
                       Expanded(
-                        child: Container(height: 2, color: i < etape ? AppTheme.primary : Colors.grey.shade300),
+                        child: Container(height: 2, color: i < etape ? AppTheme.primary : AppTheme.border),
                       ),
                   ],
                 ],
@@ -135,7 +136,7 @@ class _CommandeCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   for (final e in ['Envoyée', 'Acceptée', 'Préparée', 'Prête', 'Remise'])
-                    Text(e, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
+                    Text(e, style: TextStyle(fontSize: 10, color: AppTheme.inkSoft)),
                 ],
               ),
             ],
@@ -146,14 +147,14 @@ class _CommandeCard extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(livraison ? Icons.delivery_dining : Icons.storefront, size: 16, color: Colors.grey[700]),
+                Icon(livraison ? PhosphorIconsRegular.moped : PhosphorIconsRegular.storefront, size: 16, color: AppTheme.inkSoft),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     livraison
                         ? 'Livraison : ${commande['adresse_livraison'] ?? ''}'
                         : 'Retrait : ${pharmacie?['adresse'] ?? ''}',
-                    style: TextStyle(color: Colors.grey[700], fontSize: 13),
+                    style: TextStyle(color: AppTheme.inkSoft, fontSize: 13),
                   ),
                 ),
                 Text('${fcfa.format(total)} FCFA', style: const TextStyle(fontWeight: FontWeight.bold)),

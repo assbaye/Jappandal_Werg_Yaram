@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -39,12 +40,12 @@ class MesOrdonnancesScreen extends ConsumerWidget {
           child: ordonnances.isEmpty
               ? ListView(children: [
                   const SizedBox(height: 120),
-                  Icon(Icons.description_outlined, size: 64, color: Colors.grey[400]),
+                  Icon(PhosphorIconsRegular.fileText, size: 64, color: AppTheme.inkMuted),
                   const SizedBox(height: 12),
                   Text(
                     'Aucune ordonnance.\nElles apparaissent ici après une consultation.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(color: AppTheme.inkSoft),
                   ),
                 ])
               : ListView.builder(
@@ -78,7 +79,7 @@ class _OrdonnanceCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.description, color: AppTheme.primary),
+                const Icon(PhosphorIconsRegular.fileText, color: AppTheme.primary),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text('Dr. ${medecin?['prenom'] ?? ''} ${medecin?['nom'] ?? ''}',
@@ -86,7 +87,7 @@ class _OrdonnanceCard extends StatelessWidget {
                 ),
                 if (date != null)
                   Text(DateFormat('dd/MM/yyyy', 'fr_FR').format(date),
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                      style: TextStyle(color: AppTheme.inkSoft, fontSize: 12)),
               ],
             ),
             const SizedBox(height: 8),
@@ -106,7 +107,7 @@ class _OrdonnanceCard extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  icon: const Icon(Icons.shopping_bag_outlined),
+                  icon: const Icon(PhosphorIconsRegular.shoppingBag),
                   label: const Text('Commander en pharmacie'),
                   onPressed: meds.isEmpty ? null : () => context.push('/commandes/ordonnance', extra: ordonnance),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -76,16 +77,13 @@ class RendezVousScreen extends ConsumerWidget {
           title: const Text('Rendez-vous'),
           actions: const [NotificationBell()],
           bottom: const TabBar(
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            indicatorColor: Colors.white,
             tabs: [Tab(text: 'À venir'), Tab(text: 'Passés')],
           ),
         ),
         floatingActionButton: isMedecin
             ? null
             : FloatingActionButton.extended(
-                icon: const Icon(Icons.add),
+                icon: const Icon(PhosphorIconsRegular.plus),
                 label: const Text('Prendre RDV'),
                 onPressed: () async {
                   final ok = await context.push<bool>('/rendez-vous/nouveau');
@@ -149,9 +147,9 @@ class _Liste extends ConsumerWidget {
           ? ListView(
               children: [
                 const SizedBox(height: 120),
-                Icon(Icons.event_available, size: 64, color: Colors.grey[400]),
+                Icon(PhosphorIconsRegular.calendarCheck, size: 64, color: AppTheme.inkMuted),
                 const SizedBox(height: 12),
-                Text(vide, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[600])),
+                Text(vide, textAlign: TextAlign.center, style: TextStyle(color: AppTheme.inkSoft)),
               ],
             )
           : ListView.builder(
@@ -256,8 +254,8 @@ class _RendezVousCardState extends ConsumerState<_RendezVousCard> {
       'CONFIRME' => ('Confirmé', AppTheme.successColor),
       'REPORTE' => ('Déplacé', AppTheme.secondary),
       'ANNULE' => ('Annulé', AppTheme.errorColor),
-      'TERMINE' => ('Terminé', Colors.grey.shade600),
-      _ => (statut, Colors.grey),
+      'TERMINE' => ('Terminé', AppTheme.inkSoft),
+      _ => (statut, AppTheme.inkMuted),
     };
     final estVideo = rdv['type_rendez_vous'] == 'VIDEO';
     final actif = aVenir && statut != 'ANNULE' && statut != 'TERMINE';
@@ -301,19 +299,19 @@ class _RendezVousCardState extends ConsumerState<_RendezVousCard> {
                       const SizedBox(height: 2),
                       Row(
                         children: [
-                          Icon(estVideo ? Icons.videocam_outlined : Icons.local_hospital_outlined,
-                              size: 14, color: Colors.grey[600]),
+                          Icon(estVideo ? PhosphorIconsRegular.videoCamera : PhosphorIconsRegular.hospital,
+                              size: 14, color: AppTheme.inkSoft),
                           const SizedBox(width: 4),
                           Text(
                             '${date == null ? '' : DateFormat('EEEE à HH:mm', 'fr_FR').format(date)}'
                             ' · ${estVideo ? 'Vidéo' : 'Cabinet'}',
-                            style: TextStyle(color: Colors.grey[700], fontSize: 13),
+                            style: TextStyle(color: AppTheme.inkSoft, fontSize: 13),
                           ),
                         ],
                       ),
                       if (!isMedecin && autre?['specialite'] != null)
                         Text(autre!['specialite'] as String,
-                            style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                            style: TextStyle(color: AppTheme.inkMuted, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -361,12 +359,12 @@ class _RendezVousCardState extends ConsumerState<_RendezVousCard> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton.icon(
-                      icon: const Icon(Icons.schedule, size: 18),
+                      icon: const Icon(PhosphorIconsRegular.clock, size: 18),
                       label: const Text('Déplacer'),
                       onPressed: _reporter,
                     ),
                     TextButton.icon(
-                      icon: const Icon(Icons.close, size: 18),
+                      icon: const Icon(PhosphorIconsRegular.x, size: 18),
                       label: const Text('Annuler'),
                       style: TextButton.styleFrom(foregroundColor: AppTheme.errorColor),
                       onPressed: _annuler,

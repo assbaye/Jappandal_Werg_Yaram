@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -10,10 +11,10 @@ import '../../auth/providers/auth_provider.dart';
 
 /// Numéros d'urgence du Sénégal (+ 112, international).
 const _numeros = [
-  ('SAMU', '1515', Icons.local_hospital),
-  ('Sapeurs-pompiers', '18', Icons.local_fire_department),
-  ('Police', '17', Icons.local_police),
-  ('Urgence internationale', '112', Icons.public),
+  ('SAMU', '1515', PhosphorIconsRegular.hospital),
+  ('Sapeurs-pompiers', '18', PhosphorIconsRegular.fire),
+  ('Police', '17', PhosphorIconsRegular.policeCar),
+  ('Urgence internationale', '112', PhosphorIconsRegular.globe),
 ];
 
 const _typesUrgence = [
@@ -50,7 +51,6 @@ class UrgenceScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Urgence'),
-        backgroundColor: AppTheme.errorColor,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -121,7 +121,7 @@ class _FormulaireAlerteState extends ConsumerState<_FormulaireAlerte> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        icon: const Icon(Icons.emergency, color: AppTheme.errorColor, size: 40),
+        icon: const Icon(PhosphorIconsRegular.siren, color: AppTheme.errorColor, size: 40),
         title: const Text('Envoyer l\'alerte ?'),
         content: const Text(
           'Votre position et votre dossier seront transmis aux médecins disponibles.\n\n'
@@ -215,7 +215,7 @@ class _FormulaireAlerteState extends ConsumerState<_FormulaireAlerte> {
                   ? const Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.sos, size: 64),
+                        Icon(PhosphorIconsRegular.siren, size: 64),
                         Text('ALERTER', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                       ],
                     )
@@ -228,7 +228,7 @@ class _FormulaireAlerteState extends ConsumerState<_FormulaireAlerte> {
           child: Text(
             _etape ?? 'Les médecins disponibles reçoivent votre position et votre dossier',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey[700], fontSize: 13),
+            style: TextStyle(color: AppTheme.inkSoft, fontSize: 13),
           ),
         ),
       ],
@@ -300,7 +300,7 @@ class _AlerteEnCoursState extends ConsumerState<_AlerteEnCours> {
       ),
       child: Column(
         children: [
-          Icon(priseEnCharge ? Icons.health_and_safety : Icons.emergency_share, size: 56, color: couleur),
+          Icon(priseEnCharge ? PhosphorIconsRegular.shieldCheck : PhosphorIconsRegular.broadcast, size: 56, color: couleur),
           const SizedBox(height: 12),
           Text(
             priseEnCharge ? 'Un médecin s\'occupe de vous' : 'Alerte envoyée',
@@ -314,17 +314,17 @@ class _AlerteEnCoursState extends ConsumerState<_AlerteEnCours> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),
-          Text('${a['type_urgence']}', style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+          Text('${a['type_urgence']}', style: TextStyle(color: AppTheme.inkSoft, fontSize: 13)),
           if (!priseEnCharge) ...[
             const SizedBox(height: 16),
             const LinearProgressIndicator(color: AppTheme.errorColor),
             const SizedBox(height: 6),
-            Text('En attente d\'un médecin…', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+            Text('En attente d\'un médecin…', style: TextStyle(fontSize: 12, color: AppTheme.inkSoft)),
           ],
           if (priseEnCharge && telMedecin != null) ...[
             const SizedBox(height: 16),
             FilledButton.icon(
-              icon: const Icon(Icons.call),
+              icon: const Icon(PhosphorIconsRegular.phone),
               label: Text('Appeler Dr. ${medecin?['nom'] ?? ''}'),
               style: FilledButton.styleFrom(
                 backgroundColor: AppTheme.successColor,
@@ -338,7 +338,7 @@ class _AlerteEnCoursState extends ConsumerState<_AlerteEnCours> {
               ? const CircularProgressIndicator()
               : TextButton(
                   onPressed: _annuler,
-                  style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+                  style: TextButton.styleFrom(foregroundColor: AppTheme.inkSoft),
                   child: const Text('Je n\'ai plus besoin d\'aide — annuler l\'alerte'),
                 ),
         ],

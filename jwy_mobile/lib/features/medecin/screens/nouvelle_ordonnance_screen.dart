@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -139,21 +140,21 @@ class _NouvelleOrdonnanceScreenState extends ConsumerState<NouvelleOrdonnanceScr
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: AppTheme.border),
                 ),
                 child: Column(
                   children: [
-                    Icon(Icons.medication_outlined, size: 40, color: Colors.grey[400]),
+                    Icon(PhosphorIconsRegular.pill, size: 40, color: AppTheme.inkMuted),
                     const SizedBox(height: 8),
                     Text('Aucun médicament pour l\'instant',
-                        style: TextStyle(color: Colors.grey[600])),
+                        style: TextStyle(color: AppTheme.inkSoft)),
                   ],
                 ),
               ),
             for (int i = 0; i < _lignes.length; i++) _carteLigne(i, _lignes[i]),
             const SizedBox(height: 12),
             OutlinedButton.icon(
-              icon: const Icon(Icons.add),
+              icon: const Icon(PhosphorIconsRegular.plus),
               label: const Text('Ajouter un médicament'),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
@@ -188,7 +189,7 @@ class _NouvelleOrdonnanceScreenState extends ConsumerState<NouvelleOrdonnanceScr
                   ? const SizedBox(
                       width: 20, height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : const Icon(Icons.send),
+                  : const Icon(PhosphorIconsRegular.paperPlaneTilt),
               label: const Text('Envoyer l\'ordonnance au patient'),
               onPressed: _loading ? null : _envoyer,
             ),
@@ -217,12 +218,12 @@ class _NouvelleOrdonnanceScreenState extends ConsumerState<NouvelleOrdonnanceScr
                       Text('${i + 1}. ${med['nom_commercial']}',
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                       Text('${med['principe_actif'] ?? ''} · ${med['forme']?.toString().toLowerCase() ?? ''}',
-                          style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                          style: TextStyle(color: AppTheme.inkSoft, fontSize: 12)),
                     ],
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline, color: AppTheme.errorColor),
+                  icon: const Icon(PhosphorIconsRegular.trash, color: AppTheme.errorColor),
                   tooltip: 'Retirer',
                   onPressed: () => _retirer(l),
                 ),
@@ -341,7 +342,7 @@ class _RechercheMedicamentSheetState extends ConsumerState<_RechercheMedicamentS
             TextField(
               autofocus: true,
               decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: Icon(PhosphorIconsRegular.magnifyingGlass),
                 hintText: 'Nom ou principe actif (ex. : paracétamol)',
               ),
               onChanged: _onChanged,
@@ -355,7 +356,7 @@ class _RechercheMedicamentSheetState extends ConsumerState<_RechercheMedicamentS
                       ? Center(
                           child: Text(
                             _terme.length < 2 ? 'Tapez au moins 2 lettres' : 'Aucun médicament trouvé',
-                            style: TextStyle(color: Colors.grey[600]),
+                            style: TextStyle(color: AppTheme.inkSoft),
                           ),
                         )
                       : ListView.separated(
@@ -364,7 +365,7 @@ class _RechercheMedicamentSheetState extends ConsumerState<_RechercheMedicamentS
                           itemBuilder: (_, i) {
                             final m = _resultats[i] as Map<String, dynamic>;
                             return ListTile(
-                              leading: const Icon(Icons.medication, color: AppTheme.primary),
+                              leading: const Icon(PhosphorIconsRegular.pill, color: AppTheme.primary),
                               title: Text(m['nom_commercial'] as String),
                               subtitle: Text(
                                   '${m['principe_actif']} · ${m['dosage'] ?? ''} · ${(m['prix_unitaire'] as num?)?.toInt() ?? 0} FCFA'),

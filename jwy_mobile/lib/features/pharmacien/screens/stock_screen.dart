@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -61,7 +62,7 @@ class _StockScreenState extends ConsumerState<StockScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Stock')),
       floatingActionButton: FloatingActionButton.extended(
-        icon: const Icon(Icons.add),
+        icon: const Icon(PhosphorIconsRegular.plus),
         label: const Text('Ajouter'),
         onPressed: _ajouter,
       ),
@@ -88,7 +89,7 @@ class _StockScreenState extends ConsumerState<StockScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                 child: TextField(
                   decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
+                    prefixIcon: Icon(PhosphorIconsRegular.magnifyingGlass),
                     hintText: 'Rechercher dans le stock',
                     isDense: true,
                   ),
@@ -100,13 +101,13 @@ class _StockScreenState extends ConsumerState<StockScreen> {
                 child: Row(
                   children: [
                     FilterChip(
-                      avatar: const Icon(Icons.warning_amber_rounded, size: 18, color: AppTheme.warningColor),
+                      avatar: const Icon(PhosphorIconsRegular.warning, size: 18, color: AppTheme.warningColor),
                       label: Text('Stock faible ($nbFaible)'),
                       selected: _faibleSeulement,
                       onSelected: (v) => setState(() => _faibleSeulement = v),
                     ),
                     const Spacer(),
-                    Text('${stocks.length} produits', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                    Text('${stocks.length} produits', style: TextStyle(color: AppTheme.inkSoft, fontSize: 12)),
                   ],
                 ),
               ),
@@ -116,7 +117,7 @@ class _StockScreenState extends ConsumerState<StockScreen> {
                   child: liste.isEmpty
                       ? ListView(children: [
                           const SizedBox(height: 80),
-                          Center(child: Text('Aucun produit', style: TextStyle(color: Colors.grey[600]))),
+                          Center(child: Text('Aucun produit', style: TextStyle(color: AppTheme.inkSoft))),
                         ])
                       : ListView.separated(
                           padding: const EdgeInsets.only(bottom: 96),
@@ -147,7 +148,7 @@ class _StockScreenState extends ConsumerState<StockScreen> {
             const SizedBox(width: 6),
             const Tooltip(
               message: 'Sur ordonnance',
-              child: Icon(Icons.description_outlined, size: 15, color: AppTheme.primary),
+              child: Icon(PhosphorIconsRegular.fileText, size: 15, color: AppTheme.primary),
             ),
           ],
         ],
@@ -246,7 +247,7 @@ class _StockSheetState extends ConsumerState<_StockSheet> {
             Text(widget.medicament['nom_commercial'] as String? ?? '',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             Text(widget.stock == null ? 'Nouveau produit en stock' : 'Mettre à jour le stock',
-                style: TextStyle(color: Colors.grey[600])),
+                style: TextStyle(color: AppTheme.inkSoft)),
             const SizedBox(height: 16),
             Row(
               children: [
@@ -356,7 +357,7 @@ class _RechercheSheetState extends ConsumerState<_RechercheSheet> {
             TextField(
               autofocus: true,
               decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: Icon(PhosphorIconsRegular.magnifyingGlass),
                 hintText: 'Médicament du catalogue',
               ),
               onChanged: _onChanged,
@@ -365,13 +366,13 @@ class _RechercheSheetState extends ConsumerState<_RechercheSheet> {
               child: _resultats.isEmpty
                   ? Center(
                       child: Text(_terme.length < 2 ? 'Tapez au moins 2 lettres' : 'Aucun résultat',
-                          style: TextStyle(color: Colors.grey[600])))
+                          style: TextStyle(color: AppTheme.inkSoft)))
                   : ListView.builder(
                       itemCount: _resultats.length,
                       itemBuilder: (_, i) {
                         final m = _resultats[i] as Map<String, dynamic>;
                         return ListTile(
-                          leading: const Icon(Icons.medication, color: AppTheme.primary),
+                          leading: const Icon(PhosphorIconsRegular.pill, color: AppTheme.primary),
                           title: Text(m['nom_commercial'] as String),
                           subtitle: Text('${m['principe_actif']} · ${m['dosage'] ?? ''}'),
                           onTap: () => Navigator.pop(context, m),

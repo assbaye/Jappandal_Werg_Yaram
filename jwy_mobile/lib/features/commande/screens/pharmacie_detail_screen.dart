@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -94,7 +95,7 @@ class _PharmacieDetailScreenState extends ConsumerState<PharmacieDetailScreen> {
                     const SizedBox(height: 16),
                     TextField(
                       decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.search),
+                        prefixIcon: Icon(PhosphorIconsRegular.magnifyingGlass),
                         hintText: 'Rechercher un médicament',
                         isDense: true,
                       ),
@@ -109,12 +110,12 @@ class _PharmacieDetailScreenState extends ConsumerState<PharmacieDetailScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.info_outline, size: 16, color: AppTheme.primary),
+                          const Icon(PhosphorIconsRegular.info, size: 16, color: AppTheme.primary),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               'Les médicaments sur ordonnance se commandent depuis « Commander une ordonnance ».',
-                              style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+                              style: TextStyle(fontSize: 12, color: AppTheme.inkSoft),
                             ),
                           ),
                         ],
@@ -124,7 +125,7 @@ class _PharmacieDetailScreenState extends ConsumerState<PharmacieDetailScreen> {
                     if (visibles.isEmpty)
                       Padding(
                         padding: const EdgeInsets.all(24),
-                        child: Center(child: Text('Aucun médicament', style: TextStyle(color: Colors.grey[600]))),
+                        child: Center(child: Text('Aucun médicament', style: TextStyle(color: AppTheme.inkSoft))),
                       ),
                     for (final s in visibles) _ligne(s),
                   ],
@@ -172,7 +173,7 @@ class _PharmacieDetailScreenState extends ConsumerState<PharmacieDetailScreen> {
                 Text(
                   '${fcfa.format(s['prix_vente'])} FCFA'
                   '${dispo < 10 ? ' · plus que $dispo' : ''}',
-                  style: TextStyle(color: dispo < 10 ? AppTheme.warningColor : Colors.grey[600], fontSize: 12),
+                  style: TextStyle(color: dispo < 10 ? AppTheme.warningColor : AppTheme.inkSoft, fontSize: 12),
                 ),
               ],
             ),
@@ -181,7 +182,7 @@ class _PharmacieDetailScreenState extends ConsumerState<PharmacieDetailScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
+                color: AppTheme.border,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Text('Sur ordonnance', style: TextStyle(fontSize: 11)),
@@ -196,13 +197,13 @@ class _PharmacieDetailScreenState extends ConsumerState<PharmacieDetailScreen> {
             Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.remove_circle_outline),
+                  icon: const Icon(PhosphorIconsRegular.minusCircle),
                   color: AppTheme.primary,
                   onPressed: () => _changer(id, -1, dispo),
                 ),
                 Text('$q', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
+                  icon: const Icon(PhosphorIconsRegular.plusCircle),
                   color: AppTheme.primary,
                   onPressed: q < dispo ? () => _changer(id, 1, dispo) : null,
                 ),
@@ -229,27 +230,27 @@ class _EnTete extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.verified, color: AppTheme.primary, size: 18),
+                const Icon(PhosphorIconsFill.sealCheck, color: AppTheme.primary, size: 18),
                 const SizedBox(width: 6),
                 const Text('Partenaire JWY', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w600)),
                 const Spacer(),
                 if (pharmacie['livraison_disponible'] == true)
                   const Row(children: [
-                    Icon(Icons.delivery_dining, size: 16, color: AppTheme.successColor),
+                    Icon(PhosphorIconsRegular.moped, size: 16, color: AppTheme.successColor),
                     SizedBox(width: 4),
                     Text('Livraison', style: TextStyle(color: AppTheme.successColor, fontSize: 12)),
                   ]),
               ],
             ),
             const SizedBox(height: 8),
-            Text(pharmacie['adresse'] as String? ?? '', style: TextStyle(color: Colors.grey[700])),
+            Text(pharmacie['adresse'] as String? ?? '', style: TextStyle(color: AppTheme.inkSoft)),
             const SizedBox(height: 4),
             Text(
               pharmacie['statut_ouverture'] as String? ?? '',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: pharmacie['est_de_garde'] == true
-                    ? const Color(0xFF0D47A1)
+                    ? AppTheme.primary
                     : pharmacie['est_ouverte'] == true
                         ? AppTheme.successColor
                         : AppTheme.errorColor,
@@ -260,12 +261,12 @@ class _EnTete extends StatelessWidget {
               children: [
                 if (tel != null)
                   TextButton.icon(
-                    icon: const Icon(Icons.call_outlined, size: 18),
+                    icon: const Icon(PhosphorIconsRegular.phone, size: 18),
                     label: const Text('Appeler'),
                     onPressed: () => appeler(context, tel),
                   ),
                 TextButton.icon(
-                  icon: const Icon(Icons.directions_outlined, size: 18),
+                  icon: const Icon(PhosphorIconsRegular.navigationArrow, size: 18),
                   label: const Text('Itinéraire'),
                   onPressed: () => ouvrirCarte(
                     (pharmacie['latitude'] as num).toDouble(),
@@ -376,10 +377,10 @@ class _ValidationSheetState extends ConsumerState<_ValidationSheet> {
             const SizedBox(height: 12),
             SegmentedButton<bool>(
               segments: [
-                const ButtonSegment(value: false, icon: Icon(Icons.storefront), label: Text('Retrait')),
+                const ButtonSegment(value: false, icon: Icon(PhosphorIconsRegular.storefront), label: Text('Retrait')),
                 ButtonSegment(
                   value: true,
-                  icon: const Icon(Icons.delivery_dining),
+                  icon: const Icon(PhosphorIconsRegular.moped),
                   label: const Text('Livraison'),
                   enabled: livrable,
                 ),
@@ -409,7 +410,7 @@ class _ValidationSheetState extends ConsumerState<_ValidationSheet> {
             const SizedBox(height: 8),
             Center(
               child: Text('Paiement à la pharmacie, au retrait ou à la livraison.',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                  style: TextStyle(fontSize: 12, color: AppTheme.inkSoft)),
             ),
           ],
         ),
