@@ -47,7 +47,7 @@ class NotificationService
         // Broadcast temps réel via WebSocket
         try {
             event(new NewNotification($notification));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::warning("Broadcast notification failed: {$e->getMessage()}");
         }
 
@@ -120,7 +120,7 @@ class NotificationService
                 ],
                 'data' => $data,
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::warning("FCM push failed: {$e->getMessage()}");
         }
     }

@@ -24,24 +24,26 @@ class DemanderConsultation
         $patient = $user->patient;
 
         return DB::transaction(function () use ($args, $patient) {
+            $medecin = \App\Models\Medecin::findOrFail($args['medecin_id']);
+
             $consultation = Consultation::create([
-                'patient_id'       => $patient->id,
-                'medecin_id'       => $args['medecin_id'],
+                'patient_id'         => $patient->id,
+                'medecin_id'         => $medecin->id,
                 'dossier_medical_id' => $patient->dossierMedical?->id,
                 'type_consultation'  => strtolower($args['type_consultation']),
                 'symptomes'          => $args['symptomes'],
                 'date_consultation'  => $args['date_souhaitee'] ?? null,
                 'statut'             => 'en_attente',
+                'cout_consultation'  => $medecin->tarif_consultation,
             ]);
 
-            if (in_array($args['type_consultation'], ['VIDEO', 'CHAT'])) {
+            if (in_array(strtolower($args['type_consultation']), ['video', 'chat'])) {
                 TeleConsultation::create([
                     'consultation_id' => $consultation->id,
                 ]);
             }
 
             // Notifier le médecin
-            $medecin = $consultation->medecin;
             $this->notif->sendToUser(
                 $medecin->user_id,
                 'Nouvelle demande de consultation',

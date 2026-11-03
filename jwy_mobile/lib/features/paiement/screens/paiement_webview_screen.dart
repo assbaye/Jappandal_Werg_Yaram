@@ -35,7 +35,7 @@ class _PaiementWebviewScreenState extends ConsumerState<PaiementWebviewScreen> {
       final result = await client.mutate(
         MutationOptions(
           document: gql(confirmerPaiementMutation),
-          variables: {'transactionId': widget.transactionId},
+          variables: {'transaction_id': widget.transactionId},
         ),
       );
 

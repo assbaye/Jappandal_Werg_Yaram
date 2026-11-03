@@ -45,7 +45,6 @@ const String meQuery = r'''
         numero_patient
         nom
         prenom
-        telephone
         adresse
         groupe_sanguin
       }
@@ -55,8 +54,6 @@ const String meQuery = r'''
 
 const String logoutMutation = r'''
   mutation Logout {
-    logout {
-      message
-    }
+    logout
   }
 ''';

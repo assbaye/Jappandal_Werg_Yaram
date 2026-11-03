@@ -1,98 +1,98 @@
 enum UserRole {
-    PATIENT
-    MEDECIN
-    PHARMACIEN
-    ADMIN
+    PATIENT    @enum(value: "patient")
+    MEDECIN    @enum(value: "medecin")
+    PHARMACIEN @enum(value: "pharmacien")
+    ADMIN      @enum(value: "admin")
 }
 
 enum TypeConsultation {
-    VIDEO
-    CHAT
-    PHYSIQUE
-    DIFFEREE
+    VIDEO    @enum(value: "video")
+    CHAT     @enum(value: "chat")
+    PHYSIQUE @enum(value: "physique")
+    DIFFEREE @enum(value: "differee")
 }
 
 enum StatutConsultation {
-    EN_ATTENTE
-    CONFIRMEE
-    EN_COURS
-    TERMINEE
-    ANNULEE
-    NO_SHOW
+    EN_ATTENTE @enum(value: "en_attente")
+    CONFIRMEE  @enum(value: "confirmee")
+    EN_COURS   @enum(value: "en_cours")
+    TERMINEE   @enum(value: "terminee")
+    ANNULEE    @enum(value: "annulee")
+    NO_SHOW    @enum(value: "no_show")
 }
 
 enum StatutRendezVous {
-    EN_ATTENTE
-    CONFIRME
-    REPORTE
-    ANNULE
-    TERMINE
+    EN_ATTENTE @enum(value: "en_attente")
+    CONFIRME   @enum(value: "confirme")
+    REPORTE    @enum(value: "reporte")
+    ANNULE     @enum(value: "annule")
+    TERMINE    @enum(value: "termine")
 }
 
 enum MethodePaiement {
-    ORANGE_MONEY
-    WAVE
-    STRIPE
-    CASH
+    ORANGE_MONEY @enum(value: "orange_money")
+    WAVE         @enum(value: "wave")
+    STRIPE       @enum(value: "stripe")
+    CASH         @enum(value: "cash")
 }
 
 enum StatutPaiement {
-    EN_ATTENTE
-    CONFIRME
-    ECHEC
-    REMBOURSE
+    EN_ATTENTE @enum(value: "en_attente")
+    CONFIRME   @enum(value: "confirme")
+    ECHEC      @enum(value: "echec")
+    REMBOURSE  @enum(value: "rembourse")
 }
 
 enum TypeLivraison {
-    RETRAIT
-    LIVRAISON
+    RETRAIT   @enum(value: "retrait")
+    LIVRAISON @enum(value: "livraison")
 }
 
 enum StatutCommande {
-    EN_ATTENTE
-    CONFIRMEE
-    EN_PREPARATION
-    PRETE
-    EN_LIVRAISON
-    LIVREE
-    ANNULEE
+    EN_ATTENTE     @enum(value: "en_attente")
+    CONFIRMEE      @enum(value: "confirmee")
+    EN_PREPARATION @enum(value: "en_preparation")
+    PRETE          @enum(value: "prete")
+    EN_LIVRAISON   @enum(value: "en_livraison")
+    LIVREE         @enum(value: "livree")
+    ANNULEE        @enum(value: "annulee")
 }
 
 enum NiveauGravite {
-    INFO
-    ATTENTION
-    ALERTE
-    URGENCE
+    INFO      @enum(value: "info")
+    ATTENTION @enum(value: "attention")
+    ALERTE    @enum(value: "alerte")
+    URGENCE   @enum(value: "urgence")
 }
 
 enum TypeNotification {
-    RENDEZ_VOUS
-    CONSULTATION
-    PRESCRIPTION
-    PAIEMENT
-    COMMANDE
-    ALERTE_SANTE
-    RAPPEL_MEDICAMENT
-    URGENCE
-    SYSTEME
+    RENDEZ_VOUS        @enum(value: "rendez_vous")
+    CONSULTATION       @enum(value: "consultation")
+    PRESCRIPTION       @enum(value: "prescription")
+    PAIEMENT           @enum(value: "paiement")
+    COMMANDE           @enum(value: "commande")
+    ALERTE_SANTE       @enum(value: "alerte_sante")
+    RAPPEL_MEDICAMENT  @enum(value: "rappel_medicament")
+    URGENCE            @enum(value: "urgence")
+    SYSTEME            @enum(value: "systeme")
 }
 
 enum GroupeSanguin {
-    A_POS
-    A_NEG
-    B_POS
-    B_NEG
-    AB_POS
-    AB_NEG
-    O_POS
-    O_NEG
+    A_POS  @enum(value: "A+")
+    A_NEG  @enum(value: "A-")
+    B_POS  @enum(value: "B+")
+    B_NEG  @enum(value: "B-")
+    AB_POS @enum(value: "AB+")
+    AB_NEG @enum(value: "AB-")
+    O_POS  @enum(value: "O+")
+    O_NEG  @enum(value: "O-")
 }
 
 enum FormeMedicament {
-    COMPRIME
-    GELULE
-    SIROP
-    INJECTABLE
-    CREME
-    AUTRE
+    COMPRIME   @enum(value: "comprime")
+    GELULE     @enum(value: "gelule")
+    SIROP      @enum(value: "sirop")
+    INJECTABLE @enum(value: "injectable")
+    CREME      @enum(value: "creme")
+    AUTRE      @enum(value: "autre")
 }

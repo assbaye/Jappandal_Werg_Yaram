@@ -40,14 +40,21 @@ class InitierPaiement
                 'payable_id'       => $payable->id,
             ]);
 
-            $result = match (strtolower($args['methode'])) {
+            $methode = strtolower($args['methode']);
+            $telephone = $args['telephone'] ?? $user->telephone;
+
+            if (in_array($methode, ['orange_money', 'wave']) && ! $telephone) {
+                throw new Error('Un numéro de téléphone est requis pour ce mode de paiement.');
+            }
+
+            $result = match ($methode) {
                 'orange_money' => $this->payment->initOrangeMoney(
-                    phone: $args['telephone'],
+                    phone: $telephone,
                     amount: (int) $montant,
                     reference: $paiement->id,
                 ),
                 'wave' => $this->payment->initWave(
-                    phone: $args['telephone'],
+                    phone: $telephone,
                     amount: (int) $montant,
                     reference: $paiement->id,
                 ),
@@ -56,6 +63,11 @@ class InitierPaiement
                     currency: 'xof',
                     metadata: ['paiement_id' => $paiement->id],
                 ),
+                'cash' => [
+                    'reference' => 'CASH-' . $paiement->id,
+                    'message'   => 'Paiement en espèces enregistré. À régler lors de la consultation.',
+                    '__type'    => 'PaiementMobileResponse',
+                ],
                 default => throw new Error("Méthode de paiement non supportée."),
             };
 

@@ -25,26 +25,14 @@ extend type Query {
     medecins(
         specialite: String
         disponible: Boolean
-        first: Int = 20
+        first: Int!
         page: Int
-    ): MedecinPaginator! @paginate(model: "App\\Models\\Medecin")
+    ): [Medecin!]! @paginate(model: "App\\Models\\Medecin")
 
     "Détail d'un médecin"
     medecin(id: ID! @eq): Medecin @find
 }
 
-type MedecinPaginator {
-    data: [Medecin!]!
-    paginatorInfo: PaginatorInfo!
-}
-
-type PaginatorInfo {
-    count: Int!
-    currentPage: Int!
-    lastPage: Int!
-    total: Int!
-    hasMorePages: Boolean!
-}
 
 extend type Mutation {
     "Mettre à jour la disponibilité du médecin"

@@ -1,22 +1,25 @@
 const String initierPaiementMutation = r'''
-  mutation InitierPaiement($input: PaiementInput!) {
+  mutation InitierPaiement($input: InitierPaiementInput!) {
     initierPaiement(input: $input) {
-      paiement {
-        id
-        montant
-        statut
-        methode
-        numero_transaction
+      ... on PaiementMobileResponse {
+        paiement_id
+        payment_url
+        ussd_code
+        reference
+        message
       }
-      redirect_url
-      client_secret
+      ... on PaiementStripeResponse {
+        paiement_id
+        client_secret
+        publishable_key
+      }
     }
   }
 ''';
 
 const String confirmerPaiementMutation = r'''
-  mutation ConfirmerPaiement($transactionId: String!) {
-    confirmerPaiement(transactionId: $transactionId) {
+  mutation ConfirmerPaiement($transaction_id: String!) {
+    confirmerPaiement(transaction_id: $transaction_id) {
       id
       statut
       facture {
@@ -35,7 +38,7 @@ const String mesPaiementsQuery = r'''
         montant
         devise
         statut
-        methode
+        methode_paiement
         created_at
         facture {
           numero_facture

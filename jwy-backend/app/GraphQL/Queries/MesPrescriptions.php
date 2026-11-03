@@ -3,13 +3,11 @@
 namespace App\GraphQL\Queries;
 
 use App\Models\Prescription;
-use GraphQL\Type\Definition\ResolveInfo;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class MesPrescriptions
 {
-    public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): LengthAwarePaginator
+    public function __invoke(mixed $root, array $args, GraphQLContext $context): array
     {
         $user  = $context->user();
         $query = Prescription::query()->with(['medecin', 'medicamentsPrescrites.medicament']);
@@ -20,6 +18,18 @@ class MesPrescriptions
             $query->where('medecin_id', $user->medecin->id);
         }
 
-        return $query->orderBy('created_at', 'desc')->paginate($args['first'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+        $paginator = $query->orderBy('created_at', 'desc')
+            ->paginate($args['first'] ?? 10, ['*'], 'page', $args['page'] ?? 1);
+
+        return [
+            'data' => $paginator->items(),
+            'paginatorInfo' => [
+                'count'        => $paginator->count(),
+                'currentPage'  => $paginator->currentPage(),
+                'lastPage'     => $paginator->lastPage(),
+                'total'        => $paginator->total(),
+                'hasMorePages' => $paginator->hasMorePages(),
+            ],
+        ];
     }
 }

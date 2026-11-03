@@ -11,8 +11,8 @@ class RechercherMedicament
 {
     public function __invoke(mixed $root, array $args, GraphQLContext $context, ResolveInfo $resolveInfo): Collection
     {
-        return Medicament::where('nom_commercial', 'ilike', "%{$args['nom']}%")
-            ->orWhere('principe_actif', 'ilike', "%{$args['nom']}%")
+        return Medicament::where('nom_commercial', 'ilike', "%{$args['terme']}%")
+            ->orWhere('principe_actif', 'ilike', "%{$args['terme']}%")
             ->limit(20)
             ->get();
     }

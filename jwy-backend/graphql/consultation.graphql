@@ -127,6 +127,11 @@ extend type Mutation {
         @guard
         @field(resolver: "App\\GraphQL\\Mutations\\DemarrerTeleConsultation")
 
+    "Accepter ou refuser une demande de consultation (médecin)"
+    repondreConsultation(consultation_id: ID!, accepter: Boolean!, motif: String): Consultation!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\RepondreConsultation")
+
     "Terminer une consultation (médecin)"
     terminerConsultation(
         consultation_id: ID!

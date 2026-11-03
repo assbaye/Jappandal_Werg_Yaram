@@ -27,11 +27,13 @@ class DemarrerTeleConsultation
             throw new Error('Accès non autorisé à cette consultation.');
         }
 
-        if (! $consultation->teleconsultation) {
+        if (! in_array($consultation->type_consultation, ['video', 'chat'])) {
             throw new Error('Cette consultation n\'est pas une téléconsultation.');
         }
 
-        $tc = $consultation->teleconsultation;
+        // Rattrapage des consultations créées sans salle (ancien bug de casse des enums)
+        $tc = $consultation->teleconsultation
+            ?? $consultation->teleconsultation()->create();
         $role = $user->role === 'medecin' ? AgoraService::ROLE_PUBLISHER : AgoraService::ROLE_SUBSCRIBER;
 
         $token = $this->agora->generateToken(

@@ -15,12 +15,12 @@ class PaiementScreen extends ConsumerStatefulWidget {
 }
 
 class _PaiementScreenState extends ConsumerState<PaiementScreen> {
-  String _methodePaiement = 'orange_money';
+  String _methodePaiement = 'ORANGE_MONEY';
   bool _isLoading = false;
 
   static const _methodes = [
     {
-      'value': 'orange_money',
+      'value': 'ORANGE_MONEY',
       'label': 'Orange Money',
       'icon': 'assets/icons/orange_money.png',
       'fallbackIcon': Icons.phone_android,
@@ -28,7 +28,7 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
       'description': 'Paiement via votre compte Orange Money',
     },
     {
-      'value': 'wave',
+      'value': 'WAVE',
       'label': 'Wave',
       'icon': 'assets/icons/wave.png',
       'fallbackIcon': Icons.waves,
@@ -36,7 +36,7 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
       'description': 'Paiement rapide avec Wave',
     },
     {
-      'value': 'stripe',
+      'value': 'STRIPE',
       'label': 'Carte bancaire',
       'icon': 'assets/icons/card.png',
       'fallbackIcon': Icons.credit_card,
@@ -44,7 +44,7 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
       'description': 'Visa, Mastercard via Stripe',
     },
     {
-      'value': 'cash',
+      'value': 'CASH',
       'label': 'En espèces',
       'icon': 'assets/icons/cash.png',
       'fallbackIcon': Icons.payments,
@@ -68,8 +68,6 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
               'payable_type': 'consultation',
               'payable_id': widget.consultationId,
               'methode': _methodePaiement,
-              'montant': _montant,
-              'devise': 'XOF',
             },
           },
         ),
@@ -86,22 +84,23 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
       }
 
       final data = result.data!['initierPaiement'] as Map<String, dynamic>;
-      final paiement = data['paiement'] as Map<String, dynamic>;
-      final redirectUrl = data['redirect_url'] as String?;
+      final paiementId = data['paiement_id'] as String?;
+      final paymentUrl = data['payment_url'] as String?;        // PaiementMobileResponse
+      final clientSecret = data['client_secret'] as String?;   // PaiementStripeResponse
 
-      if (_methodePaiement == 'cash') {
+      if (_methodePaiement == 'CASH') {
         // Paiement cash → confirmation directe
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Paiement en espèces enregistré'), backgroundColor: AppTheme.successColor),
         );
         context.go('/consultations');
-      } else if (redirectUrl != null) {
+      } else if (paymentUrl != null) {
         // Orange Money / Wave → WebView
         context.push('/paiement/webview', extra: {
-          'redirect_url': redirectUrl,
-          'transaction_id': paiement['numero_transaction'] ?? paiement['id'],
+          'redirect_url': paymentUrl,
+          'transaction_id': data['reference'] ?? paiementId ?? '',
         });
-      } else if (_methodePaiement == 'stripe') {
+      } else if (clientSecret != null) {
         // Stripe → à implémenter avec flutter_stripe
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Paiement Stripe en cours d\'intégration')),
@@ -115,7 +114,10 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Paiement')),
+      appBar: AppBar(
+        leading: BackButton(onPressed: () => context.pop()),
+        title: const Text('Paiement'),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -233,7 +235,7 @@ class _MethodeCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: selected ? color.withOpacity(0.06) : Colors.white,
+          color: selected ? color.withValues(alpha:0.06) : Colors.white,
           border: Border.all(
             color: selected ? color : Colors.grey.shade300,
             width: selected ? 2 : 1,
@@ -245,7 +247,7 @@ class _MethodeCard extends StatelessWidget {
             Container(
               width: 44,
               height: 44,
-              decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: color.withValues(alpha:0.12), borderRadius: BorderRadius.circular(10)),
               child: Icon(icon, color: color, size: 24),
             ),
             const SizedBox(width: 12),

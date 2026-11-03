@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'core/config/router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/graphql/client.dart';
 import 'features/auth/providers/auth_provider.dart';
 
 void main() async {
@@ -27,12 +29,16 @@ class _JwyAppState extends ConsumerState<JwyApp> {
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
+    final token = ref.watch(authProvider).token;
 
-    return MaterialApp.router(
-      title: 'JWY Santé',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      routerConfig: router,
+    return GraphQLProvider(
+      client: graphQLClientNotifier(token),
+      child: MaterialApp.router(
+        title: 'JWY',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        routerConfig: router,
+      ),
     );
   }
 }

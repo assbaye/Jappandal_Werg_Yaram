@@ -6,12 +6,13 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^11.0",
-        "nuwave/lighthouse": "^6.0",
-        "tymon/jwt-auth": "^2.1",
-        "spatie/laravel-permission": "^6.0",
         "laravel/reverb": "^1.0",
+        "nuwave/lighthouse": "^6.0",
+        "predis/predis": "^3.4",
+        "pusher/pusher-php-server": "^7.2",
+        "spatie/laravel-permission": "^6.0",
         "stripe/stripe-php": "^13.0",
-        "pusher/pusher-php-server": "^7.2"
+        "tymon/jwt-auth": "^2.1"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.0",

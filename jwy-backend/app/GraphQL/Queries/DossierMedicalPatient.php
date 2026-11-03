@@ -17,6 +17,11 @@ class DossierMedicalPatient
 
         $patient = Patient::findOrFail($args['patient_id']);
 
+        // Un médecin ne voit que le dossier de ses propres patients
+        if ($user->medecin && ! $patient->consultations()->where('medecin_id', $user->medecin->id)->exists()) {
+            throw new \GraphQL\Error\Error('Ce patient n\'a aucune consultation avec vous.');
+        }
+
         return $patient->dossierMedical;
     }
 }

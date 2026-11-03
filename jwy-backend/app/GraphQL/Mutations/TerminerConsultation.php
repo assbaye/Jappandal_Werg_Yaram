@@ -4,6 +4,7 @@ namespace App\GraphQL\Mutations;
 
 use App\Models\Consultation;
 use App\Services\NotificationService;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
@@ -14,10 +15,19 @@ class TerminerConsultation
         $user      = $context->user();
         $medecin   = $user->medecin;
 
-        abort_if(!$medecin, 403, 'Seuls les médecins peuvent terminer une consultation.');
+        if (! $medecin) {
+            throw new Error('Seuls les médecins peuvent terminer une consultation.');
+        }
 
         $consultation = Consultation::findOrFail($args['consultation_id']);
-        abort_if($consultation->medecin_id !== $medecin->id, 403);
+
+        if ($consultation->medecin_id !== $medecin->id) {
+            throw new Error('Cette consultation ne vous est pas adressée.');
+        }
+
+        if (! in_array($consultation->statut, ['confirmee', 'en_cours'])) {
+            throw new Error('Seule une consultation acceptée ou en cours peut être terminée.');
+        }
 
         $consultation->update([
             'statut'           => 'terminee',

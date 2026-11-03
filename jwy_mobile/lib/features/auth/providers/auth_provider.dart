@@ -43,9 +43,13 @@ class AuthState {
 
 class AuthNotifier extends StateNotifier<AuthState> {
   static const _tokenKey = 'jwy_jwt_token';
+  static const _emailKey = 'jwy_remembered_email';
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   AuthNotifier() : super(const AuthState());
+
+  /// Retourne l'email sauvegardé (si "Se souvenir de moi" était coché).
+  Future<String?> getSavedEmail() => _storage.read(key: _emailKey);
 
   /// Appelé au démarrage de l'app pour restaurer la session.
   Future<void> autoLogin() async {
@@ -75,7 +79,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<bool> login(String email, String password) async {
+  Future<bool> login(String email, String password, {bool rememberMe = true}) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final client = buildGraphQLClient(null);
@@ -86,14 +90,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
         ),
       );
       if (result.hasException) {
-        final msg = result.exception?.graphqlErrors.firstOrNull?.message
-            ?? 'Identifiants incorrects';
+        final msg = _messageErreur(result.exception!, 'Identifiants incorrects');
         state = state.copyWith(isLoading: false, error: msg);
         return false;
       }
       final data = result.data!['login'] as Map<String, dynamic>;
       final token = data['access_token'] as String;
-      await _storage.write(key: _tokenKey, value: token);
+      if (rememberMe) {
+        await _storage.write(key: _tokenKey, value: token);
+        await _storage.write(key: _emailKey, value: email);
+      } else {
+        await _storage.delete(key: _tokenKey);
+        await _storage.delete(key: _emailKey);
+      }
       state = AuthState(
         token: token,
         user: data['user'] as Map<String, dynamic>,
@@ -101,7 +110,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
       return true;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: 'Erreur de connexion');
+      state = state.copyWith(isLoading: false, error: 'Impossible de joindre le serveur. Vérifiez votre connexion.');
       return false;
     }
   }
@@ -117,8 +126,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         ),
       );
       if (result.hasException) {
-        final msg = result.exception?.graphqlErrors.firstOrNull?.message
-            ?? 'Erreur lors de l\'inscription';
+        final msg = _messageErreur(result.exception!, 'Erreur lors de l\'inscription');
         state = state.copyWith(isLoading: false, error: msg);
         return false;
       }
@@ -132,9 +140,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
       return true;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: 'Erreur de connexion');
+      state = state.copyWith(isLoading: false, error: 'Impossible de joindre le serveur. Vérifiez votre connexion.');
       return false;
     }
+  }
+
+  /// Message lisible : serveur injoignable, erreur de validation, ou message du serveur.
+  String _messageErreur(OperationException e, String defaut) {
+    if (e.linkException != null) {
+      return 'Impossible de joindre le serveur. Vérifiez votre connexion.';
+    }
+    final err = e.graphqlErrors.firstOrNull;
+    final validation = err?.extensions?['validation'];
+    if (validation is Map && validation.isNotEmpty) {
+      final premiers = validation.values.first;
+      if (premiers is List && premiers.isNotEmpty) return premiers.first.toString();
+    }
+    return err?.message ?? defaut;
   }
 
   Future<void> logout() async {

@@ -48,7 +48,7 @@ class _TeleConsultationScreenState extends ConsumerState<TeleConsultationScreen>
       final result = await client.mutate(
         MutationOptions(
           document: gql(demarrerTeleConsultationMutation),
-          variables: {'consultationId': widget.consultationId},
+          variables: {'consultation_id': widget.consultationId},
         ),
       );
 
@@ -63,7 +63,7 @@ class _TeleConsultationScreenState extends ConsumerState<TeleConsultationScreen>
       final data = result.data!['demarrerTeleConsultation'] as Map<String, dynamic>;
       _agoraChannel = data['agora_channel'] as String?;
       _agoraToken = data['agora_token'] as String?;
-      _agoraUid = data['agora_uid'] as int?;
+      _agoraUid = 0;
 
       // 3. Initialiser le moteur Agora
       await _initAgora();

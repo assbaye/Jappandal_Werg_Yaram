@@ -24,9 +24,16 @@ type User {
 }
 
 input RegisterInput {
-    email: String! @rules(apply: ["required", "email", "unique:users,email"])
-    password: String! @rules(apply: ["required", "min:8"])
-    telephone: String @rules(apply: ["nullable", "unique:users,telephone"])
+    email: String! @rules(apply: ["required", "email", "unique:users,email"], messages: [
+        { rule: "email", message: "Adresse email invalide." }
+        { rule: "unique", message: "Cet email est déjà utilisé." }
+    ])
+    password: String! @rules(apply: ["required", "min:8"], messages: [
+        { rule: "min", message: "Le mot de passe doit contenir au moins 8 caractères." }
+    ])
+    telephone: String @rules(apply: ["nullable", "unique:users,telephone"], messages: [
+        { rule: "unique", message: "Ce numéro de téléphone est déjà utilisé." }
+    ])
     role: String! @rules(apply: ["required", "in:patient,medecin,pharmacien"])
     langue_preferee: String
     # Données profil selon le rôle

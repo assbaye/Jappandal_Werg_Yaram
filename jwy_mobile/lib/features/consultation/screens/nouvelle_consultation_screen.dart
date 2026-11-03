@@ -17,14 +17,14 @@ class _NouvelleConsultationScreenState extends ConsumerState<NouvelleConsultatio
   final _formKey = GlobalKey<FormState>();
   final _symptomesCtrl = TextEditingController();
 
-  String _typeConsultation = 'video';
+  String _typeConsultation = 'VIDEO';
   Map<String, dynamic>? _selectedMedecin;
   bool _isLoading = false;
 
   static const _types = [
-    {'value': 'video', 'label': 'Téléconsultation vidéo', 'icon': Icons.video_call},
-    {'value': 'chat', 'label': 'Chat médical', 'icon': Icons.chat_bubble_outline},
-    {'value': 'physique', 'label': 'Consultation physique', 'icon': Icons.local_hospital_outlined},
+    {'value': 'VIDEO', 'label': 'Téléconsultation vidéo', 'icon': Icons.video_call},
+    {'value': 'CHAT', 'label': 'Chat médical', 'icon': Icons.chat_bubble_outline},
+    {'value': 'PHYSIQUE', 'label': 'Consultation physique', 'icon': Icons.local_hospital_outlined},
   ];
 
   @override
@@ -51,7 +51,7 @@ class _NouvelleConsultationScreenState extends ConsumerState<NouvelleConsultatio
           variables: {
             'input': {
               'medecin_id': _selectedMedecin!['id'],
-              'type': _typeConsultation,
+              'type_consultation': _typeConsultation,
               'symptomes': _symptomesCtrl.text.trim(),
             },
           },
@@ -78,7 +78,10 @@ class _NouvelleConsultationScreenState extends ConsumerState<NouvelleConsultatio
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Nouvelle consultation')),
+      appBar: AppBar(
+        leading: BackButton(onPressed: () => context.pop()),
+        title: const Text('Nouvelle consultation'),
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -163,7 +166,7 @@ class _TypeCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: selected ? AppTheme.primary.withOpacity(0.08) : Colors.white,
+          color: selected ? AppTheme.primary.withValues(alpha: 0.08) : Colors.white,
           border: Border.all(
             color: selected ? AppTheme.primary : Colors.grey.shade300,
             width: selected ? 2 : 1,
@@ -198,7 +201,6 @@ class _MedecinSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (selectedMedecin != null) {
-      final user = selectedMedecin!['user'] as Map<String, dynamic>? ?? {};
       return GestureDetector(
         onTap: () => _showMedecinPicker(context),
         child: Container(
@@ -206,7 +208,7 @@ class _MedecinSelector extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border.all(color: AppTheme.primary, width: 2),
             borderRadius: BorderRadius.circular(12),
-            color: AppTheme.primary.withOpacity(0.05),
+            color: AppTheme.primary.withValues(alpha: 0.05),
           ),
           child: Row(
             children: [
@@ -216,7 +218,7 @@ class _MedecinSelector extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Dr. ${user['prenom'] ?? ''} ${user['nom'] ?? ''}',
+                    Text('Dr. ${selectedMedecin!['prenom'] ?? ''} ${selectedMedecin!['nom'] ?? ''}',
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                     Text(selectedMedecin!['specialite'] as String? ?? '',
                         style: TextStyle(color: Colors.grey[600], fontSize: 12)),
@@ -254,11 +256,36 @@ class _MedecinSelector extends StatelessWidget {
   }
 }
 
-class _MedecinPickerSheet extends StatelessWidget {
+class _MedecinPickerSheet extends StatefulWidget {
   final GraphQLClient client;
   final ValueChanged<Map<String, dynamic>> onSelected;
 
   const _MedecinPickerSheet({required this.client, required this.onSelected});
+
+  @override
+  State<_MedecinPickerSheet> createState() => _MedecinPickerSheetState();
+}
+
+class _MedecinPickerSheetState extends State<_MedecinPickerSheet> {
+  late final Future<List<dynamic>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _loadMedecins();
+  }
+
+  Future<List<dynamic>> _loadMedecins() async {
+    final result = await widget.client.query(
+      QueryOptions(
+        document: gql(medecinsPaginateQuery),
+        variables: const {'first': 20},
+        fetchPolicy: FetchPolicy.networkOnly,
+      ),
+    );
+    if (result.hasException) throw result.exception!;
+    return (result.data?['medecins']?['data'] as List<dynamic>?) ?? [];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -272,27 +299,30 @@ class _MedecinPickerSheet extends StatelessWidget {
             child: Text('Choisir un médecin', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           Expanded(
-            child: Query(
-              options: QueryOptions(
-                document: gql(medecinsPaginateQuery),
-                variables: const {'first': 20},
-                fetchPolicy: FetchPolicy.networkOnly,
-              ),
-              builder: (result, {fetchMore, refetch}) {
-                if (result.isLoading) return const Center(child: CircularProgressIndicator());
-                final medecins = (result.data?['medecins']?['data'] as List<dynamic>?) ?? [];
+            child: FutureBuilder<List<dynamic>>(
+              future: _future,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Erreur: ${snapshot.error}'));
+                }
+                final medecins = snapshot.data ?? [];
                 return ListView.builder(
                   controller: controller,
                   itemCount: medecins.length,
                   itemBuilder: (_, i) {
                     final m = medecins[i] as Map<String, dynamic>;
-                    final user = m['user'] as Map<String, dynamic>? ?? {};
                     return ListTile(
                       leading: const CircleAvatar(child: Icon(Icons.person)),
-                      title: Text('Dr. ${user['prenom'] ?? ''} ${user['nom'] ?? ''}'),
+                      title: Text('Dr. ${m['prenom'] ?? ''} ${m['nom'] ?? ''}'),
                       subtitle: Text(m['specialite'] as String? ?? ''),
-                      trailing: Text('${m['tarif_consultation'] ?? 0} FCFA', style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary)),
-                      onTap: () => onSelected(m),
+                      trailing: Text(
+                        '${m['tarif_consultation'] ?? 0} FCFA',
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
+                      ),
+                      onTap: () => widget.onSelected(m),
                     );
                   },
                 );

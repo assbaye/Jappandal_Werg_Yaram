@@ -8,7 +8,9 @@ GraphQLClient buildGraphQLClient(String? token) {
   // Desktop (Windows/Linux/macOS) et iOS et Web → localhost
   // Android emulator → 10.0.2.2 (pointe vers l'hôte)
   final bool isAndroidEmulator = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
-  final String url = isAndroidEmulator ? AppConfig.graphqlUrl : AppConfig.graphqlUrlIos;
+  final String url = AppConfig.graphqlUrlOverride.isNotEmpty
+      ? AppConfig.graphqlUrlOverride
+      : (isAndroidEmulator ? AppConfig.graphqlUrl : AppConfig.graphqlUrlIos);
 
   final authLink = AuthLink(
     getToken: () => token != null ? 'Bearer $token' : null,

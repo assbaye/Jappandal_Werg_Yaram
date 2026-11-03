@@ -25,6 +25,10 @@ class PaymentService
         $token   = config('services.orange_money.auth_token');
         $merchant = config('services.orange_money.merchant_key');
 
+        if (! $token || ! $merchant) {
+            throw new \GraphQL\Error\Error('Orange Money n\'est pas encore configuré sur le serveur.');
+        }
+
         $response = Http::withToken($token)
             ->post("{$baseUrl}/webpayment", [
                 'merchant_key'   => $merchant,
@@ -43,7 +47,7 @@ class PaymentService
         return [
             'reference'   => $data['pay_token'] ?? (string) $reference,
             'payment_url' => $data['payment_url'] ?? null,
-            'ussd_code'   => "#144*82*{$data['pay_token']}#",
+            'ussd_code'   => isset($data['pay_token']) ? "#144*82*{$data['pay_token']}#" : null,
             'message'     => 'Paiement Orange Money initié. Composez le code USSD ou utilisez le lien.',
             '__type'      => 'PaiementMobileResponse',
         ];
@@ -60,6 +64,10 @@ class PaymentService
     public function initWave(string $phone, int $amount, int|string $reference): array
     {
         $apiKey = config('services.wave.api_key');
+
+        if (! $apiKey) {
+            throw new \GraphQL\Error\Error('Wave n\'est pas encore configuré sur le serveur.');
+        }
 
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$apiKey}",

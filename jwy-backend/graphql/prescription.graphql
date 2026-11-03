@@ -7,7 +7,7 @@ type Prescription {
     instructions: String
     est_executee: Boolean!
     date_execution: DateTime
-    medicaments_prescrits: [MedicamentPrescrit!]! @hasMany
+    medicaments_prescrits: [MedicamentPrescrit!]! @hasMany(relation: "medicamentsPrescrits")
     is_expiree: Boolean!
     created_at: DateTime!
 }

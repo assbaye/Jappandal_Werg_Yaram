@@ -68,6 +68,6 @@ class Medecin extends Model
 
     public function getNomCompletAttribute(): string
     {
-        return "Dr. {$this->prenom} {$this->nom}";
+        return "{$this->prenom} {$this->nom}";
     }
 }
