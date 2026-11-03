@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/outils.dart';
 import '../../../core/graphql/queries/profil_queries.dart';
 import '../../auth/providers/auth_provider.dart';
 
@@ -28,11 +29,6 @@ String _erreur(OperationException e) {
   }
   return err?.message ?? 'Une erreur est survenue';
 }
-
-const _groupes = {
-  'A_POS': 'A+', 'A_NEG': 'A-', 'B_POS': 'B+', 'B_NEG': 'B-',
-  'AB_POS': 'AB+', 'AB_NEG': 'AB-', 'O_POS': 'O+', 'O_NEG': 'O-',
-};
 
 class ProfilScreen extends ConsumerWidget {
   const ProfilScreen({super.key});
@@ -287,7 +283,7 @@ class _FormulaireState extends ConsumerState<_Formulaire> {
                 initialValue: _groupe,
                 decoration: const InputDecoration(labelText: 'Groupe sanguin'),
                 items: [
-                  for (final e in _groupes.entries) DropdownMenuItem(value: e.key, child: Text(e.value)),
+                  for (final e in groupesSanguins.entries) DropdownMenuItem(value: e.key, child: Text(e.value)),
                 ],
                 onChanged: (v) => setState(() => _groupe = v),
               ),

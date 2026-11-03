@@ -19,3 +19,12 @@ Future<void> ouvrirCarte(double latitude, double longitude) =>
 /// À ne pas utiliser pour les dates saisies par l'utilisateur (rendez-vous), stockées telles quelles.
 DateTime? dateServeurUtc(String? d) =>
     d == null ? null : DateTime.tryParse(d.contains('Z') || d.contains('+') ? d : '${d.replaceFirst(' ', 'T')}Z')?.toLocal();
+
+/// Groupes sanguins : nom de l'enum GraphQL (qui n'accepte pas « + ») → libellé affiché.
+const groupesSanguins = {
+  'A_POS': 'A+', 'A_NEG': 'A−', 'B_POS': 'B+', 'B_NEG': 'B−',
+  'AB_POS': 'AB+', 'AB_NEG': 'AB−', 'O_POS': 'O+', 'O_NEG': 'O−',
+};
+
+/// « O_POS » → « O+ » ; renvoie la valeur telle quelle si elle est déjà lisible (ex. « O+ »).
+String? groupeSanguinLabel(String? valeur) => valeur == null ? null : groupesSanguins[valeur] ?? valeur;

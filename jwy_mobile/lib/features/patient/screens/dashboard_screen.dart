@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/outils.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../notifications/screens/notifications_screen.dart';
 
@@ -135,7 +136,7 @@ class _WelcomeBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final hour = DateTime.now().hour;
     final greeting = hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir';
-    final groupeSanguin = patient?['groupe_sanguin'] as String?;
+    final groupeSanguin = groupeSanguinLabel(patient?['groupe_sanguin'] as String?);
 
     return Container(
       width: double.infinity,
@@ -243,13 +244,17 @@ class _QuickActionsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
+    // Hauteur fixe plutôt qu'un ratio : sur un écran étroit, un libellé sur
+    // deux lignes (« Prendre rendez-vous ») débordait de la tuile
+    return GridView(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        mainAxisExtent: 124,
+      ),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 1.45,
       children: _actions.map((a) => _QuickActionCard(action: a)).toList(),
     );
   }
@@ -302,10 +307,13 @@ class _QuickActionCard extends StatelessWidget {
                 child: Icon(action.icon, color: action.color, size: 22),
               ),
               const SizedBox(height: 10),
-              Text(
-                action.label,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-                maxLines: 2,
+              Flexible(
+                child: Text(
+                  action.label,
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
@@ -388,7 +396,7 @@ class _ProfileSheet extends StatelessWidget {
     final user = ref.watch(authProvider).user;
     final patient = user?['patient'] as Map<String, dynamic>?;
     final nom = _buildDisplayName(patient, user);
-    final groupeSanguin = patient?['groupe_sanguin'] as String?;
+    final groupeSanguin = groupeSanguinLabel(patient?['groupe_sanguin'] as String?);
     final adresse = patient?['adresse'] as String?;
 
     return Padding(

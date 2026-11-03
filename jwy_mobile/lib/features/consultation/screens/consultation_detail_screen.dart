@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/outils.dart';
 import '../../../core/graphql/queries/patient_queries.dart';
 import '../../../core/graphql/queries/medecin_queries.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -39,18 +40,6 @@ final _dossierPatientProvider =
 String _messageErreur(OperationException? e) =>
     e?.graphqlErrors.firstOrNull?.message ??
     (e?.linkException != null ? 'Impossible de joindre le serveur' : 'Une erreur est survenue');
-
-String _groupeSanguinLabel(String? g) => switch (g) {
-      'A_POS' => 'A+',
-      'A_NEG' => 'A-',
-      'B_POS' => 'B+',
-      'B_NEG' => 'B-',
-      'AB_POS' => 'AB+',
-      'AB_NEG' => 'AB-',
-      'O_POS' => 'O+',
-      'O_NEG' => 'O-',
-      _ => '—',
-    };
 
 class ConsultationDetailScreen extends ConsumerWidget {
   final String consultationId;
@@ -430,7 +419,7 @@ class _PatientCard extends StatelessWidget {
       if (age != null) '$age ans',
       if (genre != null) genre,
       if (patient?['groupe_sanguin'] != null)
-        'Groupe ${_groupeSanguinLabel(patient!['groupe_sanguin'] as String?)}',
+        'Groupe ${groupeSanguinLabel(patient!['groupe_sanguin'] as String?)}',
     ];
 
     return _SectionCard(
@@ -543,7 +532,7 @@ class DossierPatientSheet extends ConsumerWidget {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: _InfoChip(icon: Icons.bloodtype_outlined, label: 'Groupe', value: _groupeSanguinLabel(dossier['groupe_sanguin'] as String?))),
+                  Expanded(child: _InfoChip(icon: Icons.bloodtype_outlined, label: 'Groupe', value: groupeSanguinLabel(dossier['groupe_sanguin'] as String?) ?? '—')),
                   const SizedBox(width: 8),
                   Expanded(child: _InfoChip(icon: Icons.monitor_weight_outlined, label: 'Poids', value: mesure('poids', 'kg'))),
                   const SizedBox(width: 8),

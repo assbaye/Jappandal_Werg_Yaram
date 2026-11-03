@@ -22,11 +22,6 @@ final alertesUrgenceProvider = FutureProvider.autoDispose<List<dynamic>>((ref) a
   return (result.data?['alertesUrgence'] as List<dynamic>?) ?? [];
 });
 
-const _groupes = {
-  'A_POS': 'A+', 'A_NEG': 'A-', 'B_POS': 'B+', 'B_NEG': 'B-',
-  'AB_POS': 'AB+', 'AB_NEG': 'AB-', 'O_POS': 'O+', 'O_NEG': 'O-',
-};
-
 String _depuis(String? d) {
   final date = dateServeurUtc(d);
   if (date == null) return '';
@@ -199,7 +194,7 @@ class _AlerteCardState extends ConsumerState<_AlerteCard> {
               Text(
                 '${patient['prenom'] ?? ''} ${patient['nom'] ?? ''}'
                 '${patient['age'] != null ? ' · ${patient['age']} ans' : ''}'
-                '${patient['groupe_sanguin'] != null ? ' · ${_groupes[patient['groupe_sanguin']] ?? ''}' : ''}',
+                '${patient['groupe_sanguin'] != null ? ' · ${groupeSanguinLabel(patient['groupe_sanguin'] as String?)}' : ''}',
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               if (allergies.isNotEmpty)
