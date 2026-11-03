@@ -64,6 +64,7 @@ class CommandesPharmacienScreen extends ConsumerWidget {
           ),
         ),
         body: async.when(
+          skipError: true, // un rafraîchissement raté garde l'affichage précédent
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Center(
             child: TextButton(
@@ -131,13 +132,13 @@ class _CommandePharmacienCardState extends ConsumerState<CommandePharmacienCard>
     if (statut == 'ANNULEE') {
       final ok = await showDialog<bool>(
         context: context,
-        builder: (_) => AlertDialog(
+        builder: (dialogContext) => AlertDialog(
           title: Text(c['statut'] == 'EN_ATTENTE' ? 'Refuser la commande ?' : 'Annuler la commande ?'),
           content: const Text('Les médicaments retournent en stock et le patient est prévenu.'),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Non')),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Non')),
             TextButton(
-              onPressed: () => Navigator.pop(context, true),
+              onPressed: () => Navigator.pop(dialogContext, true),
               style: TextButton.styleFrom(foregroundColor: AppTheme.errorColor),
               child: const Text('Oui'),
             ),

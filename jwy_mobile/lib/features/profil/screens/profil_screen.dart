@@ -41,6 +41,7 @@ class ProfilScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Mon profil')),
       body: async.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: TextButton(

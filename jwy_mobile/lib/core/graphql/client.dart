@@ -18,7 +18,7 @@ GraphQLClient buildGraphQLClient(String? token) {
 
   final httpLink = HttpLink(url);
 
-  final link = authLink.concat(httpLink);
+  final link = Link.from([authLink, RelanceLink(), httpLink]);
 
   return GraphQLClient(
     cache: GraphQLCache(store: InMemoryStore()),
@@ -35,4 +35,31 @@ GraphQLClient buildGraphQLClient(String? token) {
 /// ValueNotifier pour exposer le client aux widgets via GraphQLProvider.
 ValueNotifier<GraphQLClient> graphQLClientNotifier(String? token) {
   return ValueNotifier(buildGraphQLClient(token));
+}
+
+/// Relance une lecture qui a échoué pour une raison réseau (Wi-Fi instable,
+/// serveur momentanément occupé). Les mutations ne sont jamais relancées :
+/// une action (paiement, alerte…) ne doit pas risquer d'être envoyée deux fois.
+class RelanceLink extends Link {
+  static const _essaisMax = 3;
+
+  @override
+  Stream<Response> request(Request request, [NextLink? forward]) async* {
+    final lecture = request.operation.getOperationType()?.name == 'query';
+
+    for (var essai = 1;; essai++) {
+      try {
+        // await for (et non yield*) : yield* transmettrait l'erreur sans passer par le catch
+        await for (final reponse in forward!(request)) {
+          yield reponse;
+        }
+        return;
+      } on ServerException catch (e) {
+        // parsedResponse nul : pas de réponse du serveur (échec réseau), et non une erreur HTTP
+        final reseau = e.parsedResponse == null;
+        if (!lecture || !reseau || essai >= _essaisMax) rethrow;
+        await Future<void>.delayed(Duration(milliseconds: 700 * essai));
+      }
+    }
+  }
 }

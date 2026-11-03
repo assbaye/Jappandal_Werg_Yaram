@@ -100,6 +100,7 @@ class DashboardMedecinTab extends ConsumerWidget {
         ],
       ),
       body: medecinAsync.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text(messageErreur(e), textAlign: TextAlign.center)),
         data: (medecin) => RefreshIndicator(
@@ -308,6 +309,7 @@ class _RecentConsultations extends ConsumerWidget {
     final consultationsAsync = ref.watch(_consultationsMedecinProvider);
 
     return consultationsAsync.when(
+      skipError: true, // un rafraîchissement raté garde l'affichage précédent
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Text(messageErreur(e),
           style: const TextStyle(color: AppTheme.errorColor)),
@@ -350,6 +352,7 @@ class ConsultationsMedecinScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Mes consultations')),
       body: consultationsAsync.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: Column(

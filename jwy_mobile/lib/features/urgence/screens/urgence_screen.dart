@@ -120,7 +120,7 @@ class _FormulaireAlerteState extends ConsumerState<_FormulaireAlerte> {
   Future<void> _envoyer() async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         icon: const Icon(PhosphorIconsRegular.siren, color: AppTheme.errorColor, size: 40),
         title: const Text('Envoyer l\'alerte ?'),
         content: const Text(
@@ -128,9 +128,9 @@ class _FormulaireAlerteState extends ConsumerState<_FormulaireAlerte> {
           'En cas de danger immédiat, appelez aussi le SAMU (1515).',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Annuler')),
           FilledButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogContext, true),
             style: FilledButton.styleFrom(backgroundColor: AppTheme.errorColor),
             child: const Text('Envoyer'),
           ),
@@ -252,13 +252,13 @@ class _AlerteEnCoursState extends ConsumerState<_AlerteEnCours> {
   Future<void> _annuler() async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Annuler l\'alerte ?'),
         content: const Text('À faire uniquement si vous n\'avez plus besoin d\'aide.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Non')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Non')),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogContext, true),
             style: TextButton.styleFrom(foregroundColor: AppTheme.errorColor),
             child: const Text('Oui, annuler'),
           ),

@@ -31,6 +31,7 @@ class MesCommandesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Mes commandes')),
       body: async.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => Center(
           child: TextButton(

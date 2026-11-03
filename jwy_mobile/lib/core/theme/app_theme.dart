@@ -186,8 +186,16 @@ class AppTheme {
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
           side: const WidgetStatePropertyAll(BorderSide(color: border)),
-          backgroundColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? primarySoft : cardColor),
-          foregroundColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? primary : inkSoft),
+          backgroundColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.disabled)
+              ? background
+              : s.contains(WidgetState.selected)
+                  ? primarySoft
+                  : cardColor),
+          foregroundColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.disabled)
+              ? inkMuted.withValues(alpha: 0.6)
+              : s.contains(WidgetState.selected)
+                  ? primary
+                  : inkSoft),
           textStyle: const WidgetStatePropertyAll(TextStyle(fontFamily: police, fontWeight: FontWeight.w600)),
         ),
       ),

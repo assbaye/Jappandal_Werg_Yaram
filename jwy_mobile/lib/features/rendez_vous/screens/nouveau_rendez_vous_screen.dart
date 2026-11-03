@@ -93,6 +93,7 @@ class _NouveauRendezVousScreenState extends ConsumerState<NouveauRendezVousScree
         children: [
           const _Titre('1. Médecin'),
           medecinsAsync.when(
+            skipError: true, // un rafraîchissement raté garde l'affichage précédent
             loading: () => const Padding(
               padding: EdgeInsets.all(24),
               child: Center(child: CircularProgressIndicator()),

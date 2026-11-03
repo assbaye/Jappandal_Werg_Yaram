@@ -77,6 +77,7 @@ class PharmaciesScreen extends ConsumerWidget {
         ],
       ),
       body: locationAsync.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -222,6 +223,7 @@ class _PharmaciesListState extends ConsumerState<_PharmaciesList> {
           ),
 
           ...async.when(
+            skipError: true, // un rafraîchissement raté garde l'affichage précédent
             loading: () => [const Padding(padding: EdgeInsets.all(32), child: Center(child: CircularProgressIndicator()))],
             error: (_, __) => [
               Center(

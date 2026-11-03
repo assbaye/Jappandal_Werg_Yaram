@@ -28,6 +28,7 @@ class MesOrdonnancesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Mes ordonnances')),
       body: async.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => Center(
           child: TextButton(

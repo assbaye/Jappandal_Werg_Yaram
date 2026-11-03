@@ -291,8 +291,8 @@ class _MedecinSelector extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (_) => _MedecinPickerSheet(client: client, specialiteConseillee: specialiteConseillee, onSelected: (m) {
-        Navigator.pop(context);
+      builder: (sheetContext) => _MedecinPickerSheet(client: client, specialiteConseillee: specialiteConseillee, onSelected: (m) {
+        Navigator.pop(sheetContext); // fermer la feuille, pas l'écran
         onSelected(m);
       }),
     );

@@ -98,6 +98,7 @@ class NotificationsScreen extends ConsumerWidget {
         ],
       ),
       body: async.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: Column(

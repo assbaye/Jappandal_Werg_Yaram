@@ -94,6 +94,7 @@ class _PaiementScreenState extends ConsumerState<PaiementScreen> {
         title: const Text('Paiement'),
       ),
       body: async.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => const Center(child: Text('Impossible de charger la consultation')),
         data: (c) {

@@ -61,6 +61,7 @@ class _PharmacieDetailScreenState extends ConsumerState<PharmacieDetailScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(async.valueOrNull?['nom_pharmacie'] as String? ?? 'Pharmacie')),
       body: async.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => Center(
           child: TextButton(
@@ -388,6 +389,11 @@ class _ValidationSheetState extends ConsumerState<_ValidationSheet> {
               selected: {_livraison},
               onSelectionChanged: (s) => setState(() => _livraison = s.first),
             ),
+            if (!livrable) ...[
+              const SizedBox(height: 6),
+              const Text('Cette pharmacie ne propose pas la livraison : retrait sur place uniquement.',
+                  style: TextStyle(fontSize: 12, color: AppTheme.inkSoft)),
+            ],
             if (_livraison) ...[
               const SizedBox(height: 12),
               TextField(controller: _adresseCtrl, decoration: const InputDecoration(labelText: 'Adresse de livraison')),

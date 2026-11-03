@@ -89,6 +89,7 @@ class UrgencesMedecinScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Urgences')),
       body: async.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         skipLoadingOnRefresh: true,
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => Center(

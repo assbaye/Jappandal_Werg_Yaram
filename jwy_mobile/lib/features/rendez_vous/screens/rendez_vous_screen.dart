@@ -91,6 +91,7 @@ class RendezVousScreen extends ConsumerWidget {
                 },
               ),
         body: async.when(
+          skipError: true, // un rafraîchissement raté garde l'affichage précédent
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Center(
             child: Column(
@@ -222,13 +223,13 @@ class _RendezVousCardState extends ConsumerState<_RendezVousCard> {
   Future<void> _annuler() async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Annuler ce rendez-vous ?'),
         content: const Text('L\'autre partie sera prévenue.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Non')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Non')),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogContext, true),
             style: TextButton.styleFrom(foregroundColor: AppTheme.errorColor),
             child: const Text('Oui, annuler'),
           ),

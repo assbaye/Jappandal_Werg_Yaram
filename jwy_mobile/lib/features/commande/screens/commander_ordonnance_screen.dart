@@ -123,6 +123,7 @@ class _CommanderOrdonnanceScreenState extends ConsumerState<CommanderOrdonnanceS
     return Scaffold(
       appBar: AppBar(title: const Text('Commander l\'ordonnance')),
       body: async.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => Center(
           child: TextButton(
@@ -174,6 +175,11 @@ class _CommanderOrdonnanceScreenState extends ConsumerState<CommanderOrdonnanceS
                   selected: {_livraison},
                   onSelectionChanged: (s) => setState(() => _livraison = s.first),
                 ),
+                if (choisie.pharmacie['livraison_disponible'] != true) ...[
+                  const SizedBox(height: 6),
+                  const Text('Cette pharmacie ne propose pas la livraison : retrait sur place uniquement.',
+                  style: TextStyle(fontSize: 12, color: AppTheme.inkSoft)),
+                ],
                 if (_livraison) ...[
                   const SizedBox(height: 12),
                   TextField(

@@ -67,6 +67,7 @@ class _StockScreenState extends ConsumerState<StockScreen> {
         onPressed: _ajouter,
       ),
       body: async.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: TextButton(

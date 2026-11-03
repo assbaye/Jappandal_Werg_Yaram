@@ -38,6 +38,7 @@ class ConsultationsScreen extends ConsumerWidget {
         backgroundColor: AppTheme.primary,
       ),
       body: consultationsAsync.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: Padding(

@@ -178,6 +178,7 @@ class DashboardPharmacienTab extends ConsumerWidget {
             const Text('Commandes à traiter', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             commandes.when(
+              skipError: true, // un rafraîchissement raté garde l'affichage précédent
               loading: () => const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator())),
               error: (_, __) => const Text('Impossible de charger les commandes'),
               data: (_) => aTraiter.isEmpty

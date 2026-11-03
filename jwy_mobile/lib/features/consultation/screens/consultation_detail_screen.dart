@@ -66,6 +66,7 @@ class ConsultationDetailScreen extends ConsumerWidget {
         ],
       ),
       body: async.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: Padding(
@@ -606,6 +607,7 @@ class DossierPatientSheet extends ConsumerWidget {
       initialChildSize: 0.7,
       maxChildSize: 0.95,
       builder: (context, scrollController) => async.when(
+        skipError: true, // un rafraîchissement raté garde l'affichage précédent
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: Padding(
