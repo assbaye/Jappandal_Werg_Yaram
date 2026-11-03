@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/graphql/queries/pharmacien_queries.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -133,6 +134,12 @@ class DashboardPharmacienTab extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
 
+            // ── Garde ────────────────────────────────────────────────────
+            if (pharmacie != null) ...[
+              _GardeCard(pharmacie: pharmacie, onChange: () => ref.invalidate(_maPharmacieProvider)),
+              const SizedBox(height: 16),
+            ],
+
             // ── Chiffres clés ────────────────────────────────────────────
             Row(
               children: [
@@ -218,6 +225,102 @@ class _Stat extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Garde ────────────────────────────────────────────────────────────────────
+
+class _GardeCard extends ConsumerStatefulWidget {
+  final Map<String, dynamic> pharmacie;
+  final VoidCallback onChange;
+  const _GardeCard({required this.pharmacie, required this.onChange});
+
+  @override
+  ConsumerState<_GardeCard> createState() => _GardeCardState();
+}
+
+class _GardeCardState extends ConsumerState<_GardeCard> {
+  bool _loading = false;
+
+  Future<void> _envoyer(DateTime? jusquAu) async {
+    setState(() => _loading = true);
+    final result = await ref.read(graphQLClientProvider).mutate(MutationOptions(
+          document: gql(declarerGardeMutation),
+          variables: {
+            'jusqu_au': jusquAu == null ? null : DateFormat('yyyy-MM-dd HH:mm:ss').format(jusquAu),
+          },
+        ));
+    if (!mounted) return;
+    setState(() => _loading = false);
+    if (result.hasException) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(result.exception?.graphqlErrors.firstOrNull?.message ?? 'Une erreur est survenue'),
+        backgroundColor: AppTheme.errorColor,
+      ));
+      return;
+    }
+    widget.onChange();
+  }
+
+  Future<void> _declarer() async {
+    // Par défaut : garde jusqu'au lendemain 8 h
+    final demain = DateTime.now().add(const Duration(days: 1));
+    final date = await showDatePicker(
+      context: context,
+      initialDate: demain,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 7)),
+      helpText: 'Fin de la garde',
+    );
+    if (date == null || !mounted) return;
+    final heure = await showTimePicker(
+      context: context,
+      initialTime: const TimeOfDay(hour: 8, minute: 0),
+      helpText: 'Heure de fin de la garde',
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
+    );
+    if (heure == null) return;
+    await _envoyer(DateTime(date.year, date.month, date.day, heure.hour, heure.minute));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final deGarde = widget.pharmacie['est_de_garde'] == true;
+    final couleur = deGarde ? const Color(0xFF0D47A1) : Colors.grey.shade700;
+
+    return Card(
+      color: deGarde ? const Color(0xFFE3F2FD) : null,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            Icon(Icons.nightlight_round, color: couleur, size: 30),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(deGarde ? 'Pharmacie de garde' : 'Pas de garde en cours',
+                      style: TextStyle(fontWeight: FontWeight.bold, color: couleur)),
+                  Text(widget.pharmacie['statut_ouverture'] as String? ?? '',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+                ],
+              ),
+            ),
+            if (_loading)
+              const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
+            else
+              TextButton(
+                onPressed: deGarde ? () => _envoyer(null) : _declarer,
+                child: Text(deGarde ? 'Terminer' : 'Déclarer'),
+              ),
+          ],
         ),
       ),
     );

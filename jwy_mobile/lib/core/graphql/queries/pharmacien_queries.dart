@@ -6,6 +6,19 @@ const String maPharmacieQuery = r'''
       adresse
       telephone
       livraison_disponible
+      est_de_garde
+      de_garde_jusqu_au
+      statut_ouverture
+    }
+  }
+''';
+
+const String declarerGardeMutation = r'''
+  mutation DeclarerGarde($jusqu_au: DateTime) {
+    declarerGarde(jusqu_au: $jusqu_au) {
+      id
+      est_de_garde
+      statut_ouverture
     }
   }
 ''';

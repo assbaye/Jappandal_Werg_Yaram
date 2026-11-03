@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             PharmacieSeeder::class,
             PatientSeeder::class,
             MedicamentSeeder::class,
+            PharmaciesDemoSeeder::class,
         ]);
     }
 }

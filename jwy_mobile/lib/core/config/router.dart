@@ -22,6 +22,8 @@ import '../../features/pharmacien/screens/commandes_pharmacien_screen.dart';
 import '../../features/pharmacien/screens/stock_screen.dart';
 import '../../features/commande/screens/commander_ordonnance_screen.dart';
 import '../../features/commande/screens/mes_commandes_screen.dart';
+import '../../features/commande/screens/mes_ordonnances_screen.dart';
+import '../../features/commande/screens/pharmacie_detail_screen.dart';
 import '../../features/profil/screens/profil_screen.dart';
 import '../../features/urgence/screens/urgence_screen.dart';
 import '../../features/urgence/screens/urgences_medecin_screen.dart';
@@ -112,6 +114,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/urgence', builder: (_, __) => const UrgenceScreen()),
       GoRoute(path: '/medecin/urgences', builder: (_, __) => const UrgencesMedecinScreen()),
       GoRoute(path: '/commandes', builder: (_, __) => const MesCommandesScreen()),
+      GoRoute(path: '/ordonnances', builder: (_, __) => const MesOrdonnancesScreen()),
+      GoRoute(
+        path: '/pharmacies/:id',
+        builder: (_, state) => PharmacieDetailScreen(pharmacieId: state.pathParameters['id']!),
+      ),
       GoRoute(
         path: '/commandes/ordonnance',
         builder: (_, state) => CommanderOrdonnanceScreen(

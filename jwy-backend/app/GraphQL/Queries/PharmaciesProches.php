@@ -12,6 +12,7 @@ class PharmaciesProches
         return Pharmacie::query()
             ->where('est_active', true)
             ->proche($args['latitude'], $args['longitude'], $args['rayon'] ?? 10)
+            ->when(! empty($args['de_garde']), fn ($q) => $q->where('de_garde_jusqu_au', '>', now()))
             ->with(['stocks.medicament'])
             ->get();
     }

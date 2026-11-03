@@ -34,9 +34,15 @@ const String pharmaciesProchesQuery = r'''
       nom_pharmacie
       adresse
       telephone
+      latitude
+      longitude
       distance
       livraison_disponible
       est_active
+      est_partenaire
+      est_de_garde
+      est_ouverte
+      statut_ouverture
       heures_ouverture
     }
   }
@@ -205,6 +211,65 @@ const String mesCommandesQuery = r'''
           quantite
           prix_unitaire
           medicament {
+            nom_commercial
+            dosage
+          }
+        }
+      }
+    }
+  }
+''';
+
+const String pharmacieDetailQuery = r'''
+  query PharmacieDetail($id: ID!) {
+    pharmacie(id: $id) {
+      id
+      nom_pharmacie
+      adresse
+      telephone
+      latitude
+      longitude
+      livraison_disponible
+      heures_ouverture
+      est_de_garde
+      est_ouverte
+      statut_ouverture
+      stocks {
+        quantite_disponible
+        prix_vente
+        medicament {
+          id
+          nom_commercial
+          principe_actif
+          dosage
+          forme
+          necessite_ordonnance
+        }
+      }
+    }
+  }
+''';
+
+const String mesPrescriptionsQuery = r'''
+  query MesPrescriptions($first: Int, $page: Int) {
+    mesPrescriptions(first: $first, page: $page) {
+      data {
+        id
+        instructions
+        validite_jours
+        is_expiree
+        created_at
+        medecin {
+          nom
+          prenom
+        }
+        medicaments_prescrits {
+          id
+          quantite
+          posologie
+          duree_traitement
+          medicament {
+            id
             nom_commercial
             dosage
           }

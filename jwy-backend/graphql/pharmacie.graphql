@@ -9,6 +9,13 @@ type Pharmacie {
     est_partenaire: Boolean!
     est_active: Boolean!
     livraison_disponible: Boolean!
+    "Pharmacie de garde en ce moment"
+    est_de_garde: Boolean!
+    de_garde_jusqu_au: DateTime
+    "Ouverte maintenant (horaires du jour, ou garde)"
+    est_ouverte: Boolean!
+    "Ex. : « Ouverte jusqu'à 20:00 », « De garde jusqu'au lundi 08:00 »"
+    statut_ouverture: String!
     photo: String
     distance: Float
     pharmaciens: [Pharmacien!]! @belongsToMany
@@ -58,8 +65,13 @@ extend type Query {
         latitude: Float!
         longitude: Float!
         rayon: Float = 10
+        "Uniquement les pharmacies de garde"
+        de_garde: Boolean = false
     ): [Pharmacie!]!
         @field(resolver: "App\\GraphQL\\Queries\\PharmaciesProches")
+
+    "Détail d'une pharmacie (avec son stock)"
+    pharmacie(id: ID! @eq): Pharmacie @find
 
     "Rechercher un médicament"
     rechercherMedicament(terme: String!): [Medicament!]!
@@ -158,6 +170,11 @@ extend type Mutation {
     updateProfilPharmacien(input: UpdatePharmacienInput! @spread): Pharmacien!
         @guard
         @field(resolver: "App\\GraphQL\\Mutations\\UpdateProfilPharmacien")
+
+    "Déclarer sa pharmacie de garde jusqu'à une date (null : fin de la garde)"
+    declarerGarde(jusqu_au: DateTime): Pharmacie!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\DeclarerGarde")
 
     "Modifier les informations de sa pharmacie"
     updateMaPharmacie(input: UpdatePharmacieInput! @spread): Pharmacie!
