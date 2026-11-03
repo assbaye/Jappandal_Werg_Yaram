@@ -26,6 +26,7 @@ import '../../features/commande/screens/mes_ordonnances_screen.dart';
 import '../../features/commande/screens/pharmacie_detail_screen.dart';
 import '../../features/profil/screens/profil_screen.dart';
 import '../../features/urgence/screens/urgence_screen.dart';
+import '../../features/triage/screens/triage_screen.dart';
 import '../../features/urgence/screens/urgences_medecin_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -112,6 +113,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ── Hors shell (plein écran) ──────────────────────────────────────────
       GoRoute(path: '/profil', builder: (_, __) => const ProfilScreen()),
       GoRoute(path: '/urgence', builder: (_, __) => const UrgenceScreen()),
+      GoRoute(path: '/triage', builder: (_, __) => const TriageScreen()),
       GoRoute(path: '/medecin/urgences', builder: (_, __) => const UrgencesMedecinScreen()),
       GoRoute(path: '/commandes', builder: (_, __) => const MesCommandesScreen()),
       GoRoute(path: '/ordonnances', builder: (_, __) => const MesOrdonnancesScreen()),
@@ -129,7 +131,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/rendez-vous/nouveau', builder: (_, __) => const NouveauRendezVousScreen()),
       GoRoute(
         path: '/consultations/nouvelle',
-        builder: (_, __) => const NouvelleConsultationScreen(),
+        builder: (_, state) => NouvelleConsultationScreen(triage: state.extra as Map<String, dynamic>?),
       ),
       GoRoute(
         path: '/consultations/:id',

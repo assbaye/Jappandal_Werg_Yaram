@@ -250,6 +250,35 @@ class _DetailBody extends ConsumerWidget {
             const SizedBox(height: 12),
           ],
 
+          // ── Pré-analyse IA (vue médecin) ──────────────────────────────────
+          if (isMedecin && consultation['triage_ia'] != null) ...[
+            _SectionCard(
+              title: 'Pré-analyse de l\'assistant IA',
+              icon: Icons.auto_awesome,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Urgence estimée : ${switch (consultation['triage_ia']['niveau_urgence']) {
+                      'URGENCE_VITALE' => 'vitale',
+                      'AUJOURDHUI' => 'dans la journée',
+                      'SOUS_48H' => 'sous 48 h',
+                      _ => 'faible',
+                    }} · ${consultation['triage_ia']['specialite_recommandee']}',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(consultation['triage_ia']['resume_medecin'] as String? ?? '',
+                      style: const TextStyle(fontSize: 14, height: 1.5)),
+                  const SizedBox(height: 6),
+                  Text('Généré automatiquement — à vérifier.',
+                      style: TextStyle(fontSize: 11, color: Colors.grey[600], fontStyle: FontStyle.italic)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+
           // ── Diagnostic ────────────────────────────────────────────────────
           if (consultation['diagnostic'] != null) ...[
             _SectionCard(

@@ -91,6 +91,8 @@ class DashboardHomeTab extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const _AssistantCard(),
+                    const SizedBox(height: 24),
                     const Text('Actions rapides',
                         style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 14),
@@ -315,6 +317,46 @@ class _QuickActionCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Assistant IA (pré-orientation) ───────────────────────────────────────────
+
+class _AssistantCard extends StatelessWidget {
+  const _AssistantCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppTheme.primary.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () => context.push('/triage'),
+        child: const Padding(
+          padding: EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Icon(Icons.auto_awesome, color: AppTheme.primary, size: 30),
+              SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Pas sûr de qui consulter ?',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.primary)),
+                    SizedBox(height: 2),
+                    Text('Décrivez vos symptômes à l\'assistant santé',
+                        style: TextStyle(fontSize: 13, color: Colors.black54)),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: AppTheme.primary),
             ],
           ),
         ),

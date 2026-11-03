@@ -7,7 +7,9 @@ import '../../../core/graphql/queries/patient_queries.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class NouvelleConsultationScreen extends ConsumerStatefulWidget {
-  const NouvelleConsultationScreen({super.key});
+  /// Pré-orientation IA (facultative) : pré-remplit les symptômes, le type et la spécialité conseillée.
+  final Map<String, dynamic>? triage;
+  const NouvelleConsultationScreen({super.key, this.triage});
 
   @override
   ConsumerState<NouvelleConsultationScreen> createState() => _NouvelleConsultationScreenState();
@@ -26,6 +28,18 @@ class _NouvelleConsultationScreenState extends ConsumerState<NouvelleConsultatio
     {'value': 'CHAT', 'label': 'Chat médical', 'icon': Icons.chat_bubble_outline},
     {'value': 'PHYSIQUE', 'label': 'Consultation physique', 'icon': Icons.local_hospital_outlined},
   ];
+
+  String? get _specialiteConseillee => widget.triage?['specialite_recommandee'] as String?;
+
+  @override
+  void initState() {
+    super.initState();
+    final t = widget.triage;
+    if (t != null) {
+      _symptomesCtrl.text = t['symptomes'] as String? ?? '';
+      if (t['type_consultation'] is String) _typeConsultation = t['type_consultation'] as String;
+    }
+  }
 
   @override
   void dispose() {
@@ -53,6 +67,7 @@ class _NouvelleConsultationScreenState extends ConsumerState<NouvelleConsultatio
               'medecin_id': _selectedMedecin!['id'],
               'type_consultation': _typeConsultation,
               'symptomes': _symptomesCtrl.text.trim(),
+              if (widget.triage?['id'] != null) 'triage_ia_id': widget.triage!['id'],
             },
           },
         ),
@@ -87,6 +102,29 @@ class _NouvelleConsultationScreenState extends ConsumerState<NouvelleConsultatio
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            if (widget.triage != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.auto_awesome, color: AppTheme.primary, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Pré-rempli d\'après l\'assistant IA · spécialité conseillée : $_specialiteConseillee. '
+                        'Le médecin verra le résumé de l\'analyse.',
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
             // Type de consultation
             const Text('Type de consultation', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 12),
@@ -105,6 +143,7 @@ class _NouvelleConsultationScreenState extends ConsumerState<NouvelleConsultatio
             const SizedBox(height: 12),
             _MedecinSelector(
               selectedMedecin: _selectedMedecin,
+              specialiteConseillee: _specialiteConseillee,
               client: ref.watch(graphQLClientProvider),
               onSelected: (m) => setState(() => _selectedMedecin = m),
             ),
@@ -189,11 +228,13 @@ class _TypeCard extends StatelessWidget {
 
 class _MedecinSelector extends StatelessWidget {
   final Map<String, dynamic>? selectedMedecin;
+  final String? specialiteConseillee;
   final GraphQLClient client;
   final ValueChanged<Map<String, dynamic>> onSelected;
 
   const _MedecinSelector({
     required this.selectedMedecin,
+    this.specialiteConseillee,
     required this.client,
     required this.onSelected,
   });
@@ -248,7 +289,7 @@ class _MedecinSelector extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (_) => _MedecinPickerSheet(client: client, onSelected: (m) {
+      builder: (_) => _MedecinPickerSheet(client: client, specialiteConseillee: specialiteConseillee, onSelected: (m) {
         Navigator.pop(context);
         onSelected(m);
       }),
@@ -258,9 +299,10 @@ class _MedecinSelector extends StatelessWidget {
 
 class _MedecinPickerSheet extends StatefulWidget {
   final GraphQLClient client;
+  final String? specialiteConseillee;
   final ValueChanged<Map<String, dynamic>> onSelected;
 
-  const _MedecinPickerSheet({required this.client, required this.onSelected});
+  const _MedecinPickerSheet({required this.client, this.specialiteConseillee, required this.onSelected});
 
   @override
   State<_MedecinPickerSheet> createState() => _MedecinPickerSheetState();
@@ -308,7 +350,10 @@ class _MedecinPickerSheetState extends State<_MedecinPickerSheet> {
                 if (snapshot.hasError) {
                   return Center(child: Text('Erreur: ${snapshot.error}'));
                 }
-                final medecins = snapshot.data ?? [];
+                // Spécialité conseillée par l'assistant IA en premier
+                final conseil = widget.specialiteConseillee;
+                final medecins = [...?snapshot.data]
+                  ..sort((a, b) => (b['specialite'] == conseil ? 1 : 0) - (a['specialite'] == conseil ? 1 : 0));
                 return ListView.builder(
                   controller: controller,
                   itemCount: medecins.length,
@@ -317,7 +362,23 @@ class _MedecinPickerSheetState extends State<_MedecinPickerSheet> {
                     return ListTile(
                       leading: const CircleAvatar(child: Icon(Icons.person)),
                       title: Text('Dr. ${m['prenom'] ?? ''} ${m['nom'] ?? ''}'),
-                      subtitle: Text(m['specialite'] as String? ?? ''),
+                      subtitle: Row(
+                        children: [
+                          Flexible(child: Text(m['specialite'] as String? ?? '')),
+                          if (conseil != null && m['specialite'] == conseil) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primary.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Text('Conseillé',
+                                  style: TextStyle(fontSize: 10, color: AppTheme.primary, fontWeight: FontWeight.w600)),
+                            ),
+                          ],
+                        ],
+                      ),
                       trailing: Text(
                         '${m['tarif_consultation'] ?? 0} FCFA',
                         style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),

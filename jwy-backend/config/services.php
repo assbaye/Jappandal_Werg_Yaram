@@ -2,6 +2,14 @@
 
 return [
 
+    // ─── Claude (Anthropic) : assistant de pré-orientation ───────────────────
+    'anthropic' => [
+        'api_key' => env('ANTHROPIC_API_KEY'),
+        'model'   => env('ANTHROPIC_MODEL', 'claude-opus-5-5'),
+        // Analyses par patient et par heure (maîtrise des coûts)
+        'triages_par_heure' => (int) env('ANTHROPIC_TRIAGES_PAR_HEURE', 10),
+    ],
+
     // ─── Agora.io ─────────────────────────────────────────────────────────────
     'agora' => [
         'app_id'          => env('AGORA_APP_ID'),

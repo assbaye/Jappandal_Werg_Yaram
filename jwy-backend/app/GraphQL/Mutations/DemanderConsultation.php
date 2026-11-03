@@ -23,7 +23,14 @@ class DemanderConsultation
 
         $patient = $user->patient;
 
-        return DB::transaction(function () use ($args, $patient) {
+        // Pré-orientation IA jointe : elle doit appartenir au patient
+        $triageId = null;
+        if (! empty($args['triage_ia_id'])) {
+            $triageId = \App\Models\TriageIA::where('patient_id', $patient->id)->find($args['triage_ia_id'])?->id
+                ?? throw new Error('Cette analyse de symptômes est introuvable.');
+        }
+
+        return DB::transaction(function () use ($args, $patient, $triageId) {
             $medecin = \App\Models\Medecin::findOrFail($args['medecin_id']);
 
             $consultation = Consultation::create([
@@ -35,6 +42,7 @@ class DemanderConsultation
                 'date_consultation'  => $args['date_souhaitee'] ?? null,
                 'statut'             => 'en_attente',
                 'cout_consultation'  => $medecin->tarif_consultation,
+                'triage_ia_id'       => $triageId,
             ]);
 
             if (in_array(strtolower($args['type_consultation']), ['video', 'chat'])) {

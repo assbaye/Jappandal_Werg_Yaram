@@ -133,6 +133,12 @@ const String consultationDetailQuery = r'''
         agora_channel
         duree_consultation
       }
+      triage_ia {
+        niveau_urgence
+        specialite_recommandee
+        resume_medecin
+        created_at
+      }
     }
   }
 ''';

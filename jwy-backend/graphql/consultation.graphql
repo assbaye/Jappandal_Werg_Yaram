@@ -15,6 +15,8 @@ type Consultation {
     duree_minutes: Int
     note_patient: Float
     avis_patient: String
+    "Pré-orientation IA à l'origine de la demande"
+    triage_ia: TriageIA @belongsTo(relation: "triageIa")
     teleconsultation: TeleConsultation @hasOne
     consultation_physique: ConsultationPhysique @hasOne
     prescriptions: [Prescription!]! @hasMany
@@ -72,6 +74,8 @@ input DemanderConsultationInput {
     symptomes: String!
     date_souhaitee: DateTime
     adresse_physique: String
+    "Pré-orientation IA à joindre (son résumé sera visible par le médecin)"
+    triage_ia_id: ID
 }
 
 input PrendreRendezVousInput {

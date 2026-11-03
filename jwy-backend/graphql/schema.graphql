@@ -14,3 +14,4 @@ scalar JSON @scalar(class: "App\\GraphQL\\Scalars\\JSON")
 #import paiement.graphql
 #import notification.graphql
 #import administration.graphql
+#import ia.graphql

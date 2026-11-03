@@ -15,7 +15,7 @@ class Consultation extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'patient_id', 'medecin_id', 'dossier_medical_id',
+        'patient_id', 'medecin_id', 'dossier_medical_id', 'triage_ia_id',
         'type_consultation', 'symptomes', 'diagnostic', 'recommandations',
         'cout_consultation', 'statut', 'notes_consultation',
         'date_consultation', 'duree_minutes', 'note_patient', 'avis_patient',
@@ -45,6 +45,12 @@ class Consultation extends Model
     public function dossierMedical(): BelongsTo
     {
         return $this->belongsTo(DossierMedical::class, 'dossier_medical_id');
+    }
+
+    /** Pré-orientation IA à l'origine de la demande (facultative) */
+    public function triageIa(): BelongsTo
+    {
+        return $this->belongsTo(TriageIA::class, 'triage_ia_id');
     }
 
     public function teleconsultation(): HasOne

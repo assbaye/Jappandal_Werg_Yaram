@@ -1,0 +1,35 @@
+enum NiveauUrgenceIA {
+    URGENCE_VITALE @enum(value: "urgence_vitale")
+    AUJOURDHUI     @enum(value: "aujourdhui")
+    SOUS_48H       @enum(value: "sous_48h")
+    CONSEIL        @enum(value: "conseil")
+}
+
+"Pré-orientation des symptômes par l'assistant IA (ce n'est pas un diagnostic)"
+type TriageIA {
+    id: ID!
+    symptomes: String!
+    niveau_urgence: NiveauUrgenceIA!
+    specialite_recommandee: String!
+    "null en cas d'urgence vitale (appeler les secours)"
+    type_consultation: TypeConsultation
+    "Pour le patient"
+    explication: String!
+    conseils: [String!]!
+    signes_alerte: [String!]!
+    "Pour le médecin"
+    resume_medecin: String!
+    created_at: DateTime!
+}
+
+extend type Mutation {
+    "Analyser des symptômes avec l'assistant IA (patient)"
+    analyserSymptomes(
+        symptomes: String! @rules(apply: ["min:10", "max:2000"], messages: [
+            { rule: "min", message: "Décrivez vos symptômes en quelques mots de plus." }
+            { rule: "max", message: "Description trop longue (2 000 caractères au plus)." }
+        ])
+    ): TriageIA!
+        @guard
+        @field(resolver: "App\\GraphQL\\Mutations\\AnalyserSymptomes")
+}
