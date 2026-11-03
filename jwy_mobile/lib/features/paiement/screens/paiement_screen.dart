@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/graphql/queries/paiement_queries.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../consultation/screens/consultation_detail_screen.dart' show consultationDetailProvider;
+import '../../pharmacien/screens/commandes_pharmacien_screen.dart' show fcfa;
 
 class PaiementScreen extends ConsumerStatefulWidget {
   final String consultationId;
@@ -15,257 +18,164 @@ class PaiementScreen extends ConsumerStatefulWidget {
 }
 
 class _PaiementScreenState extends ConsumerState<PaiementScreen> {
-  String _methodePaiement = 'ORANGE_MONEY';
+  String _methode = 'WAVE';
   bool _isLoading = false;
 
   static const _methodes = [
-    {
-      'value': 'ORANGE_MONEY',
-      'label': 'Orange Money',
-      'icon': 'assets/icons/orange_money.png',
-      'fallbackIcon': Icons.phone_android,
-      'color': Color(0xFFFF6200),
-      'description': 'Paiement via votre compte Orange Money',
-    },
-    {
-      'value': 'WAVE',
-      'label': 'Wave',
-      'icon': 'assets/icons/wave.png',
-      'fallbackIcon': Icons.waves,
-      'color': Color(0xFF1BAAE1),
-      'description': 'Paiement rapide avec Wave',
-    },
-    {
-      'value': 'STRIPE',
-      'label': 'Carte bancaire',
-      'icon': 'assets/icons/card.png',
-      'fallbackIcon': Icons.credit_card,
-      'color': Color(0xFF6772E5),
-      'description': 'Visa, Mastercard via Stripe',
-    },
-    {
-      'value': 'CASH',
-      'label': 'En espèces',
-      'icon': 'assets/icons/cash.png',
-      'fallbackIcon': Icons.payments,
-      'color': Color(0xFF388E3C),
-      'description': 'Paiement à la pharmacie ou à la clinique',
-    },
+    (value: 'WAVE', label: 'Wave', icon: Icons.waves, color: Color(0xFF1BAAE1),
+        description: 'Paiement dans l\'application Wave'),
+    (value: 'ORANGE_MONEY', label: 'Orange Money', icon: Icons.phone_android, color: Color(0xFFFF6200),
+        description: 'Bientôt disponible'),
+    (value: 'CASH', label: 'En espèces', icon: Icons.payments, color: Color(0xFF388E3C),
+        description: 'À régler auprès du médecin'),
   ];
 
-  // Montant simulé — dans une vraie app, vient de la consultation
-  static const double _montant = 5000;
+  void _erreur(String msg) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg), backgroundColor: AppTheme.errorColor),
+      );
 
-  Future<void> _initierPaiement() async {
+  Future<void> _payer() async {
     setState(() => _isLoading = true);
-    try {
-      final client = ref.read(graphQLClientProvider);
-      final result = await client.mutate(
-        MutationOptions(
+    final result = await ref.read(graphQLClientProvider).mutate(MutationOptions(
           document: gql(initierPaiementMutation),
+          // Le montant n'est pas envoyé : le serveur le calcule à partir de la consultation
           variables: {
             'input': {
               'payable_type': 'consultation',
               'payable_id': widget.consultationId,
-              'methode': _methodePaiement,
+              'methode': _methode,
             },
           },
-        ),
-      );
+        ));
+    if (!mounted) return;
+    setState(() => _isLoading = false);
 
-      if (!mounted) return;
-
-      if (result.hasException) {
-        final msg = result.exception?.graphqlErrors.firstOrNull?.message ?? 'Erreur de paiement';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg), backgroundColor: AppTheme.errorColor),
-        );
-        return;
-      }
-
-      final data = result.data!['initierPaiement'] as Map<String, dynamic>;
-      final paiementId = data['paiement_id'] as String?;
-      final paymentUrl = data['payment_url'] as String?;        // PaiementMobileResponse
-      final clientSecret = data['client_secret'] as String?;   // PaiementStripeResponse
-
-      if (_methodePaiement == 'CASH') {
-        // Paiement cash → confirmation directe
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Paiement en espèces enregistré'), backgroundColor: AppTheme.successColor),
-        );
-        context.go('/consultations');
-      } else if (paymentUrl != null) {
-        // Orange Money / Wave → WebView
-        context.push('/paiement/webview', extra: {
-          'redirect_url': paymentUrl,
-          'transaction_id': data['reference'] ?? paiementId ?? '',
-        });
-      } else if (clientSecret != null) {
-        // Stripe → à implémenter avec flutter_stripe
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Paiement Stripe en cours d\'intégration')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+    if (result.hasException) {
+      _erreur(result.exception?.graphqlErrors.firstOrNull?.message ?? 'Paiement impossible');
+      return;
     }
+
+    final data = result.data!['initierPaiement'] as Map<String, dynamic>;
+    final paiementId = data['paiement_id'] as String;
+    final url = data['payment_url'] as String?;
+
+    if (_methode == 'CASH') {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Paiement en espèces enregistré : à régler lors de la consultation.'),
+        backgroundColor: AppTheme.successColor,
+      ));
+      context.pop();
+      return;
+    }
+
+    if (url == null) {
+      _erreur('Lien de paiement indisponible.');
+      return;
+    }
+
+    // Wave exige l'ouverture dans le navigateur ou son application, jamais dans une vue web intégrée
+    final ouvert = await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    if (!mounted) return;
+    if (!ouvert) {
+      _erreur('Impossible d\'ouvrir Wave sur cet appareil.');
+      return;
+    }
+    context.pushReplacement('/paiement/suivi/$paiementId');
   }
 
   @override
   Widget build(BuildContext context) {
+    final async = ref.watch(consultationDetailProvider(widget.consultationId));
+
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(onPressed: () => context.pop()),
         title: const Text('Paiement'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Récapitulatif
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Récapitulatif', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  const Divider(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: async.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) => const Center(child: Text('Impossible de charger la consultation')),
+        data: (c) {
+          if (c == null) return const Center(child: Text('Consultation introuvable'));
+          final montant = (c['cout_consultation'] as num?) ?? 0;
+          final medecin = c['medecin'] as Map<String, dynamic>?;
+
+          if (c['est_payee'] == true) {
+            return const Center(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.verified, color: AppTheme.successColor, size: 56),
+                SizedBox(height: 12),
+                Text('Cette consultation est déjà payée.', style: TextStyle(fontSize: 16)),
+              ]),
+            );
+          }
+
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Consultation vidéo'),
-                      Text('${_montant.toStringAsFixed(0)} FCFA',
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Frais de service'),
-                      Text('${(_montant * 0.02).toStringAsFixed(0)} FCFA',
-                          style: TextStyle(color: Colors.grey[600])),
-                    ],
-                  ),
-                  const Divider(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Total', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text(
-                        '${(_montant * 1.02).toStringAsFixed(0)} FCFA',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primary),
+                      const Text('Récapitulatif', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      const SizedBox(height: 12),
+                      Text('Consultation avec Dr. ${medecin?['prenom'] ?? ''} ${medecin?['nom'] ?? ''}'),
+                      const Divider(height: 24),
+                      Row(
+                        children: [
+                          const Expanded(
+                              child: Text('Total', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
+                          Text('${fcfa.format(montant)} FCFA',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.primary)),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Méthode de paiement
-          const Text('Choisir une méthode de paiement',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 12),
-          ..._methodes.map((m) => _MethodeCard(
-            value: m['value'] as String,
-            label: m['label'] as String,
-            description: m['description'] as String,
-            icon: m['fallbackIcon'] as IconData,
-            color: m['color'] as Color,
-            selected: _methodePaiement == m['value'],
-            onTap: () => setState(() => _methodePaiement = m['value'] as String),
-          )),
-
-          const SizedBox(height: 32),
-
-          ElevatedButton.icon(
-            icon: _isLoading
-                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : const Icon(Icons.lock),
-            label: Text(_isLoading ? 'Traitement...' : 'Payer maintenant'),
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 52),
-              backgroundColor: AppTheme.primary,
-            ),
-            onPressed: _isLoading ? null : _initierPaiement,
-          ),
-          const SizedBox(height: 12),
-          const Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.security, size: 14, color: Colors.grey),
-                SizedBox(width: 4),
-                Text('Paiement sécurisé et chiffré', style: TextStyle(color: Colors.grey, fontSize: 12)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MethodeCard extends StatelessWidget {
-  final String value;
-  final String label;
-  final String description;
-  final IconData icon;
-  final Color color;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _MethodeCard({
-    required this.value,
-    required this.label,
-    required this.description,
-    required this.icon,
-    required this.color,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: selected ? color.withValues(alpha:0.06) : Colors.white,
-          border: Border.all(
-            color: selected ? color : Colors.grey.shade300,
-            width: selected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(color: color.withValues(alpha:0.12), borderRadius: BorderRadius.circular(10)),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label, style: TextStyle(fontWeight: selected ? FontWeight.bold : FontWeight.normal, fontSize: 15)),
-                  Text(description, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-                ],
+              const SizedBox(height: 20),
+              const Text('Moyen de paiement', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 10),
+              for (final m in _methodes)
+                Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: _methode == m.value ? m.color : Colors.transparent, width: 2),
+                  ),
+                  child: ListTile(
+                    enabled: m.value != 'ORANGE_MONEY',
+                    leading: CircleAvatar(
+                      backgroundColor: m.color.withValues(alpha: 0.12),
+                      child: Icon(m.icon, color: m.color),
+                    ),
+                    title: Text(m.label, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: Text(m.description),
+                    trailing: _methode == m.value ? Icon(Icons.check_circle, color: m.color) : null,
+                    onTap: () => setState(() => _methode = m.value),
+                  ),
+                ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                icon: _isLoading
+                    ? const SizedBox(
+                        width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Icon(Icons.lock_outline),
+                label: Text(_methode == 'CASH' ? 'Confirmer le paiement en espèces' : 'Payer ${fcfa.format(montant)} FCFA'),
+                onPressed: _isLoading || montant <= 0 ? null : _payer,
               ),
-            ),
-            if (selected)
-              Icon(Icons.check_circle, color: color)
-            else
-              Icon(Icons.radio_button_unchecked, color: Colors.grey[400]),
-          ],
-        ),
+              const SizedBox(height: 10),
+              Text(
+                'Le paiement n\'est validé qu\'après confirmation par Wave.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

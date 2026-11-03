@@ -17,11 +17,13 @@ const String initierPaiementMutation = r'''
   }
 ''';
 
-const String confirmerPaiementMutation = r'''
-  mutation ConfirmerPaiement($transaction_id: String!) {
-    confirmerPaiement(transaction_id: $transaction_id) {
+const String verifierPaiementMutation = r'''
+  mutation VerifierPaiement($paiement_id: ID!) {
+    verifierPaiement(paiement_id: $paiement_id) {
       id
       statut
+      montant
+      methode_paiement
       facture {
         numero_facture
         montant_ttc

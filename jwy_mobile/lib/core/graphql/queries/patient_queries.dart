@@ -91,6 +91,7 @@ const String consultationDetailQuery = r'''
       date_consultation
       duree_minutes
       note_patient
+      est_payee
       created_at
       medecin {
         id

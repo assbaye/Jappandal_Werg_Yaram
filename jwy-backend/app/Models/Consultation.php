@@ -47,6 +47,14 @@ class Consultation extends Model
         return $this->belongsTo(DossierMedical::class, 'dossier_medical_id');
     }
 
+    public function getEstPayeeAttribute(): bool
+    {
+        return Paiement::where('payable_type', self::class)
+            ->where('payable_id', $this->id)
+            ->where('statut', 'confirme')
+            ->exists();
+    }
+
     /** Pré-orientation IA à l'origine de la demande (facultative) */
     public function triageIa(): BelongsTo
     {

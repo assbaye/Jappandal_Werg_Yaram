@@ -21,6 +21,8 @@ type Consultation {
     consultation_physique: ConsultationPhysique @hasOne
     prescriptions: [Prescription!]! @hasMany
     paiement: Paiement @morphOne
+    "Un paiement confirmé existe pour cette consultation"
+    est_payee: Boolean!
     created_at: DateTime!
 }
 

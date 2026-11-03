@@ -71,8 +71,8 @@ extend type Mutation {
         @guard
         @field(resolver: "App\\GraphQL\\Mutations\\InitierPaiement")
 
-    "Confirmer un paiement (webhook ou manuel)"
-    confirmerPaiement(transaction_id: String!): Paiement!
+    "Vérifier auprès de Wave l'état d'un de mes paiements (le serveur interroge Wave ; l'app ne peut pas confirmer)"
+    verifierPaiement(paiement_id: ID!): Paiement!
         @guard
-        @field(resolver: "App\\GraphQL\\Mutations\\ConfirmerPaiement")
+        @field(resolver: "App\\GraphQL\\Mutations\\VerifierPaiement")
 }

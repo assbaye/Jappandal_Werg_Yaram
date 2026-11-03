@@ -37,6 +37,8 @@ return [
         'api_url'        => env('WAVE_API_URL', 'https://api.wave.com/v1'),
         'api_key'        => env('WAVE_API_KEY'),
         'webhook_secret' => env('WAVE_WEBHOOK_SECRET'),
+        // Adresse https publique du serveur (retour après paiement) — ex. tunnel en développement
+        'url_retour'     => env('WAVE_URL_RETOUR'),
     ],
 
     // ─── Firebase Cloud Messaging ─────────────────────────────────────────────

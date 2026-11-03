@@ -10,7 +10,7 @@ import '../../features/patient/screens/pharmacies_screen.dart';
 import '../../features/consultation/screens/nouvelle_consultation_screen.dart';
 import '../../features/consultation/screens/teleconsultation_screen.dart';
 import '../../features/paiement/screens/paiement_screen.dart';
-import '../../features/paiement/screens/paiement_webview_screen.dart';
+import '../../features/paiement/screens/paiement_suivi_screen.dart';
 import '../../features/medecin/screens/dashboard_medecin_screen.dart';
 import '../../features/consultation/screens/consultation_detail_screen.dart';
 import '../../features/medecin/screens/nouvelle_ordonnance_screen.dart';
@@ -159,14 +159,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: '/paiement/webview',
-        builder: (_, state) {
-          final extra = state.extra as Map<String, dynamic>;
-          return PaiementWebviewScreen(
-            redirectUrl: extra['redirect_url'] as String,
-            transactionId: extra['transaction_id'] as String,
-          );
-        },
+        path: '/paiement/suivi/:paiementId',
+        builder: (_, state) => PaiementSuiviScreen(paiementId: state.pathParameters['paiementId']!),
       ),
     ],
   );

@@ -56,38 +56,109 @@ class PaymentService
     // ─── Wave Sénégal ─────────────────────────────────────────────────────────
 
     /**
-     * Initier un paiement Wave (Sénégal).
-     * Docs : https://docs.wave.com/
+     * Créer une session Checkout Wave. Docs : https://docs.wave.com/checkout
      *
-     * @return array{reference: string, payment_url: string, message: string}
+     * Le paiement n'est PAS confirmé ici : seul le webhook signé de Wave (ou une
+     * vérification serveur de la session) peut le passer à « confirmé ».
+     *
+     * @return array{reference: string, payment_url: string, message: string, __type: string}
      */
-    public function initWave(string $phone, int $amount, int|string $reference): array
+    public function initWave(int $amount, int|string $reference): array
     {
         $apiKey = config('services.wave.api_key');
+        $retour = rtrim((string) config('services.wave.url_retour'), '/');
 
         if (! $apiKey) {
             throw new \GraphQL\Error\Error('Wave n\'est pas encore configuré sur le serveur.');
         }
+        if (! str_starts_with($retour, 'https://')) {
+            // Wave refuse les adresses de retour qui ne sont pas en https
+            throw new \GraphQL\Error\Error('Wave n\'est pas encore configuré sur le serveur (WAVE_URL_RETOUR doit être une adresse https).');
+        }
+        if ($amount <= 0) {
+            throw new \GraphQL\Error\Error('Montant invalide pour un paiement Wave.');
+        }
 
-        $response = Http::withHeaders([
-            'Authorization' => "Bearer {$apiKey}",
-            'Content-Type'  => 'application/json',
-        ])->post(config('services.wave.api_url') . '/checkout/sessions', [
-            'currency'        => 'XOF',
-            'amount'          => (string) $amount,
-            'client_reference' => 'JWY-' . $reference,
-            'success_url'     => config('app.url') . '/payment/success',
-            'error_url'       => config('app.url') . '/payment/error',
-        ]);
+        $response = Http::withToken($apiKey)
+            ->acceptJson()
+            ->timeout(20)
+            ->post(config('services.wave.api_url') . '/checkout/sessions', [
+                'amount'           => (string) $amount,   // XOF : entier, sans décimales
+                'currency'         => 'XOF',
+                'client_reference' => 'JWY-' . $reference,
+                'success_url'      => "{$retour}/paiement/retour?statut=succes",
+                'error_url'        => "{$retour}/paiement/retour?statut=echec",
+            ]);
 
-        $data = $response->json();
+        if (! $response->successful() || empty($response->json('wave_launch_url'))) {
+            \Illuminate\Support\Facades\Log::error('Wave : création de session refusée', [
+                'status' => $response->status(),
+                'code'   => $response->json('code'),
+            ]);
+            throw new \GraphQL\Error\Error('Wave a refusé la demande de paiement. Réessayez plus tard.');
+        }
 
         return [
-            'reference'   => $data['id'] ?? (string) $reference,
-            'payment_url' => $data['wave_launch_url'] ?? null,
-            'message'     => 'Paiement Wave initié. Utilisez le lien pour payer.',
+            'reference'   => $response->json('id'),            // cos-…
+            'payment_url' => $response->json('wave_launch_url'),
+            'message'     => 'Finalisez le paiement dans l\'application Wave, puis revenez dans JWY.',
             '__type'      => 'PaiementMobileResponse',
         ];
+    }
+
+    /**
+     * Relire une session Checkout auprès de Wave (source de vérité pour le statut).
+     */
+    public function getWaveSession(string $sessionId): ?array
+    {
+        $apiKey = config('services.wave.api_key');
+        if (! $apiKey || ! str_starts_with($sessionId, 'cos-')) {
+            return null;
+        }
+
+        $response = Http::withToken($apiKey)
+            ->acceptJson()
+            ->timeout(15)
+            ->get(config('services.wave.api_url') . '/checkout/sessions/' . rawurlencode($sessionId));
+
+        return $response->successful() ? $response->json() : null;
+    }
+
+    /**
+     * Vérifier la signature d'un webhook Wave (en-tête « Wave-Signature: t=…,v1=… »).
+     * Docs : https://docs.wave.com/webhook — HMAC-SHA256 de « timestamp + corps brut ».
+     */
+    public function verifyWaveWebhook(string $rawBody, ?string $header): bool
+    {
+        $secret = config('services.wave.webhook_secret');
+        if (! $secret || ! $header) {
+            return false;
+        }
+
+        $timestamp = null;
+        $signatures = [];
+        foreach (explode(',', $header) as $part) {
+            [$cle, $valeur] = array_pad(explode('=', trim($part), 2), 2, null);
+            if ($cle === 't') {
+                $timestamp = $valeur;
+            } elseif ($cle === 'v1' && $valeur) {
+                $signatures[] = $valeur; // plusieurs v1 possibles pendant une rotation de clé
+            }
+        }
+
+        // Rejeter les requêtes de plus de 5 minutes (anti-rejeu)
+        if (! ctype_digit((string) $timestamp) || abs(time() - (int) $timestamp) > 300) {
+            return false;
+        }
+
+        $attendue = hash_hmac('sha256', $timestamp . $rawBody, $secret);
+        foreach ($signatures as $signature) {
+            if (hash_equals($attendue, $signature)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // ─── Stripe ───────────────────────────────────────────────────────────────

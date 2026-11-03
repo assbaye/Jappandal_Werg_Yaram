@@ -8,7 +8,6 @@
 
 #include <agora_rtc_engine/agora_rtc_engine_plugin.h>
 #include <connectivity_plus/connectivity_plus_windows_plugin.h>
-#include <flutter_inappwebview_windows/flutter_inappwebview_windows_plugin_c_api.h>
 #include <flutter_secure_storage_windows/flutter_secure_storage_windows_plugin.h>
 #include <geolocator_windows/geolocator_windows.h>
 #include <iris_method_channel/iris_method_channel_plugin_c_api.h>
@@ -20,8 +19,6 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("AgoraRtcEnginePlugin"));
   ConnectivityPlusWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("ConnectivityPlusWindowsPlugin"));
-  FlutterInappwebviewWindowsPluginCApiRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("FlutterInappwebviewWindowsPluginCApi"));
   FlutterSecureStorageWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FlutterSecureStorageWindowsPlugin"));
   GeolocatorWindowsRegisterWithRegistrar(

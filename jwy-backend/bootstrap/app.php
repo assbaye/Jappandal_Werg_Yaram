@@ -11,7 +11,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Les webhooks sont authentifiés par leur signature, pas par un jeton CSRF
+        $middleware->validateCsrfTokens(except: ['webhooks/*']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

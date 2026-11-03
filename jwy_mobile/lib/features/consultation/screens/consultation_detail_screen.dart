@@ -344,6 +344,34 @@ class _DetailBody extends ConsumerWidget {
             const SizedBox(height: 12),
           ],
 
+          // ── Paiement (patient) ────────────────────────────────────────────
+          if (!isMedecin && cout > 0 && statut != 'ANNULEE') ...[
+            if (consultation['est_payee'] == true)
+              const Card(
+                child: ListTile(
+                  leading: Icon(Icons.verified, color: AppTheme.successColor),
+                  title: Text('Consultation payée'),
+                ),
+              )
+            else
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.payments_outlined),
+                  label: Text('Payer la consultation ($cout FCFA)'),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(0, 50),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () async {
+                    await context.push('/paiement/${consultation['id']}');
+                    ref.invalidate(consultationDetailProvider(consultation['id'] as String));
+                  },
+                ),
+              ),
+            const SizedBox(height: 12),
+          ],
+
           // ── Action vidéo (patient et médecin) ─────────────────────────────
           if (type == 'VIDEO' && estActive) ...[
             SizedBox(
